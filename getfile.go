@@ -11,7 +11,10 @@ import (
 
 var log = logging.MustGetLogger("getfile")
 
+var success = &RelationshipImpl{"success", "All files are routed to success"}
+
 type GetFile struct {
+	readDir        func(string) ([]os.FileInfo, error)
 	recursive      bool
 	minSize        int64
 	maxSize        int64
@@ -21,54 +24,26 @@ type GetFile struct {
 	keepSourceFile bool
 }
 
+func NewGetFile() *GetFile {
+	return &GetFile{readDir: ioutil.ReadDir}
+}
+
 func (getFile *GetFile) OnTrigger(context ProcessContext, session ProcessSession) error {
 	files, err := getFile.performListing("/tmp/mgo")
 	if err != nil {
 		return err
 	}
 	for fileName := range files {
-		file := getFile.open(fileName)
-		if file == nil {
-			continue
-		}
-		deleteName := fileName
-		defer func() {
-			file.Close()
-			if !getFile.keepSourceFile {
-				err := os.Remove(deleteName)
-				if err != nil {
-					log.Error("Unable to delete " + deleteName + " even though we could open it read/write. (" + err.Error() + ")")
-				}
-			}
-		}()
 		attributes := make(map[string]string)
 		attributes["filename"] = filepath.Base(fileName)
 		attributes["path"] = filepath.Dir(fileName)
 		attributes["absolute.path"] = fileName
 		var flowFile = session.Create()
 		flowFile = session.PutAllAttributes(flowFile, attributes)
-		flowFile = session.ImportFrom(file, flowFile)
-		//session.transfer(flowFile
+		flowFile = session.ImportFrom(fileName, getFile.keepSourceFile, flowFile)
+		session.Transfer(flowFile, success)
 	}
 	return nil
-}
-
-func (getFile *GetFile) open(fileName string) *os.File {
-	if getFile.keepSourceFile {
-		file, err := os.Open(fileName)
-		if err != nil {
-			log.Warning("Unable to open file for reading: " + fileName + " (" + err.Error() + ")")
-			return nil
-		}
-		return file
-	} else {
-		file, err := os.OpenFile(fileName, os.O_RDWR, 0600)
-		if err != nil {
-			log.Warning("Unable to open file for read/write: " + fileName + " (" + err.Error() + ")")
-			return nil
-		}
-		return file
-	}
 }
 
 func (getFile *GetFile) performListing(dir string) (chan string, error) {
@@ -85,7 +60,7 @@ func (getFile *GetFile) performListing(dir string) (chan string, error) {
 }
 
 func (getFile *GetFile) doPerformListing(absoluteDirectory string, files chan string) {
-	dirFiles, err := ioutil.ReadDir(absoluteDirectory)
+	dirFiles, err := getFile.readDir(absoluteDirectory)
 	if err != nil {
 		log.Warning("Unable to read directory: " + absoluteDirectory + " (" + err.Error() + ")")
 		return

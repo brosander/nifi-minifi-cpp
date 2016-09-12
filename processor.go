@@ -1,14 +1,13 @@
 package main
 
-import "os"
-
 type ProcessContext interface {
 }
 
 type ProcessSession interface {
 	Create() FlowFile
-	ImportFrom(file *os.File, destination FlowFile) FlowFile
+	ImportFrom(fileName string, keepSourceFile bool, destination FlowFile) FlowFile
 	PutAllAttributes(flowFile FlowFile, attributes map[string]string) FlowFile
+	Transfer(flowFile FlowFile, relationship Relationship)
 }
 
 type Processor interface {
