@@ -1,4 +1,4 @@
 package main
 
-type FlowFileRecord interface {
+type FlowFile interface {
 }

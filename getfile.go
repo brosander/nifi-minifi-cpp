@@ -21,7 +21,7 @@ type GetFile struct {
 	keepSourceFile bool
 }
 
-func (getFile *GetFile) OnTrigger(context *ProcessContext, session *ProcessSession) error {
+func (getFile *GetFile) OnTrigger(context ProcessContext, session ProcessSession) error {
 	files, err := getFile.performListing("/tmp/mgo")
 	if err != nil {
 		return err
@@ -41,6 +41,14 @@ func (getFile *GetFile) OnTrigger(context *ProcessContext, session *ProcessSessi
 				}
 			}
 		}()
+		attributes := make(map[string]string)
+		attributes["filename"] = filepath.Base(fileName)
+		attributes["path"] = filepath.Dir(fileName)
+		attributes["absolute.path"] = fileName
+		var flowFile = session.Create()
+		flowFile = session.PutAllAttributes(flowFile, attributes)
+		flowFile = session.ImportFrom(file, flowFile)
+		//session.transfer(flowFile
 	}
 	return nil
 }
