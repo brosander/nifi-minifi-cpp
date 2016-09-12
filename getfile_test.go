@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/apache/gominifi/api/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -59,9 +60,9 @@ func TestAverage(t *testing.T) {
 	getFile.readDir = MockReadDir(t, map[string][]os.FileInfo{
 		"/tmp/mgo": []os.FileInfo{mockFile},
 	})
-	testProcessContext := new(MockProcessContext)
-	testProcessSession := new(MockProcessSession)
-	flowFile := new(MockFlowFile)
+	testProcessContext := new(mocks.ProcessContext)
+	testProcessSession := new(mocks.ProcessSession)
+	flowFile := new(mocks.FlowFile)
 	testProcessSession.On("Create").Return(flowFile)
 	testProcessSession.On("PutAllAttributes", flowFile, mock.AnythingOfType("map[string]string")).Return(flowFile)
 	testProcessSession.On("ImportFrom", "/tmp/mgo/testFile", false, flowFile).Return(flowFile)

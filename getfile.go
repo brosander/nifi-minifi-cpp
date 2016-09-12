@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/apache/gominifi/api"
 	"github.com/op/go-logging"
 )
 
@@ -28,7 +29,7 @@ func NewGetFile() *GetFile {
 	return &GetFile{readDir: ioutil.ReadDir}
 }
 
-func (getFile *GetFile) OnTrigger(context ProcessContext, session ProcessSession) error {
+func (getFile *GetFile) OnTrigger(context api.ProcessContext, session api.ProcessSession) error {
 	files, err := getFile.performListing("/tmp/mgo")
 	if err != nil {
 		return err

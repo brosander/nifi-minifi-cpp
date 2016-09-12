@@ -1,4 +1,4 @@
-package main
+package api
 
 type Connection interface {
 	Name() string
