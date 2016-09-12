@@ -10,6 +10,10 @@ type RelationshipImpl struct {
 	description string
 }
 
+func NewRelationship(name string, description string) Relationship {
+	return &RelationshipImpl{name, description}
+}
+
 func (relationship *RelationshipImpl) Name() string {
 	return relationship.name
 }

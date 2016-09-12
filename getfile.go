@@ -12,7 +12,7 @@ import (
 
 var log = logging.MustGetLogger("getfile")
 
-var success = &RelationshipImpl{"success", "All files are routed to success"}
+var success = api.NewRelationship("success", "All files are routed to success")
 
 type GetFile struct {
 	readDir        func(string) ([]os.FileInfo, error)
