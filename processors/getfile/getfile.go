@@ -18,9 +18,8 @@ var supportedProperties = []api.Property{}
 var supportedRelationships = []api.Relationship{success}
 
 type GetFile struct {
-	name           string
-	id             string
-	isRunning      bool
+	api.BaseProcessor
+
 	directory      string
 	recursive      bool
 	minSize        int64
@@ -34,31 +33,11 @@ type GetFile struct {
 }
 
 func NewGetFile(name string, id string) *GetFile {
-	return &GetFile{
-		name:    name,
-		id:      id,
-		readDir: ioutil.ReadDir,
+	result := &GetFile{
+		BaseProcessor: *api.NewBaseProcessor(name, id),
+		readDir:       ioutil.ReadDir,
 	}
-}
-
-func (getFile *GetFile) Name() string {
-	return getFile.name
-}
-
-func (getFile *GetFile) Id() string {
-	return getFile.id
-}
-
-func (getFile *GetFile) IsRunning() bool {
-	return getFile.isRunning
-}
-
-func (getFile *GetFile) SupportedProperties() []api.Property {
-	return supportedProperties
-}
-
-func (getFile *GetFile) SupportedRelationships() []api.Relationship {
-	return supportedRelationships
+	return result
 }
 
 func (getFile *GetFile) OnTrigger(context api.ProcessContext, session api.ProcessSession) error {
