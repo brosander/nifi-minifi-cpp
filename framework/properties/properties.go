@@ -5,11 +5,24 @@ import (
 	"bytes"
 	"io"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
+	//"time"
 
 	"github.com/apache/gominifi/api"
 )
+
+var nanos = strings.Join([]string{"ns", "nano", "nanos", "nanoseconds"}, "|")
+var millis = strings.Join([]string{"ms", "milli", "millis", "milliseconds"}, "|")
+var seconds = strings.Join([]string{"s", "sec", "secs", "second", "seconds"}, "|")
+var minutes = strings.Join([]string{"m", "min", "mins", "minute", "minutes"}, "|")
+var hours = strings.Join([]string{"h", "hr", "hrs", "hour", "hours"}, "|")
+var days = strings.Join([]string{"d", "day", "days"}, "|")
+var weeks = strings.Join([]string{"w", "wk", "wks", "week", "weeks"}, "|")
+
+var validTimeUnits = strings.Join([]string{nanos, millis, seconds, minutes, hours, days, weeks}, "|")
+var validTimeRegex = regexp.MustCompile(`(\d+)\s*(` + validTimeUnits + ")")
 
 func ReadProps(r io.Reader) map[string]string {
 	var result = make(map[string]string)
@@ -63,6 +76,10 @@ func (p *PropertyValueImpl) AsBool() bool {
 	}
 	return result
 }
+
+/*func (p *PropertyValueImpl) AsTimePeriod() time.Duration {
+	return p.val
+}*/
 
 // Verify PropertyValue is implemented
 var _ api.PropertyValue = (*PropertyValueImpl)(nil)

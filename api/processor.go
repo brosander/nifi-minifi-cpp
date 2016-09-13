@@ -1,5 +1,9 @@
 package api
 
+import (
+//	"time"
+)
+
 type Property struct {
 	Name         string
 	Description  string
@@ -9,6 +13,7 @@ type Property struct {
 type PropertyValue interface {
 	AsString() string
 	AsBool() bool
+	//AsTime() time.Time
 }
 
 type ProcessContext interface {
