@@ -6,7 +6,12 @@ type Property struct {
 	DefaultValue string
 }
 
+type PropertyValue interface {
+	AsString() string
+}
+
 type ProcessContext interface {
+	GetPropertyValue(property *Property) PropertyValue
 }
 
 type ProcessSession interface {
