@@ -57,6 +57,6 @@ func (_m *ProcessSession) PutAllAttributes(flowFile api.FlowFile, attributes map
 }
 
 // Transfer provides a mock function with given fields: flowFile, relationship
-func (_m *ProcessSession) Transfer(flowFile api.FlowFile, relationship api.Relationship) {
+func (_m *ProcessSession) Transfer(flowFile api.FlowFile, relationship *api.Relationship) {
 	_m.Called(flowFile, relationship)
 }

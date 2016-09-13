@@ -12,10 +12,10 @@ import (
 
 var log = logging.MustGetLogger("getfile")
 
-var success = api.NewRelationship("success", "All files are routed to success")
+var success = &api.Relationship{"success", "All files are routed to success"}
 
-var supportedProperties = []api.Property{}
-var supportedRelationships = []api.Relationship{success}
+var supportedProperties = []*api.Property{}
+var supportedRelationships = []*api.Relationship{success}
 
 type GetFile struct {
 	api.BaseProcessor
@@ -34,8 +34,12 @@ type GetFile struct {
 
 func NewGetFile(name string, id string) *GetFile {
 	result := &GetFile{
-		BaseProcessor: *api.NewBaseProcessor(name, id),
-		readDir:       ioutil.ReadDir,
+		BaseProcessor: *api.NewBaseProcessor(name,
+			id,
+			supportedProperties,
+			supportedRelationships,
+		),
+		readDir: ioutil.ReadDir,
 	}
 	return result
 }

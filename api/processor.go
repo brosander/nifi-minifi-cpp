@@ -13,27 +13,27 @@ type ProcessSession interface {
 	Create() FlowFile
 	ImportFrom(fileName string, keepSourceFile bool, destination FlowFile) FlowFile
 	PutAllAttributes(flowFile FlowFile, attributes map[string]string) FlowFile
-	Transfer(flowFile FlowFile, relationship Relationship)
+	Transfer(flowFile FlowFile, relationship *Relationship)
 }
 
 type Processor interface {
 	Name() string
 	Id() string
 	IsRunning() bool
-	SupportedProperties() []Property
-	SupportedRelationships() []Relationship
+	SupportedProperties() []*Property
+	SupportedRelationships() []*Relationship
 }
 
 type BaseProcessor struct {
 	name                   string
 	id                     string
 	isRunning              bool
-	supportedProperties    []Property
-	supportedRelationships []Relationship
+	supportedProperties    []*Property
+	supportedRelationships []*Relationship
 }
 
-func NewBaseProcessor(name string, id string) *BaseProcessor {
-	return &BaseProcessor{name: name, id: id}
+func NewBaseProcessor(name string, id string, supportedProperties []*Property, supportedRelationships []*Relationship) *BaseProcessor {
+	return &BaseProcessor{name: name, id: id, supportedProperties: supportedProperties, supportedRelationships: supportedRelationships}
 }
 
 func (b *BaseProcessor) Name() string {
@@ -48,10 +48,10 @@ func (b *BaseProcessor) IsRunning() bool {
 	return b.isRunning
 }
 
-func (b *BaseProcessor) SupportedProperties() []Property {
+func (b *BaseProcessor) SupportedProperties() []*Property {
 	return b.supportedProperties
 }
 
-func (b *BaseProcessor) SupportedRelationships() []Relationship {
+func (b *BaseProcessor) SupportedRelationships() []*Relationship {
 	return b.supportedRelationships
 }
