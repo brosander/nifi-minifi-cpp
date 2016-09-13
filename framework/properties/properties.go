@@ -1,4 +1,4 @@
-package api
+package properties
 
 import (
 	"bufio"
