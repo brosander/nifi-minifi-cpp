@@ -14,7 +14,13 @@ var log = logging.MustGetLogger("getfile")
 
 var success = api.NewRelationship("success", "All files are routed to success")
 
+var supportedProperties = []api.Property{}
+var supportedRelationships = []api.Relationship{success}
+
 type GetFile struct {
+	name           string
+	id             string
+	isRunning      bool
 	directory      string
 	recursive      bool
 	minSize        int64
@@ -27,10 +33,32 @@ type GetFile struct {
 	readDir func(string) ([]os.FileInfo, error)
 }
 
-func NewGetFile() *GetFile {
+func NewGetFile(name string, id string) *GetFile {
 	return &GetFile{
+		name:    name,
+		id:      id,
 		readDir: ioutil.ReadDir,
 	}
+}
+
+func (getFile *GetFile) Name() string {
+	return getFile.name
+}
+
+func (getFile *GetFile) Id() string {
+	return getFile.id
+}
+
+func (getFile *GetFile) IsRunning() bool {
+	return getFile.isRunning
+}
+
+func (getFile *GetFile) SupportedProperties() []api.Property {
+	return supportedProperties
+}
+
+func (getFile *GetFile) SupportedRelationships() []api.Relationship {
+	return supportedRelationships
 }
 
 func (getFile *GetFile) OnTrigger(context api.ProcessContext, session api.ProcessSession) error {
@@ -99,3 +127,6 @@ func (getFile *GetFile) acceptFile(absolutePath string, file os.FileInfo) bool {
 	}
 	return true
 }
+
+// Verify that Processor interface is implemented
+var _ api.Processor = (*GetFile)(nil)

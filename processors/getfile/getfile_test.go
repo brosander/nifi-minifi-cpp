@@ -53,7 +53,7 @@ func (m *MockFileInfo) Sys() interface{} {
 }
 
 func TestAverage(t *testing.T) {
-	getFile := NewGetFile()
+	getFile := NewGetFile("testGetFile", "abcd")
 	mockFile := new(MockFileInfo)
 	mockFile.On("IsDir").Return(false)
 	mockFile.On("Name").Return("testFile")
