@@ -5,7 +5,10 @@ import (
 	"bytes"
 	"io"
 	"os"
+	"strconv"
 	"strings"
+
+	"github.com/apache/gominifi/api"
 )
 
 func ReadProps(r io.Reader) map[string]string {
@@ -40,3 +43,26 @@ func ReadPropsFile(fileName string) (map[string]string, error) {
 
 	return ReadProps(propsFile), nil
 }
+
+type PropertyValueImpl struct {
+	val string
+}
+
+func NewPropertyValue(val string) *PropertyValueImpl {
+	return &PropertyValueImpl{val: val}
+}
+
+func (p *PropertyValueImpl) AsString() string {
+	return p.val
+}
+
+func (p *PropertyValueImpl) AsBool() bool {
+	result, err := strconv.ParseBool(p.val)
+	if err != nil {
+		return false
+	}
+	return result
+}
+
+// Verify PropertyValue is implemented
+var _ api.PropertyValue = (*PropertyValueImpl)(nil)

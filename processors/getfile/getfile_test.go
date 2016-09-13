@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	apiMocks "github.com/apache/gominifi/api/mocks"
-	"github.com/apache/gominifi/framework/processor"
+	"github.com/apache/gominifi/framework/properties"
 	"github.com/apache/gominifi/processors/getfile/mocks"
 	"github.com/stretchr/testify/mock"
 )
@@ -22,7 +22,8 @@ func TestSingleFile(t *testing.T) {
 	})
 
 	testProcessContext := new(apiMocks.ProcessContext)
-	testProcessContext.On("GetPropertyValue", inputDirectory).Return(processor.NewPropertyValue("/tmp/mgo"))
+	testProcessContext.On("GetPropertyValue", inputDirectory).Return(properties.NewPropertyValue("/tmp/mgo"))
+	testProcessContext.On("GetPropertyValue", recursive).Return(properties.NewPropertyValue("false"))
 	testProcessSession := new(apiMocks.ProcessSession)
 	flowFile := new(apiMocks.FlowFile)
 	testProcessSession.On("Create").Return(flowFile)

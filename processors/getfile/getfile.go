@@ -21,9 +21,9 @@ var minAge = &api.Property{"Minimum File Age", "The maximum age that a file must
 var maxSize = &api.Property{"Maximum File Size", "The maximum size that a file can be in order to be pulled", "0 B"}
 var minSize = &api.Property{"Minimum File Size", "The minimum size that a file must be in order to be pulled", "0 B"}
 var pollInterval = &api.Property{"Polling Interval", "Indicates how long to wait before performing a directory listing", "0 sec"}
-var recurse = &api.Property{"Recurse Subdirectories", "Indicates whether or not to pull files from subdirectories", "true"}
+var recursive = &api.Property{"Recurse Subdirectories", "Indicates whether or not to pull files from subdirectories", "true"}
 
-var supportedProperties = []*api.Property{batchSize, inputDirectory, ignoreHidden, keepSource, maxAge, minAge, maxSize, minSize, pollInterval, recurse}
+var supportedProperties = []*api.Property{batchSize, inputDirectory, ignoreHidden, keepSource, maxAge, minAge, maxSize, minSize, pollInterval, recursive}
 
 var success = &api.Relationship{"success", "All files are routed to success"}
 
@@ -58,6 +58,7 @@ func NewGetFile(name string, id string) *GetFile {
 }
 
 func (getFile *GetFile) OnTrigger(context api.ProcessContext, session api.ProcessSession) error {
+	getFile.recursive = context.GetPropertyValue(recursive).AsBool()
 	files, err := getFile.performListing(context.GetPropertyValue(inputDirectory).AsString())
 	if err != nil {
 		return err

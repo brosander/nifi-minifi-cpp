@@ -8,6 +8,7 @@ type Property struct {
 
 type PropertyValue interface {
 	AsString() string
+	AsBool() bool
 }
 
 type ProcessContext interface {
