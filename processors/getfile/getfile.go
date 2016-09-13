@@ -1,4 +1,4 @@
-package processors
+package getfile
 
 import (
 	"io/ioutil"
@@ -15,7 +15,7 @@ var log = logging.MustGetLogger("getfile")
 var success = api.NewRelationship("success", "All files are routed to success")
 
 type GetFile struct {
-	readDir        func(string) ([]os.FileInfo, error)
+	directory      string
 	recursive      bool
 	minSize        int64
 	maxSize        int64
@@ -23,10 +23,14 @@ type GetFile struct {
 	maxAge         time.Time
 	ignoreHidden   bool
 	keepSourceFile bool
+
+	readDir func(string) ([]os.FileInfo, error)
 }
 
 func NewGetFile() *GetFile {
-	return &GetFile{readDir: ioutil.ReadDir}
+	return &GetFile{
+		readDir: ioutil.ReadDir,
+	}
 }
 
 func (getFile *GetFile) OnTrigger(context api.ProcessContext, session api.ProcessSession) error {

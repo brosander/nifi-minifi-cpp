@@ -1,5 +1,11 @@
 package api
 
+type Property struct {
+	Name         string
+	Description  string
+	DefaultValue string
+}
+
 type ProcessContext interface {
 }
 
