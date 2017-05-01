@@ -63,27 +63,6 @@ class StreamFactory {
  public:
 
   /**
-   * Build an instance, creating a memory fence, which
-   * allows us to avoid locking. This is tantamount to double checked locking.
-   * @returns new StreamFactory;
-   */
-  static StreamFactory *getInstance() {
-    StreamFactory* atomic_context = context_instance_.load(
-        std::memory_order_relaxed);
-    std::atomic_thread_fence(std::memory_order_acquire);
-    if (atomic_context == nullptr) {
-      std::lock_guard<std::mutex> lock(context_mutex_);
-      atomic_context = context_instance_.load(std::memory_order_relaxed);
-      if (atomic_context == nullptr) {
-        atomic_context = new StreamFactory();
-        std::atomic_thread_fence(std::memory_order_release);
-        context_instance_.store(atomic_context, std::memory_order_relaxed);
-      }
-    }
-    return atomic_context;
-  }
-
-  /**
    * Creates a socket and returns a unique ptr
    *
    */
@@ -92,11 +71,25 @@ class StreamFactory {
     Socket *socket = 0;
 
     if (is_secure_) {
+#ifdef OPENSSL_SUPPORT
       socket = createSocket<TLSSocket>(host, port);
+#endif
+#ifndef OPENSSL_SUPPORT
+      throw std::invalid_argument( "MiNiFi CPP compiled without tls support." );
+#endif
     } else {
       socket = createSocket<Socket>(host, port);
     }
     return std::unique_ptr<Socket>(socket);
+  }
+
+  StreamFactory(std::shared_ptr<Configure> configure) {
+    std::string secureStr;
+    is_secure_ = false;
+    if (configure->get(Configure::nifi_remote_input_secure, secureStr)) {
+      org::apache::nifi::minifi::utils::StringUtils::StringToBool(secureStr,
+                                                                  is_secure_);
+    }
   }
 
  protected:
@@ -111,21 +104,9 @@ class StreamFactory {
     return creator.create(host, port);
   }
 
-  StreamFactory()
-      : configure_(Configure::getConfigure()) {
-    std::string secureStr;
-    is_secure_ = false;
-    if (configure_->get(Configure::nifi_remote_input_secure, secureStr)) {
-      org::apache::nifi::minifi::utils::StringUtils::StringToBool(secureStr,
-                                                                  is_secure_);
-    }
-  }
-
   bool is_secure_;
   static std::atomic<StreamFactory*> context_instance_;
   static std::mutex context_mutex_;
-
-  Configure *configure_;
 };
 
 } /* namespace io */

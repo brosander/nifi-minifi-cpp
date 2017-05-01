@@ -42,29 +42,8 @@ namespace io {
 class TLSContext {
 
  public:
-
-  /**
-   * Build an instance, creating a memory fence, which
-   * allows us to avoid locking. This is tantamount to double checked locking.
-   * @returns new TLSContext;
-   */
-  static TLSContext *getInstance() {
-    TLSContext* atomic_context = context_instance.load(
-        std::memory_order_relaxed);
-    std::atomic_thread_fence(std::memory_order_acquire);
-    if (atomic_context == nullptr) {
-      std::lock_guard<std::mutex> lock(context_mutex);
-      atomic_context = context_instance.load(std::memory_order_relaxed);
-      if (atomic_context == nullptr) {
-        atomic_context = new TLSContext();
-        atomic_context->initialize();
-        std::atomic_thread_fence(std::memory_order_release);
-        context_instance.store(atomic_context, std::memory_order_relaxed);
-      }
-    }
-    return atomic_context;
-  }
-
+  TLSContext(std::shared_ptr<Configure> configure);
+  
   virtual ~TLSContext() {
     if (0 != ctx)
       SSL_CTX_free(ctx);
@@ -82,10 +61,10 @@ class TLSContext {
 
  private:
 
-  static int pemPassWordCb(char *buf, int size, int rwflag, void *userdata) {
+  static int pemPassWordCb(char *buf, int size, int rwflag, void *configure) {
     std::string passphrase;
 
-    if (Configure::getConfigure()->get(
+    if (static_cast<Configure*>(configure)->get(
         Configure::nifi_security_client_pass_phrase, passphrase)) {
 
       std::ifstream file(passphrase.c_str(), std::ifstream::in);
@@ -106,10 +85,9 @@ class TLSContext {
     return 0;
   }
 
-  TLSContext();
 
   std::shared_ptr<logging::Logger> logger_;
-  Configure *configuration;
+  std::shared_ptr<Configure> configure_;
   SSL_CTX *ctx;
 
   int16_t error_value;
@@ -150,7 +128,7 @@ class TLSSocket : public Socket {
    * Initializes the socket
    * @return result of the creation operation.
    */
-  int16_t initialize();
+  int16_t initialize(TLSContext *context);
 
   /**
    * Attempt to select the socket file descriptor

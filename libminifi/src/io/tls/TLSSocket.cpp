@@ -15,12 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "io/tls/TLSSocket.h"
 #include <openssl/ssl.h>
 #include <openssl/err.h>
+#include <memory>
 #include <utility>
 #include <string>
 #include <vector>
+#include "io/tls/TLSSocket.h"
 #include "properties/Configure.h"
 #include "utils/StringUtils.h"
 #include "core/Property.h"
@@ -34,11 +35,11 @@ namespace io {
 std::atomic<TLSContext*> TLSContext::context_instance;
 std::mutex TLSContext::context_mutex;
 
-TLSContext::TLSContext()
+TLSContext::TLSContext(std::shared_ptr<Configure> configure)
     : error_value(0),
       ctx(0),
       logger_(logging::Logger::getLogger()),
-      configuration(Configure::getConfigure()) {
+      configure_(configure) {
 }
 /**
  * The memory barrier is defined by the singleton
@@ -49,7 +50,7 @@ int16_t TLSContext::initialize() {
   }
   std::string clientAuthStr;
   bool needClientCert = true;
-  if (!(configuration->get(Configure::nifi_security_need_ClientAuth,
+  if (!(configure_->get(Configure::nifi_security_need_ClientAuth,
                            clientAuthStr)
       && org::apache::nifi::minifi::utils::StringUtils::StringToBool(
           clientAuthStr, needClientCert))) {
@@ -75,9 +76,9 @@ int16_t TLSContext::initialize() {
     std::string passphrase;
     std::string caCertificate;
 
-    if (!(configuration->get(Configure::nifi_security_client_certificate,
+    if (!(configure_->get(Configure::nifi_security_client_certificate,
                              certificate)
-        && configuration->get(Configure::nifi_security_client_private_key,
+        && configure_->get(Configure::nifi_security_client_private_key,
                               privatekey))) {
       logger_->log_error(
           "Certificate and Private Key PEM file not configured, error: %s.",
@@ -93,10 +94,11 @@ int16_t TLSContext::initialize() {
       error_value = TLS_ERROR_CERT_MISSING;
       return error_value;
     }
-    if (configuration->get(Configure::nifi_security_client_pass_phrase,
+    if (configure_->get(Configure::nifi_security_client_pass_phrase,
                            passphrase)) {
       // if the private key has passphase
       SSL_CTX_set_default_passwd_cb(ctx, pemPassWordCb);
+      SSL_CTX_set_default_passwd_cb_userdata(ctx, static_cast<void*>(configure_.get()));
     }
 
     int retp = SSL_CTX_use_PrivateKey_file(ctx, privatekey.c_str(),
@@ -117,7 +119,7 @@ int16_t TLSContext::initialize() {
       return error_value;
     }
     // load CA certificates
-    if (configuration->get(Configure::nifi_security_client_ca_certificate,
+    if (configure_->get(Configure::nifi_security_client_ca_certificate,
                            caCertificate)) {
       retp = SSL_CTX_load_verify_locations(ctx, caCertificate.c_str(), 0);
       if (retp == 0) {
@@ -160,8 +162,7 @@ TLSSocket::TLSSocket(const TLSSocket &&d)
       ssl(0) {
 }
 
-int16_t TLSSocket::initialize() {
-  TLSContext *context = TLSContext::getInstance();
+int16_t TLSSocket::initialize(TLSContext *context) {
   int16_t ret = context->initialize();
   Socket::initialize();
   if (!ret) {
