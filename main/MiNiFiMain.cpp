@@ -160,7 +160,7 @@ int main(int argc, char **argv) {
   // Create repos for flow record and provenance
   std::shared_ptr<core::Repository> prov_repo = core::createRepository(
       prov_repo_class, true);
-  prov_repo->initialize();
+  prov_repo->initialize(configure);
 
   configure->get(minifi::Configure::nifi_flow_repository_class_name,
                  flow_repo_class);
@@ -168,7 +168,7 @@ int main(int argc, char **argv) {
   std::shared_ptr<core::Repository> flow_repo = core::createRepository(
       flow_repo_class, true);
 
-  flow_repo->initialize();
+  flow_repo->initialize(configure);
 
   configure->get(minifi::Configure::nifi_configuration_class_name,
                  nifi_configuration_class_name);

@@ -112,7 +112,6 @@ class Configure {
   std::shared_ptr<logging::Logger> logger_;
   // Home location for this executable
   std::string minifi_home_;
-  static Configure *configure_;
 
  protected:
   std::map<std::string, std::string> properties_;

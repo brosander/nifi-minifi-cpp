@@ -71,7 +71,7 @@ class Repository : public CoreComponent {
   }
 
   // initialize
-  virtual bool initialize() {
+  virtual bool initialize(std::shared_ptr<Configure> configure) {
     return true;
   }
   // Put
