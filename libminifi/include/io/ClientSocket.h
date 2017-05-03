@@ -37,6 +37,10 @@ namespace nifi {
 namespace minifi {
 namespace io {
 
+/**
+ * Context class for socket. This is currently only used as a parent class for TLSContext.  It is necessary so the Socket and TLSSocket constructors
+ * can be the same.  It also gives us a common place to set timeouts, etc from the Configure object in the future.
+ */ 
 class SocketContext {
  public:
   SocketContext(std::shared_ptr<Configure> configure) {}
