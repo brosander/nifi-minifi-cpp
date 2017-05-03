@@ -22,10 +22,6 @@
 #include "utils/StringUtils.h"
 #include "validation.h"
 
-#ifdef OPENSSL_SUPPORT
-#include "tls/TLSSocket.h"
-#endif
-
 namespace org {
 namespace apache {
 namespace nifi {
@@ -35,52 +31,6 @@ namespace io {
 class AbstractStreamFactory {
  public:
   virtual std::unique_ptr<Socket> createSocket(const std::string &host, const uint16_t port) = 0;
-};
-
-/**
- * Purpose: Socket Creator is a class that will determine if the provided socket type
- * exists per the compilation parameters
- */
-
-template<typename T, typename V>
-class SocketCreator : public AbstractStreamFactory {
-
-  template<bool cond, typename U>
-  using TypeCheck = typename std::enable_if< cond, U >::type;
-  
-  template<bool cond, typename Q>
-  using ContextTypeCheck = typename std::enable_if< cond, Q >::type;
-
- public:
-  template<typename Q = V>
-  ContextTypeCheck<true, std::shared_ptr<Q>> create(std::shared_ptr<Configure> configure) {
-    return std::make_shared<V>(configure);
-  }
-  template<typename Q = V>
-  ContextTypeCheck<false, std::shared_ptr<Q>> create(std::shared_ptr<Configure> configure) {
-    return std::make_shared<SocketContext>(configure);
-  }
-  
-  SocketCreator<T, V>(std::shared_ptr<Configure> configure) {
-    context_ = create(configure);
-  }
-  
-  template<typename U = T>
-  TypeCheck<true, U> *create(const std::string &host, const uint16_t port) {
-    return new T(context_, host, port);
-  }
-  template<typename U = T>
-  TypeCheck<false, U> *create(const std::string &host, const uint16_t port) {
-    return new Socket(context_, host, port);
-  }
-  
-  std::unique_ptr<Socket> createSocket(const std::string &host, const uint16_t port) {
-    T *socket = create(host, port);
-    return std::unique_ptr<Socket>(socket);
-  }
-
- private:
-  std::shared_ptr<V> context_;
 };
 
 /**
@@ -100,16 +50,7 @@ class StreamFactory {
     return delegate_->createSocket(host, port);
   }
 
-  StreamFactory(std::shared_ptr<Configure> configure) {
-    std::string secureStr;
-    bool is_secure = false;
-    if (configure->get(Configure::nifi_remote_input_secure, secureStr)) {
-      org::apache::nifi::minifi::utils::StringUtils::StringToBool(secureStr, is_secure);
-      delegate_ = std::make_shared<SocketCreator<TLSSocket, TLSContext>>(configure);
-    } else {
-      delegate_ = std::make_shared<SocketCreator<Socket, SocketContext>>(configure);
-    }
-  }
+  StreamFactory(std::shared_ptr<Configure> configure);
 
  protected:
   std::shared_ptr<AbstractStreamFactory> delegate_;
