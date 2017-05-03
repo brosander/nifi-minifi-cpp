@@ -17,7 +17,6 @@
  */
 #include <openssl/ssl.h>
 #include <openssl/err.h>
-#include <memory>
 #include <utility>
 #include <string>
 #include <vector>
@@ -32,11 +31,8 @@ namespace nifi {
 namespace minifi {
 namespace io {
 
-std::atomic<TLSContext*> TLSContext::context_instance;
-std::mutex TLSContext::context_mutex;
-
 TLSContext::TLSContext(std::shared_ptr<Configure> configure)
-    : error_value(0),
+    : SocketContext(configure), error_value(0),
       ctx(0),
       logger_(logging::Logger::getLogger()),
       configure_(configure) {
@@ -146,28 +142,31 @@ TLSSocket::~TLSSocket() {
  * @param port connecting port
  * @param listeners number of listeners in the queue
  */
-TLSSocket::TLSSocket(const std::string &hostname, const uint16_t port,
+TLSSocket::TLSSocket(std::shared_ptr<TLSContext> context, const std::string &hostname, const uint16_t port,
                      const uint16_t listeners)
-    : Socket(hostname, port, listeners),
+    : Socket(context, hostname, port, listeners),
       ssl(0) {
+        context_ = context;
 }
 
-TLSSocket::TLSSocket(const std::string &hostname, const uint16_t port)
-    : Socket(hostname, port, 0),
+TLSSocket::TLSSocket(std::shared_ptr<TLSContext> context, const std::string &hostname, const uint16_t port)
+    : Socket(context, hostname, port, 0),
       ssl(0) {
+        context_ = context;
 }
 
 TLSSocket::TLSSocket(const TLSSocket &&d)
     : Socket(std::move(d)),
       ssl(0) {
+        context_ = d.context_;
 }
 
-int16_t TLSSocket::initialize(TLSContext *context) {
-  int16_t ret = context->initialize();
+int16_t TLSSocket::initialize() {
+  int16_t ret = context_->initialize();
   Socket::initialize();
   if (!ret) {
     // we have s2s secure config
-    ssl = SSL_new(context->getContext());
+    ssl = SSL_new(context_->getContext());
     SSL_set_fd(ssl, socket_file_descriptor_);
     if (SSL_connect(ssl) == -1) {
       logger_->log_error("SSL socket connect failed to %s %d",

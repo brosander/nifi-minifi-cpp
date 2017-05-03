@@ -25,8 +25,8 @@ namespace nifi {
 namespace minifi {
 namespace io {
 
-std::atomic<StreamFactory*> StreamFactory::context_instance_;
-std::mutex StreamFactory::context_mutex_;
+// std::atomic<StreamFactory*> StreamFactory::context_instance_;
+// std::mutex StreamFactory::context_mutex_;
 
 } /* namespace io */
 } /* namespace minifi */

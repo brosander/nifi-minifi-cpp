@@ -21,8 +21,6 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <cstdint>
-#include <atomic>
-#include <mutex>
 #include "../ClientSocket.h"
 
 #include "properties/Configure.h"
@@ -39,7 +37,7 @@ namespace io {
 #define TLS_ERROR_KEY_ERROR 4
 #define TLS_ERROR_CERT_ERROR 5
 
-class TLSContext {
+class TLSContext: public SocketContext {
 
  public:
   TLSContext(std::shared_ptr<Configure> configure);
@@ -91,10 +89,6 @@ class TLSContext {
   SSL_CTX *ctx;
 
   int16_t error_value;
-
-  static std::atomic<TLSContext*> context_instance;
-  static std::mutex context_mutex;
-
 };
 
 class TLSSocket : public Socket {
@@ -107,7 +101,7 @@ class TLSSocket : public Socket {
    * @param port connecting port
    * @param listeners number of listeners in the queue
    */
-  explicit TLSSocket(const std::string &hostname, const uint16_t port,
+  explicit TLSSocket(std::shared_ptr<TLSContext> context, const std::string &hostname, const uint16_t port,
                      const uint16_t listeners);
 
   /**
@@ -115,7 +109,7 @@ class TLSSocket : public Socket {
    * @param hostname hostname we are connecting to.
    * @param port port we are connecting to.
    */
-  explicit TLSSocket(const std::string &hostname, const uint16_t port);
+  explicit TLSSocket(std::shared_ptr<TLSContext> context, const std::string &hostname, const uint16_t port);
 
   /**
    * Move constructor.
@@ -128,7 +122,7 @@ class TLSSocket : public Socket {
    * Initializes the socket
    * @return result of the creation operation.
    */
-  int16_t initialize(TLSContext *context);
+  int16_t initialize();
 
   /**
    * Attempt to select the socket file descriptor
@@ -161,7 +155,7 @@ class TLSSocket : public Socket {
   int writeData(uint8_t *value, int size);
 
  protected:
-
+  std::shared_ptr<TLSContext> context_;
   SSL* ssl;
 
 };
