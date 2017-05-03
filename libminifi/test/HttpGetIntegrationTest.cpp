@@ -35,6 +35,7 @@
 #include "../include/FlowController.h"
 #include "../include/properties/Configure.h"
 #include "unit/ProvenanceTestHelper.h"
+#include "../include/io/StreamFactory.h"
 
 std::string test_file_location;
 
