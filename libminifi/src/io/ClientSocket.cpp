@@ -24,6 +24,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <cstdio>
+#include <memory>
 #include <utility>
 #include <vector>
 #include <cerrno>

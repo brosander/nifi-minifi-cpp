@@ -17,7 +17,9 @@
  */
 #include "io/StreamFactory.h"
 #include <atomic>
+#include <memory>
 #include <mutex>
+#include <string>
 
 #ifdef OPENSSL_SUPPORT
 #include "io/tls/TLSSocket.h"
@@ -37,10 +39,9 @@ namespace io {
 
 template<typename T, typename V>
 class SocketCreator : public AbstractStreamFactory {
-
   template<bool cond, typename U>
   using TypeCheck = typename std::enable_if< cond, U >::type;
-  
+
   template<bool cond, typename Q>
   using ContextTypeCheck = typename std::enable_if< cond, Q >::type;
 
@@ -53,11 +54,11 @@ class SocketCreator : public AbstractStreamFactory {
   ContextTypeCheck<false, std::shared_ptr<Q>> create(std::shared_ptr<Configure> configure) {
     return std::make_shared<SocketContext>(configure);
   }
-  
+
   SocketCreator<T, V>(std::shared_ptr<Configure> configure) {
     context_ = create(configure);
   }
-  
+
   template<typename U = T>
   TypeCheck<true, U> *create(const std::string &host, const uint16_t port) {
     return new T(context_, host, port);
@@ -66,7 +67,7 @@ class SocketCreator : public AbstractStreamFactory {
   TypeCheck<false, U> *create(const std::string &host, const uint16_t port) {
     return new Socket(context_, host, port);
   }
-  
+
   std::unique_ptr<Socket> createSocket(const std::string &host, const uint16_t port) {
     T *socket = create(host, port);
     return std::unique_ptr<Socket>(socket);
