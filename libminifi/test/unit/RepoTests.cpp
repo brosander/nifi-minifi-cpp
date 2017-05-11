@@ -29,8 +29,6 @@ TEST_CASE("Test Repo Empty Value Attribute", "[TestFFR1]") {
 
   TestController testController;
 
-  //testController.setDebugToConsole();
-
   char format[] = "/tmp/testRepo.XXXXXX";
   char *dir = testController.createTempDirectory(format);
   std::shared_ptr<core::repository::FlowFileRepository> repository =
@@ -60,8 +58,6 @@ TEST_CASE("Test Repo Empty Value Attribute", "[TestFFR1]") {
 TEST_CASE("Test Repo Empty Key Attribute ", "[TestFFR2]") {
 
   TestController testController;
-
-  //testController.setDebugToConsole();
 
   char format[] = "/tmp/testRepo.XXXXXX";
   char *dir = testController.createTempDirectory(format);
@@ -96,8 +92,6 @@ TEST_CASE("Test Repo Empty Key Attribute ", "[TestFFR2]") {
 TEST_CASE("Test Repo Key Attribute Verify ", "[TestFFR3]") {
 
   TestController testController;
-
-  //testController.setDebugToConsole();
 
   char format[] = "/tmp/testRepo.XXXXXX";
   char *dir = testController.createTempDirectory(format);

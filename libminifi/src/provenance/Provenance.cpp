@@ -48,11 +48,11 @@ bool ProvenanceEventRecord::DeSerialize(
   ret = repo->Get(key, value);
 
   if (!ret) {
-    logger_->log_error("NiFi Provenance Store event %s can not found",
+    logger_.log_error("NiFi Provenance Store event %s can not found",
                        key.c_str());
     return false;
   } else {
-    logger_->log_debug("NiFi Provenance Read event %s length %d", key.c_str(),
+    logger_.log_debug("NiFi Provenance Read event %s length %d", key.c_str(),
                        value.length());
   }
 
@@ -62,11 +62,11 @@ bool ProvenanceEventRecord::DeSerialize(
   ret = DeSerialize(stream);
 
   if (ret) {
-    logger_->log_debug(
+    logger_.log_debug(
         "NiFi Provenance retrieve event %s size %d eventType %d success",
         _eventIdStr.c_str(), stream.getSize(), _eventType);
   } else {
-    logger_->log_debug(
+    logger_.log_debug(
         "NiFi Provenance retrieve event %s size %d eventType %d fail",
         _eventIdStr.c_str(), stream.getSize(), _eventType);
   }
@@ -215,10 +215,10 @@ bool ProvenanceEventRecord::Serialize(
   // Persistent to the DB
   if (repo->Put(_eventIdStr, const_cast<uint8_t*>(outStream.getBuffer()),
                 outStream.getSize())) {
-    logger_->log_debug("NiFi Provenance Store event %s size %d success",
+    logger_.log_debug("NiFi Provenance Store event %s size %d success",
                        _eventIdStr.c_str(), outStream.getSize());
   } else {
-    logger_->log_error("NiFi Provenance Store event %s size %d fail",
+    logger_.log_error("NiFi Provenance Store event %s size %d fail",
                        _eventIdStr.c_str(), outStream.getSize());
   }
   return true;
@@ -381,7 +381,7 @@ void ProvenanceReporter::commit() {
     if (!repo_->isFull()) {
       event->Serialize(repo_);
     } else {
-      logger_->log_debug("Provenance Repository is full");
+      logger_.log_debug("Provenance Repository is full");
     }
   }
 }

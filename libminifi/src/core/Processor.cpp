@@ -45,7 +45,7 @@ namespace core {
 
 Processor::Processor(std::string name, uuid_t uuid)
     : Connectable(name, uuid),
-      ConfigurableComponent(logging::Logger::getLogger()) {
+    logger_(logging::Logger<Processor>::getLogger()) {
   has_work_.store(false);
   // Setup the default values
   state_ = DISABLED;
@@ -61,8 +61,7 @@ Processor::Processor(std::string name, uuid_t uuid)
   active_tasks_ = 0;
   yield_expiration_ = 0;
   incoming_connections_Iter = this->_incomingConnections.begin();
-  logger_ = logging::Logger::getLogger();
-  logger_->log_info("Processor %s created UUID %s", name_.c_str(),
+  logger_.log_info("Processor %s created UUID %s", name_.c_str(),
                     uuidStr_.c_str());
 }
 
@@ -78,7 +77,7 @@ bool Processor::addConnection(std::shared_ptr<Connectable> conn) {
   bool ret = false;
 
   if (isRunning()) {
-    logger_->log_info("Can not add connection while the process %s is running",
+    logger_.log_info("Can not add connection while the process %s is running",
                       name_.c_str());
     return false;
   }
@@ -102,7 +101,7 @@ bool Processor::addConnection(std::shared_ptr<Connectable> conn) {
     if (_incomingConnections.find(connection) == _incomingConnections.end()) {
       _incomingConnections.insert(connection);
       connection->setDestination(shared_from_this());
-      logger_->log_info(
+      logger_.log_info(
           "Add connection %s into Processor %s incoming connection",
           connection->getName().c_str(), name_.c_str());
       incoming_connections_Iter = this->_incomingConnections.begin();
@@ -123,7 +122,7 @@ bool Processor::addConnection(std::shared_ptr<Connectable> conn) {
         existedConnection.insert(connection);
         connection->setSource(shared_from_this());
         _outGoingConnections[relationship] = existedConnection;
-        logger_->log_info(
+        logger_.log_info(
             "Add connection %s into Processor %s outgoing connection for relationship %s",
             connection->getName().c_str(), name_.c_str(), relationship.c_str());
         ret = true;
@@ -134,7 +133,7 @@ bool Processor::addConnection(std::shared_ptr<Connectable> conn) {
       newConnection.insert(connection);
       connection->setSource(shared_from_this());
       _outGoingConnections[relationship] = newConnection;
-      logger_->log_info(
+      logger_.log_info(
           "Add connection %s into Processor %s outgoing connection for relationship %s",
           connection->getName().c_str(), name_.c_str(), relationship.c_str());
       ret = true;
@@ -146,7 +145,7 @@ bool Processor::addConnection(std::shared_ptr<Connectable> conn) {
 
 void Processor::removeConnection(std::shared_ptr<Connectable> conn) {
   if (isRunning()) {
-    logger_->log_info(
+    logger_.log_info(
         "Can not remove connection while the process %s is running",
         name_.c_str());
     return;
@@ -168,7 +167,7 @@ void Processor::removeConnection(std::shared_ptr<Connectable> conn) {
     if (_incomingConnections.find(connection) != _incomingConnections.end()) {
       _incomingConnections.erase(connection);
       connection->setDestination(NULL);
-      logger_->log_info(
+      logger_.log_info(
           "Remove connection %s into Processor %s incoming connection",
           connection->getName().c_str(), name_.c_str());
       incoming_connections_Iter = this->_incomingConnections.begin();
@@ -186,7 +185,7 @@ void Processor::removeConnection(std::shared_ptr<Connectable> conn) {
           != _outGoingConnections[relationship].end()) {
         _outGoingConnections[relationship].erase(connection);
         connection->setSource(NULL);
-        logger_->log_info(
+        logger_.log_info(
             "Remove connection %s into Processor %s outgoing connection for relationship %s",
             connection->getName().c_str(), name_.c_str(), relationship.c_str());
       }
@@ -282,11 +281,11 @@ void Processor::onTrigger(ProcessContext *context,
     onTrigger(context, session.get());
     session->commit();
   } catch (std::exception &exception) {
-    logger_->log_debug("Caught Exception %s", exception.what());
+    logger_.log_debug("Caught Exception %s", exception.what());
     session->rollback();
     throw;
   } catch (...) {
-    logger_->log_debug("Caught Exception Processor::onTrigger");
+    logger_.log_debug("Caught Exception Processor::onTrigger");
     session->rollback();
     throw;
   }
@@ -306,7 +305,7 @@ bool Processor::isWorkAvailable() {
       }
     }
   } catch (...) {
-    logger_->log_error(
+    logger_.log_error(
         "Caught an exception while checking if work is available;"
         " unless it was positively determined that work is available, assuming NO work is available!");
   }

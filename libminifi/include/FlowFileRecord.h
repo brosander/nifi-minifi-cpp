@@ -110,7 +110,8 @@ class FlowFileRecord : public core::FlowFile, public io::Serializable {
   explicit FlowFileRecord(std::shared_ptr<core::Repository> flow_repository)
       : FlowFile(),
         flow_repository_(flow_repository),
-        snapshot_("") {
+        snapshot_(""),
+      logger_(logging::Logger<FlowFileRecord>::getLogger())  {
 
   }
   // Destructor
@@ -180,6 +181,8 @@ class FlowFileRecord : public core::FlowFile, public io::Serializable {
   // Prevent default copy constructor and assignment operation
   // Only support pass by reference or pointer
 
+ private:
+  logging::Logger<FlowFileRecord> & logger_;
 };
 
 } /* namespace minifi */

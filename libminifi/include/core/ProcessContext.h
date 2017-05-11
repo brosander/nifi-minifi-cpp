@@ -46,8 +46,7 @@ class ProcessContext {
    */
   ProcessContext(ProcessorNode &processor,
                  std::shared_ptr<core::Repository> repo)
-      : processor_node_(processor) {
-    logger_ = logging::Logger::getLogger();
+      : processor_node_(processor), logger_(logging::Logger<ProcessContext>::getLogger()) {
     repo_ = repo;
   }
   // Destructor
@@ -102,7 +101,7 @@ class ProcessContext {
   // Processor
   ProcessorNode processor_node_;
   // Logger
-  std::shared_ptr<logging::Logger> logger_;
+  logging::Logger<ProcessContext> & logger_;
 
 };
 

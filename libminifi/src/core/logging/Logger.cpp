@@ -31,7 +31,6 @@ namespace minifi {
 namespace core {
 namespace logging {
 
-std::shared_ptr<Logger> Logger::singleton_logger_(nullptr);
 
 } /* namespace logging */
 } /* namespace core */

@@ -57,8 +57,8 @@ class ListenSyslog : public core::Processor {
    * Create a new processor
    */
   ListenSyslog(std::string name, uuid_t uuid = NULL)
-      : Processor(name, uuid) {
-    logger_ = logging::Logger::getLogger();
+      : Processor(name, uuid),
+        logger_(logging::Logger<ListenSyslog>::getLogger()) {
     _eventQueueByteSize = 0;
     _serverSocket = 0;
     _recvBufSize = 65507;
@@ -89,7 +89,7 @@ class ListenSyslog : public core::Processor {
     }
     _clientSockets.clear();
     if (_serverSocket > 0) {
-      logger_->log_info("ListenSysLog Server socket %d close", _serverSocket);
+      logger_.log_info("ListenSysLog Server socket %d close", _serverSocket);
       close(_serverSocket);
       _serverSocket = 0;
     }
@@ -134,7 +134,7 @@ class ListenSyslog : public core::Processor {
 
  private:
   // Logger
-  std::shared_ptr<logging::Logger> logger_;
+  logging::Logger<ListenSyslog> & logger_;
   // Run function for the thread
   static void run(ListenSyslog *process);
   // Run Thread

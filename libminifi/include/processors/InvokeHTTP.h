@@ -109,7 +109,8 @@ class InvokeHTTP : public core::Processor {
         connect_timeout_(20000),
         penalize_no_retry_(false),
         read_timeout_(20000),
-        always_output_response_(false) {
+        always_output_response_(false),
+        logger_(logging::Logger<InvokeHTTP>::getLogger()) {
     curl_global_init(CURL_GLOBAL_DEFAULT);
   }
   // Destructor
@@ -217,6 +218,9 @@ class InvokeHTTP : public core::Processor {
   bool always_output_response_;
   // penalize on no retry
   bool penalize_no_retry_;
+
+ private:
+  logging::Logger<InvokeHTTP> & logger_;
 };
 
 } /* namespace processors */

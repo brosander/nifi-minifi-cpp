@@ -62,7 +62,8 @@ class FlowConfiguration : public CoreComponent {
                     const std::string path)
       : CoreComponent(core::getClassName<FlowConfiguration>()),
         flow_file_repo_(flow_file_repo),
-        config_path_(path) {
+        config_path_(path),
+        logger_(logging::Logger<FlowConfiguration>::getLogger()){
 
   }
 
@@ -111,6 +112,7 @@ class FlowConfiguration : public CoreComponent {
   // flow file repo
   std::shared_ptr<core::Repository> flow_file_repo_;
   std::shared_ptr<io::StreamFactory> stream_factory_;
+  logging::Logger<FlowConfiguration> & logger_;
 };
 
 } /* namespace core */

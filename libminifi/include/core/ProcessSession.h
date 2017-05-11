@@ -48,9 +48,8 @@ class ProcessSession {
    * Create a new process session
    */
   ProcessSession(ProcessContext *processContext = NULL)
-      : process_context_(processContext) {
-    logger_ = logging::Logger::getLogger();
-    logger_->log_trace("ProcessSession created for %s",
+      : process_context_(processContext), logger_(logging::Logger<ProcessSession>::getLogger()) {
+    logger_.log_trace("ProcessSession created for %s",
                        process_context_->getProcessorNode().getName().c_str());
     auto repo = processContext->getProvenanceRepository();
     provenance_report_ = new provenance::ProvenanceReporter(
@@ -167,7 +166,7 @@ class ProcessSession {
 // ProcessContext
   ProcessContext *process_context_;
 // Logger
-  std::shared_ptr<logging::Logger> logger_;
+  logging::Logger<ProcessSession> & logger_;
 // Provenance Report
   provenance::ProvenanceReporter *provenance_report_;
 

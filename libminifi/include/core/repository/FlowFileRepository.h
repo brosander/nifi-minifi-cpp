@@ -50,8 +50,8 @@ class FlowFileRepository : public core::Repository,
   FlowFileRepository(std::string directory, int64_t maxPartitionMillis,
                      int64_t maxPartitionBytes, uint64_t purgePeriod)
       : Repository(core::getClassName<FlowFileRepository>(), directory,
-                   maxPartitionMillis, maxPartitionBytes, purgePeriod)
-
+                   maxPartitionMillis, maxPartitionBytes, purgePeriod),
+        logger_(logging::Logger<FlowFileRepository>::getLogger())
   {
     db_ = NULL;
   }
@@ -77,13 +77,13 @@ class FlowFileRepository : public core::Repository,
                         value)) {
       directory_ = value;
     }
-    logger_->log_info("NiFi FlowFile Repository Directory %s",
+    logger_.log_info("NiFi FlowFile Repository Directory %s",
                       directory_.c_str());
     if (configure->get(Configure::nifi_flowfile_repository_max_storage_size,
                         value)) {
       Property::StringToInt(value, max_partition_bytes_);
     }
-    logger_->log_info("NiFi FlowFile Max Partition Bytes %d",
+    logger_.log_info("NiFi FlowFile Max Partition Bytes %d",
                       max_partition_bytes_);
     if (configure->get(Configure::nifi_flowfile_repository_max_storage_time,
                         value)) {
@@ -93,17 +93,17 @@ class FlowFileRepository : public core::Repository,
                                            max_partition_millis_)) {
       }
     }
-    logger_->log_info("NiFi FlowFile Max Storage Time: [%d] ms",
+    logger_.log_info("NiFi FlowFile Max Storage Time: [%d] ms",
                       max_partition_millis_);
     leveldb::Options options;
     options.create_if_missing = true;
     leveldb::Status status = leveldb::DB::Open(options, directory_.c_str(),
                                                &db_);
     if (status.ok()) {
-      logger_->log_info("NiFi FlowFile Repository database open %s success",
+      logger_.log_info("NiFi FlowFile Repository database open %s success",
                         directory_.c_str());
     } else {
-      logger_->log_error("NiFi FlowFile Repository database open %s fail",
+      logger_.log_error("NiFi FlowFile Repository database open %s fail",
                          directory_.c_str());
       return false;
     }
@@ -163,12 +163,13 @@ class FlowFileRepository : public core::Repository,
     thread_ = std::thread(&FlowFileRepository::run, shared_from_this());
     thread_.detach();
     running_ = true;
-    logger_->log_info("%s Repository Monitor Thread Start", name_.c_str());
+    logger_.log_info("%s Repository Monitor Thread Start", name_.c_str());
   }
 
  private:
   std::map<std::string, std::shared_ptr<minifi::Connection>> connectionMap;
   leveldb::DB* db_;
+  logging::Logger<FlowFileRepository> & logger_;
 };
 
 } /* namespace repository */

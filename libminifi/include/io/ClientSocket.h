@@ -236,7 +236,7 @@ class Socket : public BaseStream {
    */
   virtual int16_t select_descriptor(const uint16_t msec);
 
-  std::shared_ptr<logging::Logger> logger_;
+  logging::Logger<Socket> & logger_;
 
   addrinfo *addr_info_;
 

@@ -44,8 +44,8 @@ public:
 	 * Create a new processor
 	 */
 	SiteToSiteProvenanceReportingTask(const std::shared_ptr<io::StreamFactory> &stream_factory) :
-			core::Processor(ReportTaskName) {
-		logger_ = logging::Logger::getLogger();
+			core::Processor(ReportTaskName),
+			logger_(logging::Logger<SiteToSiteProvenanceReportingTask>::getLogger()) {
 		this->setTriggerWhenEmpty(true);
 		port_ = 0;
 		batch_size_ = 100;
@@ -108,7 +108,7 @@ private:
 	uint16_t port_;
 	int batch_size_;
 	//! Logger
-	std::shared_ptr<logging::Logger> logger_;
+	logging::Logger<SiteToSiteProvenanceReportingTask> & logger_;
         std::shared_ptr<io::StreamFactory> stream_factory_;
 };
 

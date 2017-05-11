@@ -398,8 +398,7 @@ class Site2SiteClientProtocol {
   /*!
    * Create a new control protocol
    */
-  Site2SiteClientProtocol(std::unique_ptr<Site2SitePeer> peer) {
-    logger_ = logging::Logger::getLogger();
+  Site2SiteClientProtocol(std::unique_ptr<Site2SitePeer> peer) : logger_(logging::Logger<Site2SiteClientProtocol>::getLogger()) {
     peer_ = std::move(peer);
     _batchSize = 0;
     _batchCount = 0;
@@ -555,7 +554,7 @@ class Site2SiteClientProtocol {
         int size = std::min(len, (int) sizeof(buffer));
         int ret = _packet->_transaction->getStream().readData(buffer, size);
         if (ret != size) {
-          _packet->_protocol->logger_->log_error(
+          _packet->_protocol->logger_.log_error(
               "Site2Site Receive Flow Size %d Failed %d", size, ret);
           break;
         }
@@ -583,7 +582,7 @@ class Site2SiteClientProtocol {
         int ret = _packet->_transaction->getStream().writeData(buffer,
                                                                readSize);
         if (ret != readSize) {
-          _packet->_protocol->logger_->log_error(
+          _packet->_protocol->logger_.log_error(
               "Site2Site Send Flow Size %d Failed %d", readSize, ret);
           break;
         }
@@ -599,7 +598,7 @@ class Site2SiteClientProtocol {
   // Mutex for protection
   std::mutex mutex_;
   // Logger
-  std::shared_ptr<logging::Logger> logger_;
+  logging::Logger<Site2SiteClientProtocol> & logger_;
   // Batch Count
   std::atomic<uint64_t> _batchCount;
   // Batch Size

@@ -50,8 +50,8 @@ class ExecuteProcess : public core::Processor {
    * Create a new processor
    */
   ExecuteProcess(std::string name, uuid_t uuid = NULL)
-      : Processor(name, uuid) {
-    logger_ = logging::Logger::getLogger();
+      : Processor(name, uuid),
+        logger_(logging::Logger<ExecuteProcess>::getLogger()){
     _redirectErrorStream = false;
     _batchDuration = 0;
     _workingDir = ".";
@@ -100,7 +100,7 @@ class ExecuteProcess : public core::Processor {
 
  private:
   // Logger
-  std::shared_ptr<logging::Logger> logger_;
+  logging::Logger<ExecuteProcess> & logger_;
   // Property
   std::string _command;
   std::string _commandArgument;

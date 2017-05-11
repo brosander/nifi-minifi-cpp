@@ -35,7 +35,7 @@ namespace io {
 TLSContext::TLSContext(const std::shared_ptr<Configure> &configure)
     : SocketContext(configure), error_value(0),
       ctx(0),
-      logger_(logging::Logger::getLogger()),
+      logger_(logging::Logger<TLSContext>::getLogger()),
       configure_(configure) {
 }
 /**
@@ -62,7 +62,7 @@ int16_t TLSContext::initialize() {
   method = TLSv1_2_client_method();
   ctx = SSL_CTX_new(method);
   if (ctx == NULL) {
-    logger_->log_error("Could not create SSL context, error: %s.",
+    logger_.log_error("Could not create SSL context, error: %s.",
                        std::strerror(errno));
     error_value = TLS_ERROR_CONTEXT;
     return error_value;
@@ -77,7 +77,7 @@ int16_t TLSContext::initialize() {
                              certificate)
         && configure_->get(Configure::nifi_security_client_private_key,
                               privatekey))) {
-      logger_->log_error(
+      logger_.log_error(
           "Certificate and Private Key PEM file not configured, error: %s.",
           std::strerror(errno));
       error_value = TLS_ERROR_PEM_MISSING;
@@ -86,7 +86,7 @@ int16_t TLSContext::initialize() {
     // load certificates and private key in PEM format
     if (SSL_CTX_use_certificate_file(ctx, certificate.c_str(), SSL_FILETYPE_PEM)
         <= 0) {
-      logger_->log_error("Could not create load certificate, error : %s",
+      logger_.log_error("Could not create load certificate, error : %s",
                          std::strerror(errno));
       error_value = TLS_ERROR_CERT_MISSING;
       return error_value;
@@ -101,7 +101,7 @@ int16_t TLSContext::initialize() {
     int retp = SSL_CTX_use_PrivateKey_file(ctx, privatekey.c_str(),
                                            SSL_FILETYPE_PEM);
     if (retp != 1) {
-      logger_->log_error(
+      logger_.log_error(
           "Could not create load private key,%i on %s error : %s", retp,
           privatekey.c_str(), std::strerror(errno));
       error_value = TLS_ERROR_KEY_ERROR;
@@ -109,7 +109,7 @@ int16_t TLSContext::initialize() {
     }
     // verify private key
     if (!SSL_CTX_check_private_key(ctx)) {
-      logger_->log_error(
+      logger_.log_error(
           "Private key does not match the public certificate, error : %s",
           std::strerror(errno));
       error_value = TLS_ERROR_KEY_ERROR;
@@ -120,14 +120,14 @@ int16_t TLSContext::initialize() {
                            caCertificate)) {
       retp = SSL_CTX_load_verify_locations(ctx, caCertificate.c_str(), 0);
       if (retp == 0) {
-        logger_->log_error("Can not load CA certificate, Exiting, error : %s",
+        logger_.log_error("Can not load CA certificate, Exiting, error : %s",
                            std::strerror(errno));
         error_value = TLS_ERROR_CERT_ERROR;
         return error_value;
       }
     }
 
-    logger_->log_info("Load/Verify Client Certificate OK.");
+    logger_.log_info("Load/Verify Client Certificate OK.");
   }
   return 0;
 }
@@ -146,19 +146,19 @@ TLSSocket::~TLSSocket() {
 TLSSocket::TLSSocket(const std::shared_ptr<TLSContext> &context, const std::string &hostname, const uint16_t port,
                      const uint16_t listeners)
     : Socket(context, hostname, port, listeners),
-      ssl(0) {
+      ssl(0), logger_(logging::Logger<TLSSocket>::getLogger()) {
         context_ = context;
 }
 
 TLSSocket::TLSSocket(const std::shared_ptr<TLSContext> &context, const std::string &hostname, const uint16_t port)
     : Socket(context, hostname, port, 0),
-      ssl(0) {
+      ssl(0), logger_(logging::Logger<TLSSocket>::getLogger()) {
         context_ = context;
 }
 
 TLSSocket::TLSSocket(const TLSSocket &&d)
     : Socket(std::move(d)),
-      ssl(0) {
+      ssl(0), logger_(d.logger_) {
         context_ = d.context_;
 }
 
@@ -170,14 +170,14 @@ int16_t TLSSocket::initialize() {
     ssl = SSL_new(context_->getContext());
     SSL_set_fd(ssl, socket_file_descriptor_);
     if (SSL_connect(ssl) == -1) {
-      logger_->log_error("SSL socket connect failed to %s %d",
+      logger_.log_error("SSL socket connect failed to %s %d",
                          requested_hostname_.c_str(), port_);
       SSL_free(ssl);
       ssl = NULL;
       close(socket_file_descriptor_);
       return -1;
     } else {
-      logger_->log_info("SSL socket connect success to %s %d",
+      logger_.log_info("SSL socket connect success to %s %d",
                         requested_hostname_.c_str(), port_);
       return 0;
     }
@@ -205,7 +205,7 @@ int TLSSocket::writeData(uint8_t *value, int size) {
     sent = SSL_write(ssl, value + bytes, size - bytes);
     // check for errors
     if (sent < 0) {
-      logger_->log_error("Site2Site Peer socket %d send failed %s",
+      logger_.log_error("Site2Site Peer socket %d send failed %s",
                          socket_file_descriptor_, strerror(errno));
       return sent;
     }

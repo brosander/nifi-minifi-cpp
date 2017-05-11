@@ -153,6 +153,7 @@ class Connectable : public CoreComponent {
   // Concurrent condition variable for whether there is incoming work to do
   std::condition_variable work_condition_;
 
+  logging::Logger<Connectable> & logger_;
 };
 
 }

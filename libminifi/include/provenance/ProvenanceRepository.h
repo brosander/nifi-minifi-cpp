@@ -48,7 +48,8 @@ class ProvenanceRepository : public core::Repository,
                        int64_t maxPartitionBytes = MAX_PROVENANCE_STORAGE_SIZE,
                        uint64_t purgePeriod = PROVENANCE_PURGE_PERIOD)
       : Repository(core::getClassName<ProvenanceRepository>(), directory,
-                   maxPartitionMillis, maxPartitionBytes, purgePeriod) {
+                   maxPartitionMillis, maxPartitionBytes, purgePeriod),
+        logger_(logging::Logger<ProvenanceRepository>::getLogger()){
 
     db_ = NULL;
   }
@@ -67,7 +68,7 @@ class ProvenanceRepository : public core::Repository,
   thread_ = std::thread(&ProvenanceRepository::run, shared_from_this());
   thread_.detach();
   running_ = true;
-  logger_->log_info("%s Repository Monitor Thread Start", name_.c_str());
+  logger_.log_info("%s Repository Monitor Thread Start", name_.c_str());
 }
 
   // initialize
@@ -77,13 +78,13 @@ class ProvenanceRepository : public core::Repository,
                         value)) {
       directory_ = value;
     }
-    logger_->log_info("NiFi Provenance Repository Directory %s",
+    logger_.log_info("NiFi Provenance Repository Directory %s",
                       directory_.c_str());
     if (config->get(Configure::nifi_provenance_repository_max_storage_size,
                         value)) {
       core::Property::StringToInt(value, max_partition_bytes_);
     }
-    logger_->log_info("NiFi Provenance Max Partition Bytes %d",
+    logger_.log_info("NiFi Provenance Max Partition Bytes %d",
                       max_partition_bytes_);
     if (config->get(Configure::nifi_provenance_repository_max_storage_time,
                         value)) {
@@ -93,17 +94,17 @@ class ProvenanceRepository : public core::Repository,
                                                  max_partition_millis_)) {
       }
     }
-    logger_->log_info("NiFi Provenance Max Storage Time: [%d] ms",
+    logger_.log_info("NiFi Provenance Max Storage Time: [%d] ms",
                       max_partition_millis_);
     leveldb::Options options;
     options.create_if_missing = true;
     leveldb::Status status = leveldb::DB::Open(options, directory_.c_str(),
                                                &db_);
     if (status.ok()) {
-      logger_->log_info("NiFi Provenance Repository database open %s success",
+      logger_.log_info("NiFi Provenance Repository database open %s success",
                         directory_.c_str());
     } else {
-      logger_->log_error("NiFi Provenance Repository database open %s fail",
+      logger_.log_error("NiFi Provenance Repository database open %s fail",
                          directory_.c_str());
       return false;
     }
@@ -197,7 +198,7 @@ class ProvenanceRepository : public core::Repository,
 
  private:
   leveldb::DB* db_;
-
+  logging::Logger<ProvenanceRepository> & logger_;
 };
 
 } /* namespace provenance */

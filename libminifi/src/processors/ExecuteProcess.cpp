@@ -91,7 +91,7 @@ void ExecuteProcess::onTrigger(core::ProcessContext *context,
     if (core::Property::StringToTime(value, _batchDuration, unit)
         && core::Property::ConvertTimeUnitToMS(_batchDuration, unit,
                                                _batchDuration)) {
-      logger_->log_info("Setting _batchDuration");
+      logger_.log_info("Setting _batchDuration");
     }
   }
   if (context->getProperty(RedirectErrorStream.getName(), value)) {
@@ -106,13 +106,13 @@ void ExecuteProcess::onTrigger(core::ProcessContext *context,
   if (_workingDir.length() > 0 && _workingDir != ".") {
     // change to working directory
     if (chdir(_workingDir.c_str()) != 0) {
-      logger_->log_error("Execute Command can not chdir %s",
+      logger_.log_error("Execute Command can not chdir %s",
                          _workingDir.c_str());
       yield();
       return;
     }
   }
-  logger_->log_info("Execute Command %s", _fullCommand.c_str());
+  logger_.log_info("Execute Command %s", _fullCommand.c_str());
   // split the command into array
   char *p = std::strtok(const_cast<char*>(_fullCommand.c_str()), " ");
   int argc = 0;
@@ -135,7 +135,7 @@ void ExecuteProcess::onTrigger(core::ProcessContext *context,
     }
     switch (_pid = fork()) {
       case -1:
-        logger_->log_error("Execute Process fork failed");
+        logger_.log_error("Execute Process fork failed");
         _processRunning = false;
         close(_pipefd[0]);
         close(_pipefd[1]);
@@ -162,7 +162,7 @@ void ExecuteProcess::onTrigger(core::ProcessContext *context,
             int numRead = read(_pipefd[0], buffer, sizeof(buffer));
             if (numRead <= 0)
               break;
-            logger_->log_info("Execute Command Respond %d", numRead);
+            logger_.log_info("Execute Command Respond %d", numRead);
             ExecuteProcess::WriteCallback callback(buffer, numRead);
             std::shared_ptr<FlowFileRecord> flowFile = std::static_pointer_cast<
                 FlowFileRecord>(session->create());
@@ -185,7 +185,7 @@ void ExecuteProcess::onTrigger(core::ProcessContext *context,
                                (sizeof(buffer) - totalRead));
             if (numRead <= 0) {
               if (totalRead > 0) {
-                logger_->log_info("Execute Command Respond %d", totalRead);
+                logger_.log_info("Execute Command Respond %d", totalRead);
                 // child exits and close the pipe
                 ExecuteProcess::WriteCallback callback(buffer, totalRead);
                 if (!flowFile) {
@@ -206,7 +206,7 @@ void ExecuteProcess::onTrigger(core::ProcessContext *context,
             } else {
               if (numRead == (sizeof(buffer) - totalRead)) {
                 // we reach the max buffer size
-                logger_->log_info("Execute Command Max Respond %d",
+                logger_.log_info("Execute Command Max Respond %d",
                                   sizeof(buffer));
                 ExecuteProcess::WriteCallback callback(buffer, sizeof(buffer));
                 if (!flowFile) {
@@ -234,10 +234,10 @@ void ExecuteProcess::onTrigger(core::ProcessContext *context,
 
         died = wait(&status);
         if (WIFEXITED(status)) {
-          logger_->log_info("Execute Command Complete %s status %d pid %d",
+          logger_.log_info("Execute Command Complete %s status %d pid %d",
                             _fullCommand.c_str(), WEXITSTATUS(status), _pid);
         } else {
-          logger_->log_info("Execute Command Complete %s status %d pid %d",
+          logger_.log_info("Execute Command Complete %s status %d pid %d",
                             _fullCommand.c_str(), WTERMSIG(status), _pid);
         }
 

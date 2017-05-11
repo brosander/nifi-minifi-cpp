@@ -32,12 +32,14 @@ namespace core {
 
 Connectable::Connectable(std::string name, uuid_t uuid)
     : CoreComponent(name, uuid),
-      max_concurrent_tasks_(1) {
+      max_concurrent_tasks_(1),
+      logger_(logging::Logger<Connectable>::getLogger()) {
 }
 
 Connectable::Connectable(const Connectable &&other)
     : CoreComponent(std::move(other)),
-      max_concurrent_tasks_(std::move(other.max_concurrent_tasks_)) {
+      max_concurrent_tasks_(std::move(other.max_concurrent_tasks_)),
+      logger_(other.logger_) {
   has_work_ = other.has_work_.load();
   strategy_ = other.strategy_.load();
 }
@@ -48,7 +50,7 @@ Connectable::~Connectable() {
 bool Connectable::setSupportedRelationships(
     std::set<core::Relationship> relationships) {
   if (isRunning()) {
-    logger_->log_info(
+    logger_.log_info(
         "Can not set processor supported relationship while the process %s is running",
         name_.c_str());
     return false;
@@ -59,7 +61,7 @@ bool Connectable::setSupportedRelationships(
   relationships_.clear();
   for (auto item : relationships) {
     relationships_[item.getName()] = item;
-    logger_->log_info("Processor %s supported relationship name %s",
+    logger_.log_info("Processor %s supported relationship name %s",
                       name_.c_str(), item.getName().c_str());
   }
   return true;
@@ -85,7 +87,7 @@ bool Connectable::isSupportedRelationship(core::Relationship relationship) {
 bool Connectable::setAutoTerminatedRelationships(
     std::set<Relationship> relationships) {
   if (isRunning()) {
-    logger_->log_info(
+    logger_.log_info(
         "Can not set processor auto terminated relationship while the process %s is running",
         name_.c_str());
     return false;
@@ -96,7 +98,7 @@ bool Connectable::setAutoTerminatedRelationships(
   auto_terminated_relationships_.clear();
   for (auto item : relationships) {
     auto_terminated_relationships_[item.getName()] = item;
-    logger_->log_info("Processor %s auto terminated relationship name %s",
+    logger_.log_info("Processor %s auto terminated relationship name %s",
                       name_.c_str(), item.getName().c_str());
   }
   return true;

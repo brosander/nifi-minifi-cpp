@@ -36,7 +36,7 @@ core::ProcessGroup *YamlConfiguration::parseRootProcessGroupYaml(
   std::string id = getOrGenerateId(&rootFlowNode);
   uuid_parse(id.c_str(), uuid);
 
-  logger_->log_debug(
+  logger_.log_debug(
       "parseRootProcessGroup: id => [%s], name => [%s]", id, flowName);
   std::unique_ptr<core::ProcessGroup> group =
       FlowConfiguration::createRootProcessGroup(flowName, uuid);
@@ -56,7 +56,7 @@ void YamlConfiguration::parseProcessorNodeYaml(
   std::shared_ptr<core::Processor> processor = nullptr;
 
   if (!parentGroup) {
-    logger_->log_error("parseProcessNodeYaml: no parent group exists");
+    logger_.log_error("parseProcessNodeYaml: no parent group exists");
     return;
   }
 
@@ -72,11 +72,11 @@ void YamlConfiguration::parseProcessorNodeYaml(
         procCfg.name = procNode["name"].as<std::string>();
         procCfg.id = getOrGenerateId(&procNode);
         uuid_parse(procCfg.id.c_str(), uuid);
-        logger_->log_debug("parseProcessorNode: name => [%s] id => [%s]",
+        logger_.log_debug("parseProcessorNode: name => [%s] id => [%s]",
                            procCfg.name, procCfg.id);
         checkRequiredField(&procNode, "class", CONFIG_YAML_PROCESSORS_KEY);
         procCfg.javaClass = procNode["class"].as<std::string>();
-        logger_->log_debug("parseProcessorNode: class => [%s]",
+        logger_.log_debug("parseProcessorNode: class => [%s]",
                            procCfg.javaClass);
 
         // Determine the processor name only from the Java class
@@ -90,7 +90,7 @@ void YamlConfiguration::parseProcessorNodeYaml(
         }
 
         if (!processor) {
-          logger_->log_error("Could not create a processor %s with id %s",
+          logger_.log_error("Could not create a processor %s with id %s",
                              procCfg.name, procCfg.id);
           throw std::invalid_argument(
               "Could not create processor " + procCfg.name);
@@ -99,30 +99,30 @@ void YamlConfiguration::parseProcessorNodeYaml(
 
         checkRequiredField(&procNode, "scheduling strategy", CONFIG_YAML_PROCESSORS_KEY);
         procCfg.schedulingStrategy = procNode["scheduling strategy"].as<std::string>();
-        logger_->log_debug("parseProcessorNode: scheduling strategy => [%s]", procCfg.schedulingStrategy);
+        logger_.log_debug("parseProcessorNode: scheduling strategy => [%s]", procCfg.schedulingStrategy);
 
         checkRequiredField(&procNode, "scheduling period", CONFIG_YAML_PROCESSORS_KEY);
         procCfg.schedulingPeriod = procNode["scheduling period"].as<std::string>();
-        logger_->log_debug("parseProcessorNode: scheduling period => [%s]", procCfg.schedulingPeriod);
+        logger_.log_debug("parseProcessorNode: scheduling period => [%s]", procCfg.schedulingPeriod);
 
         if (procNode["max concurrent tasks"]) {
           procCfg.maxConcurrentTasks = procNode["max concurrent tasks"].as<std::string>();
-          logger_->log_debug("parseProcessorNode: max concurrent tasks => [%s]", procCfg.maxConcurrentTasks);
+          logger_.log_debug("parseProcessorNode: max concurrent tasks => [%s]", procCfg.maxConcurrentTasks);
         }
 
         if (procNode["penalization period"]) {
           procCfg.penalizationPeriod = procNode["penalization period"].as<std::string>();
-          logger_->log_debug("parseProcessorNode: penalization period => [%s]", procCfg.penalizationPeriod);
+          logger_.log_debug("parseProcessorNode: penalization period => [%s]", procCfg.penalizationPeriod);
         }
 
         if (procNode["yield period"]) {
           procCfg.yieldPeriod = procNode["yield period"].as<std::string>();
-          logger_->log_debug("parseProcessorNode: yield period => [%s]", procCfg.yieldPeriod);
+          logger_.log_debug("parseProcessorNode: yield period => [%s]", procCfg.yieldPeriod);
         }
 
         if (procNode["run duration nanos"]) {
           procCfg.yieldPeriod = procNode["run duration nanos"].as<std::string>();
-          logger_->log_debug("parseProcessorNode: run duration nanos => [%s]", procCfg.runDurationNanos);
+          logger_.log_debug("parseProcessorNode: run duration nanos => [%s]", procCfg.runDurationNanos);
         }
 
         // handle auto-terminated relationships
@@ -151,19 +151,19 @@ void YamlConfiguration::parseProcessorNodeYaml(
         core::TimeUnit unit;
         if (core::Property::StringToTime(procCfg.schedulingPeriod, schedulingPeriod, unit)
             && core::Property::ConvertTimeUnitToNS(schedulingPeriod, unit, schedulingPeriod)) {
-          logger_->log_debug("convert: parseProcessorNode: schedulingPeriod => [%d] ns", schedulingPeriod);
+          logger_.log_debug("convert: parseProcessorNode: schedulingPeriod => [%d] ns", schedulingPeriod);
           processor->setSchedulingPeriodNano(schedulingPeriod);
         }
 
         if (core::Property::StringToTime(procCfg.penalizationPeriod, penalizationPeriod, unit)
             && core::Property::ConvertTimeUnitToMS(penalizationPeriod, unit, penalizationPeriod)) {
-          logger_->log_debug("convert: parseProcessorNode: penalizationPeriod => [%d] ms", penalizationPeriod);
+          logger_.log_debug("convert: parseProcessorNode: penalizationPeriod => [%d] ms", penalizationPeriod);
           processor->setPenalizationPeriodMsec(penalizationPeriod);
         }
 
         if (core::Property::StringToTime(procCfg.yieldPeriod, yieldPeriod, unit)
             && core::Property::ConvertTimeUnitToMS(yieldPeriod, unit, yieldPeriod)) {
-          logger_->log_debug("convert: parseProcessorNode: yieldPeriod => [%d] ms", yieldPeriod);
+          logger_.log_debug("convert: parseProcessorNode: yieldPeriod => [%d] ms", yieldPeriod);
           processor->setYieldPeriodMsec(yieldPeriod);
         }
 
@@ -172,30 +172,30 @@ void YamlConfiguration::parseProcessorNodeYaml(
 
         if (procCfg.schedulingStrategy == "TIMER_DRIVEN") {
           processor->setSchedulingStrategy(core::TIMER_DRIVEN);
-          logger_->log_debug("setting scheduling strategy as %s", procCfg.schedulingStrategy);
+          logger_.log_debug("setting scheduling strategy as %s", procCfg.schedulingStrategy);
         } else if (procCfg.schedulingStrategy == "EVENT_DRIVEN") {
           processor->setSchedulingStrategy(core::EVENT_DRIVEN);
-          logger_->log_debug("setting scheduling strategy as %s", procCfg.schedulingStrategy);
+          logger_.log_debug("setting scheduling strategy as %s", procCfg.schedulingStrategy);
         } else {
           processor->setSchedulingStrategy(core::CRON_DRIVEN);
-          logger_->log_debug("setting scheduling strategy as %s", procCfg.schedulingStrategy);
+          logger_.log_debug("setting scheduling strategy as %s", procCfg.schedulingStrategy);
         }
 
         int64_t maxConcurrentTasks;
         if (core::Property::StringToInt(procCfg.maxConcurrentTasks, maxConcurrentTasks)) {
-          logger_->log_debug("parseProcessorNode: maxConcurrentTasks => [%d]", maxConcurrentTasks);
+          logger_.log_debug("parseProcessorNode: maxConcurrentTasks => [%d]", maxConcurrentTasks);
           processor->setMaxConcurrentTasks((uint8_t) maxConcurrentTasks);
         }
 
         if (core::Property::StringToInt(procCfg.runDurationNanos, runDurationNanos)) {
-          logger_->log_debug("parseProcessorNode: runDurationNanos => [%d]", runDurationNanos);
+          logger_.log_debug("parseProcessorNode: runDurationNanos => [%d]", runDurationNanos);
           processor->setRunDurationNano((uint64_t) runDurationNanos);
         }
 
         std::set<core::Relationship> autoTerminatedRelationships;
         for (auto &&relString : procCfg.autoTerminatedRelationships) {
           core::Relationship relationship(relString, "");
-          logger_->log_debug("parseProcessorNode: autoTerminatedRelationship  => [%s]", relString);
+          logger_.log_debug("parseProcessorNode: autoTerminatedRelationship  => [%s]", relString);
           autoTerminatedRelationships.insert(relationship);
         }
 
@@ -217,7 +217,7 @@ void YamlConfiguration::parseRemoteProcessGroupYaml(
   std::string id;
 
   if (!parentGroup) {
-    logger_->log_error("parseRemoteProcessGroupYaml: no parent group exists");
+    logger_.log_error("parseRemoteProcessGroupYaml: no parent group exists");
     return;
   }
 
@@ -231,11 +231,11 @@ void YamlConfiguration::parseRemoteProcessGroupYaml(
         auto name = currRpgNode["name"].as<std::string>();
         id = getOrGenerateId(&currRpgNode);
 
-        logger_->log_debug("parseRemoteProcessGroupYaml: name => [%s], id => [%s]", name, id);
+        logger_.log_debug("parseRemoteProcessGroupYaml: name => [%s], id => [%s]", name, id);
 
         checkRequiredField(&currRpgNode, "url", CONFIG_YAML_REMOTE_PROCESS_GROUP_KEY);
         std::string url = currRpgNode["url"].as<std::string>();
-        logger_->log_debug("parseRemoteProcessGroupYaml: url => [%s]", url);
+        logger_.log_debug("parseRemoteProcessGroupYaml: url => [%s]", url);
 
         core::ProcessGroup *group = NULL;
         core::TimeUnit unit;
@@ -248,12 +248,12 @@ void YamlConfiguration::parseRemoteProcessGroupYaml(
 
         if (currRpgNode["yield period"]) {
           std::string yieldPeriod = currRpgNode["yield period"].as<std::string>();
-          logger_->log_debug("parseRemoteProcessGroupYaml: yield period => [%s]", yieldPeriod);
+          logger_.log_debug("parseRemoteProcessGroupYaml: yield period => [%s]", yieldPeriod);
 
           if (core::Property::StringToTime(yieldPeriod, yieldPeriodValue, unit)
               && core::Property::ConvertTimeUnitToMS(yieldPeriodValue, unit,
                                                      yieldPeriodValue) && group) {
-            logger_->log_debug(
+            logger_.log_debug(
                 "parseRemoteProcessGroupYaml: yieldPeriod => [%d] ms",
                 yieldPeriodValue);
             group->setYieldPeriodMsec(yieldPeriodValue);
@@ -262,12 +262,12 @@ void YamlConfiguration::parseRemoteProcessGroupYaml(
 
         if (currRpgNode["timeout"]) {
           std::string timeout = currRpgNode["timeout"].as<std::string>();
-          logger_->log_debug("parseRemoteProcessGroupYaml: timeout => [%s]", timeout);
+          logger_.log_debug("parseRemoteProcessGroupYaml: timeout => [%s]", timeout);
 
           if (core::Property::StringToTime(timeout, timeoutValue, unit)
               && core::Property::ConvertTimeUnitToMS(timeoutValue, unit,
                                                      timeoutValue) && group) {
-            logger_->log_debug(
+            logger_.log_debug(
                 "parseRemoteProcessGroupYaml: timeoutValue => [%d] ms",
                 timeoutValue);
             group->setTimeOut(timeoutValue);
@@ -282,7 +282,7 @@ void YamlConfiguration::parseRemoteProcessGroupYaml(
         if (inputPorts && inputPorts.IsSequence()) {
           for (YAML::const_iterator portIter = inputPorts.begin();
               portIter != inputPorts.end(); ++portIter) {
-            logger_->log_debug("Got a current port, iterating...");
+            logger_.log_debug("Got a current port, iterating...");
 
             YAML::Node currPort = portIter->as<YAML::Node>();
 
@@ -293,7 +293,7 @@ void YamlConfiguration::parseRemoteProcessGroupYaml(
         if (outputPorts && outputPorts.IsSequence()) {
           for (YAML::const_iterator portIter = outputPorts.begin();
               portIter != outputPorts.end(); ++portIter) {
-            logger_->log_debug("Got a current port, iterating...");
+            logger_.log_debug("Got a current port, iterating...");
 
             YAML::Node currPort = portIter->as<YAML::Node>();
 
@@ -311,12 +311,12 @@ void YamlConfiguration::parseProvenanceReportingYaml(
   int64_t schedulingPeriod = -1;
 
   if (!parentGroup) {
-    logger_->log_error("parseProvenanceReportingYaml: no parent group exists");
+    logger_.log_error("parseProvenanceReportingYaml: no parent group exists");
     return;
   }
 
   if (!reportNode || !reportNode->IsDefined() || reportNode->IsNull()) {
-    logger_->log_debug("no provenance reporting task specified");
+    logger_.log_debug("no provenance reporting task specified");
     return;
   }
 
@@ -348,7 +348,7 @@ void YamlConfiguration::parseProvenanceReportingYaml(
   core::TimeUnit unit;
   if (core::Property::StringToTime(schedulingPeriodStr, schedulingPeriod, unit) &&
       core::Property::ConvertTimeUnitToNS(schedulingPeriod, unit, schedulingPeriod)) {
-    logger_->log_debug(
+    logger_.log_debug(
         "ProvenanceReportingTask schedulingPeriod %d ns",
         schedulingPeriod);
     processor->setSchedulingPeriodNano(schedulingPeriod);
@@ -356,7 +356,7 @@ void YamlConfiguration::parseProvenanceReportingYaml(
 
   if (schedulingStrategyStr == "TIMER_DRIVEN") {
      processor->setSchedulingStrategy(core::TIMER_DRIVEN);
-     logger_->log_debug(
+     logger_.log_debug(
          "ProvenanceReportingTask scheduling strategy %s", schedulingStrategyStr);
   } else {
     throw std::invalid_argument(
@@ -364,13 +364,13 @@ void YamlConfiguration::parseProvenanceReportingYaml(
   }
 
   reportTask->setHost(hostStr);
-  logger_->log_debug("ProvenanceReportingTask host %s", hostStr);
+  logger_.log_debug("ProvenanceReportingTask host %s", hostStr);
   int64_t lvalue;
   if (core::Property::StringToInt(portStr, lvalue)) {
-    logger_->log_debug("ProvenanceReportingTask port %d", (uint16_t) lvalue);
+    logger_.log_debug("ProvenanceReportingTask port %d", (uint16_t) lvalue);
     reportTask->setPort((uint16_t) lvalue);
   }
-  logger_->log_debug("ProvenanceReportingTask port uuid %s", portUUIDStr);
+  logger_.log_debug("ProvenanceReportingTask port uuid %s", portUUIDStr);
   uuid_parse(portUUIDStr.c_str(), port_uuid);
   reportTask->setPortUUID(port_uuid);
   if (core::Property::StringToInt(batchSizeStr, lvalue)) {
@@ -382,7 +382,7 @@ void YamlConfiguration::parseConnectionYaml(
     YAML::Node *connectionsNode,
     core::ProcessGroup *parent) {
   if (!parent) {
-    logger_->log_error("parseProcessNode: no parent group was provided");
+    logger_.log_error("parseProcessNode: no parent group was provided");
     return;
   }
 
@@ -400,7 +400,7 @@ void YamlConfiguration::parseConnectionYaml(
         std::string id = getOrGenerateId(&connectionNode);
         uuid_parse(id.c_str(), uuid);
         connection = this->createConnection(name, uuid);
-        logger_->log_debug(
+        logger_.log_debug(
             "Created connection with UUID %s and name %s", id, name);
 
 
@@ -408,7 +408,7 @@ void YamlConfiguration::parseConnectionYaml(
         checkRequiredField(&connectionNode, "source relationship name", CONFIG_YAML_CONNECTIONS_KEY);
         auto rawRelationship = connectionNode["source relationship name"].as<std::string>();
         core::Relationship relationship(rawRelationship, "");
-        logger_->log_debug("parseConnection: relationship => [%s]", rawRelationship);
+        logger_.log_debug("parseConnection: relationship => [%s]", rawRelationship);
         if (connection) {
           connection->setRelationship(relationship);
         }
@@ -418,7 +418,7 @@ void YamlConfiguration::parseConnectionYaml(
         if (connectionNode["source id"]) {
           std::string connectionSrcProcId = connectionNode["source id"].as<std::string>();
           uuid_parse(connectionSrcProcId.c_str(), srcUUID);
-          logger_->log_debug("Using 'source id' to match source with same id for "
+          logger_.log_debug("Using 'source id' to match source with same id for "
                                  "connection '%s': source id => [%s]", name, connectionSrcProcId);
         } else {
           // if we don't have a source id, try to resolve using source name. config schema v2 will make this unnecessary
@@ -428,18 +428,18 @@ void YamlConfiguration::parseConnectionYaml(
           if (!uuid_parse(connectionSrcProcName.c_str(), tmpUUID) && NULL != parent->findProcessor(tmpUUID)) {
             // the source name is a remote port id, so use that as the source id
             uuid_copy(srcUUID, tmpUUID);
-            logger_->log_debug("Using 'source name' containing a remote port id to match the source for "
+            logger_.log_debug("Using 'source name' containing a remote port id to match the source for "
                                    "connection '%s': source name => [%s]", name, connectionSrcProcName);
           } else {
             // lastly, look the processor up by name
             auto srcProcessor = parent->findProcessor(connectionSrcProcName);
             if (NULL != srcProcessor) {
               srcProcessor->getUUID(srcUUID);
-              logger_->log_debug("Using 'source name' to match source with same name for "
+              logger_.log_debug("Using 'source name' to match source with same name for "
                                      "connection '%s': source name => [%s]", name, connectionSrcProcName);
             } else {
               // we ran out of ways to discover the source processor
-              logger_->log_error(
+              logger_.log_error(
                   "Could not locate a source with name %s to create a connection", connectionSrcProcName);
               throw std::invalid_argument(
                   "Could not locate a source with name " + connectionSrcProcName + " to create a connection ");
@@ -453,7 +453,7 @@ void YamlConfiguration::parseConnectionYaml(
         if (connectionNode["destination id"]) {
           std::string connectionDestProcId = connectionNode["destination id"].as<std::string>();
           uuid_parse(connectionDestProcId.c_str(), destUUID);
-          logger_->log_debug("Using 'destination id' to match destination with same id for "
+          logger_.log_debug("Using 'destination id' to match destination with same id for "
                                  "connection '%s': destination id => [%s]", name, connectionDestProcId);
         } else {
           // we use the same logic as above for resolving the source processor
@@ -465,18 +465,18 @@ void YamlConfiguration::parseConnectionYaml(
               NULL != parent->findProcessor(tmpUUID)) {
             // the destination name is a remote port id, so use that as the dest id
             uuid_copy(destUUID, tmpUUID);
-            logger_->log_debug("Using 'destination name' containing a remote port id to match the destination for "
+            logger_.log_debug("Using 'destination name' containing a remote port id to match the destination for "
                                    "connection '%s': destination name => [%s]", name, connectionDestProcName);
           } else {
             // look the processor up by name
             auto destProcessor = parent->findProcessor(connectionDestProcName);
             if (NULL != destProcessor) {
               destProcessor->getUUID(destUUID);
-              logger_->log_debug("Using 'destination name' to match destination with same name for "
+              logger_.log_debug("Using 'destination name' to match destination with same name for "
                                      "connection '%s': destination name => [%s]", name, connectionDestProcName);
             } else {
               // we ran out of ways to discover the destination processor
-              logger_->log_error(
+              logger_.log_error(
                   "Could not locate a destination with name %s to create a connection", connectionDestProcName);
               throw std::invalid_argument(
                   "Could not locate a destination with name " + connectionDestProcName + " to create a connection");
@@ -501,7 +501,7 @@ void YamlConfiguration::parsePortYaml(YAML::Node *portNode,
   std::shared_ptr<minifi::RemoteProcessorGroupPort> port = NULL;
 
   if (!parent) {
-    logger_->log_error("parseProcessNode: no parent group existed");
+    logger_.log_error("parseProcessNode: no parent group existed");
     return;
   }
 
@@ -542,7 +542,7 @@ void YamlConfiguration::parsePortYaml(YAML::Node *portNode,
     if (core::Property::StringToInt(rawMaxConcurrentTasks, maxConcurrentTasks)) {
       processor->setMaxConcurrentTasks(maxConcurrentTasks);
     }
-    logger_->log_debug("parseProcessorNode: maxConcurrentTasks => [%d]", maxConcurrentTasks);
+    logger_.log_debug("parseProcessorNode: maxConcurrentTasks => [%d]", maxConcurrentTasks);
     processor->setMaxConcurrentTasks(maxConcurrentTasks);
   }
 }
@@ -557,7 +557,7 @@ void YamlConfiguration::parsePropertiesNodeYaml(
     if (!propertyValueNode.IsNull() && propertyValueNode.IsDefined()) {
       std::string rawValueString = propertyValueNode.as<std::string>();
       if (!processor->setProperty(propertyName, rawValueString)) {
-        logger_->log_warn(
+        logger_.log_warn(
             "Received property %s with value %s but it is not one of the properties for %s",
             propertyName,
             rawValueString,
@@ -587,7 +587,7 @@ std::string YamlConfiguration::getOrGenerateId(
     char uuid_str[37];
     uuid_unparse(uuid, uuid_str);
     id = uuid_str;
-    logger_->log_debug("Generating random ID: id => [%s]", id);
+    logger_.log_debug("Generating random ID: id => [%s]", id);
   }
   return id;
 }
@@ -615,7 +615,7 @@ void YamlConfiguration::checkRequiredField(
             "' section of configuration file]";
       }
     }
-    logger_->log_error(errMsg.c_str());
+    logger_.log_error(errMsg.c_str());
     throw std::invalid_argument(errMsg);
   }
 }

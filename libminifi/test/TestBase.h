@@ -73,15 +73,6 @@ class TestController {
     }
   }
 
-  void setDebugToConsole(std::shared_ptr<org::apache::nifi::minifi::Configure> configure) {
-    std::ostringstream oss;
-    std::unique_ptr<logging::BaseLogger> outputLogger = std::unique_ptr<
-        logging::BaseLogger>(
-        new org::apache::nifi::minifi::core::logging::OutputStreamAppender(std::cout, configure));
-    std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
-    logger->updateLogger(std::move(outputLogger));
-  }
-
   void setNullAppender() {
 
     std::unique_ptr<logging::BaseLogger> outputLogger = std::unique_ptr<

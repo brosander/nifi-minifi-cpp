@@ -38,7 +38,8 @@ namespace core {
 
 ProcessGroup::ProcessGroup(ProcessGroupType type, std::string name, uuid_t uuid,
                            ProcessGroup *parent)
-    : name_(name),
+    : logger_(logging::Logger<ProcessGroup>::getLogger()),
+      name_(name),
       type_(type),
       parent_process_group_(parent) {
   if (!uuid)
@@ -50,8 +51,7 @@ ProcessGroup::ProcessGroup(ProcessGroupType type, std::string name, uuid_t uuid,
   yield_period_msec_ = 0;
   transmitting_ = false;
 
-  logger_ = logging::Logger::getLogger();
-  logger_->log_info("ProcessGroup %s created", name_.c_str());
+  logger_.log_info("ProcessGroup %s created", name_.c_str());
 }
 
 ProcessGroup::~ProcessGroup() {
@@ -77,7 +77,7 @@ void ProcessGroup::addProcessor(std::shared_ptr<Processor> processor) {
   if (processors_.find(processor) == processors_.end()) {
     // We do not have the same processor in this process group yet
     processors_.insert(processor);
-    logger_->log_info("Add processor %s into process group %s",
+    logger_.log_info("Add processor %s into process group %s",
                       processor->getName().c_str(), name_.c_str());
   }
 }
@@ -88,7 +88,7 @@ void ProcessGroup::removeProcessor(std::shared_ptr<Processor> processor) {
   if (processors_.find(processor) != processors_.end()) {
     // We do have the same processor in this process group yet
     processors_.erase(processor);
-    logger_->log_info("Remove processor %s from process group %s",
+    logger_.log_info("Remove processor %s from process group %s",
                       processor->getName().c_str(), name_.c_str());
   }
 }
@@ -99,7 +99,7 @@ void ProcessGroup::addProcessGroup(ProcessGroup *child) {
   if (child_process_groups_.find(child) == child_process_groups_.end()) {
     // We do not have the same child process group in this process group yet
     child_process_groups_.insert(child);
-    logger_->log_info("Add child process group %s into process group %s",
+    logger_.log_info("Add child process group %s into process group %s",
                       child->getName().c_str(), name_.c_str());
   }
 }
@@ -110,7 +110,7 @@ void ProcessGroup::removeProcessGroup(ProcessGroup *child) {
   if (child_process_groups_.find(child) != child_process_groups_.end()) {
     // We do have the same child process group in this process group yet
     child_process_groups_.erase(child);
-    logger_->log_info("Remove child process group %s from process group %s",
+    logger_.log_info("Remove child process group %s from process group %s",
                       child->getName().c_str(), name_.c_str());
   }
 }
@@ -122,7 +122,7 @@ void ProcessGroup::startProcessing(TimerDrivenSchedulingAgent *timeScheduler,
   try {
     // Start all the processor node, input and output ports
     for (auto processor : processors_) {
-      logger_->log_debug("Starting %s", processor->getName().c_str());
+      logger_.log_debug("Starting %s", processor->getName().c_str());
 
       if (!processor->isRunning()
           && processor->getScheduledState() != DISABLED) {
@@ -137,10 +137,10 @@ void ProcessGroup::startProcessing(TimerDrivenSchedulingAgent *timeScheduler,
       processGroup->startProcessing(timeScheduler, eventScheduler);
     }
   } catch (std::exception &exception) {
-    logger_->log_debug("Caught Exception %s", exception.what());
+    logger_.log_debug("Caught Exception %s", exception.what());
     throw;
   } catch (...) {
-    logger_->log_debug(
+    logger_.log_debug(
         "Caught Exception during process group start processing");
     throw;
   }
@@ -167,10 +167,10 @@ void ProcessGroup::stopProcessing(TimerDrivenSchedulingAgent *timeScheduler,
       processGroup->stopProcessing(timeScheduler, eventScheduler);
     }
   } catch (std::exception &exception) {
-    logger_->log_debug("Caught Exception %s", exception.what());
+    logger_.log_debug("Caught Exception %s", exception.what());
     throw;
   } catch (...) {
-    logger_->log_debug("Caught Exception during process group stop processing");
+    logger_.log_debug("Caught Exception during process group stop processing");
     throw;
   }
 }
@@ -178,7 +178,7 @@ void ProcessGroup::stopProcessing(TimerDrivenSchedulingAgent *timeScheduler,
 std::shared_ptr<Processor> ProcessGroup::findProcessor(uuid_t uuid) {
   std::shared_ptr<Processor> ret = NULL;
   for (auto processor : processors_) {
-    logger_->log_info("find processor %s", processor->getName().c_str());
+    logger_.log_info("find processor %s", processor->getName().c_str());
     uuid_t processorUUID;
 
     if (processor->getUUID(processorUUID)) {
@@ -193,7 +193,7 @@ std::shared_ptr<Processor> ProcessGroup::findProcessor(uuid_t uuid) {
     }
   }
   for (auto processGroup : child_process_groups_) {
-    logger_->log_info("find processor child %s",
+    logger_.log_info("find processor child %s",
                       processGroup->getName().c_str());
     std::shared_ptr<Processor> processor = processGroup->findProcessor(uuid);
     if (processor)
@@ -206,7 +206,7 @@ std::shared_ptr<Processor> ProcessGroup::findProcessor(
     const std::string &processorName) {
   std::shared_ptr<Processor> ret = NULL;
   for (auto processor : processors_) {
-    logger_->log_debug("Current processor is %s", processor->getName().c_str());
+    logger_.log_debug("Current processor is %s", processor->getName().c_str());
     if (processor->getName() == processorName)
       return processor;
   }
@@ -251,7 +251,7 @@ void ProcessGroup::addConnection(std::shared_ptr<Connection> connection) {
   if (connections_.find(connection) == connections_.end()) {
     // We do not have the same connection in this process group yet
     connections_.insert(connection);
-    logger_->log_info("Add connection %s into process group %s",
+    logger_.log_info("Add connection %s into process group %s",
                       connection->getName().c_str(), name_.c_str());
     uuid_t sourceUUID;
     std::shared_ptr<Processor> source = NULL;
@@ -274,7 +274,7 @@ void ProcessGroup::removeConnection(std::shared_ptr<Connection> connection) {
   if (connections_.find(connection) != connections_.end()) {
     // We do not have the same connection in this process group yet
     connections_.erase(connection);
-    logger_->log_info("Remove connection %s into process group %s",
+    logger_.log_info("Remove connection %s into process group %s",
                       connection->getName().c_str(), name_.c_str());
     uuid_t sourceUUID;
     std::shared_ptr<Processor> source = NULL;

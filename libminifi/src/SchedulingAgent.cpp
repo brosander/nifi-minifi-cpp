@@ -67,14 +67,14 @@ bool SchedulingAgent::onTrigger(std::shared_ptr<core::Processor> processor,
     processor->decrementActiveTask();
   } catch (Exception &exception) {
     // Normal exception
-    logger_->log_debug("Caught Exception %s", exception.what());
+    logger_.log_debug("Caught Exception %s", exception.what());
     processor->decrementActiveTask();
   } catch (std::exception &exception) {
-    logger_->log_debug("Caught Exception %s", exception.what());
+    logger_.log_debug("Caught Exception %s", exception.what());
     processor->yield(_administrativeYieldDuration);
     processor->decrementActiveTask();
   } catch (...) {
-    logger_->log_debug("Caught Exception during SchedulingAgent::onTrigger");
+    logger_.log_debug("Caught Exception during SchedulingAgent::onTrigger");
     processor->yield(_administrativeYieldDuration);
     processor->decrementActiveTask();
   }

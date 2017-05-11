@@ -121,7 +121,7 @@ void TailFile::parseStateFileLine(char *buf) {
 void TailFile::recoverState() {
   std::ifstream file(_stateFile.c_str(), std::ifstream::in);
   if (!file.good()) {
-    logger_->log_error("load state file failed %s", _stateFile.c_str());
+    logger_.log_error("load state file failed %s", _stateFile.c_str());
     return;
   }
   char buf[BUFFER_SIZE];
@@ -134,7 +134,7 @@ void TailFile::recoverState() {
 void TailFile::storeState() {
   std::ofstream file(_stateFile.c_str());
   if (!file.is_open()) {
-    logger_->log_error("store state file failed %s", _stateFile.c_str());
+    logger_.log_error("store state file failed %s", _stateFile.c_str());
     return;
   }
   file << "FILENAME=" << this->_currentTailFileName << "\n";
@@ -200,7 +200,7 @@ void TailFile::checkRollOver(const std::string &fileLocation,
         ++it;
         if (it != matchedFiles.end()) {
           TailMatchedFileItem nextItem = *it;
-          logger_->log_info("TailFile File Roll Over from %s to %s",
+          logger_.log_info("TailFile File Roll Over from %s to %s",
                             _currentTailFileName.c_str(),
                             nextItem.fileName.c_str());
           _currentTailFileName = nextItem.fileName;
@@ -256,7 +256,7 @@ void TailFile::onTrigger(core::ProcessContext *context,
     flowFile->addKeyedAttribute(ABSOLUTE_PATH, fullPath);
     session->import(fullPath, flowFile, true, this->_currentTailFilePosition);
     session->transfer(flowFile, Success);
-    logger_->log_info("TailFile %s for %d bytes", _currentTailFileName.c_str(),
+    logger_.log_info("TailFile %s for %d bytes", _currentTailFileName.c_str(),
                       flowFile->getSize());
     std::string logName = baseName + "."
         + std::to_string(_currentTailFilePosition) + "-"

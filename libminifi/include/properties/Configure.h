@@ -64,9 +64,7 @@ class Configure {
   static const char *nifi_security_client_pass_phrase;
   static const char *nifi_security_client_ca_certificate;
 
-  Configure() {
-    logger_ = logging::Logger::getLogger();
-  }
+  Configure() : logger_(logging::Logger<Configure>::getLogger()) {}
   
   virtual ~Configure() {
 
@@ -109,7 +107,7 @@ class Configure {
   // Mutex for protection
   std::mutex mutex_;
   // Logger
-  std::shared_ptr<logging::Logger> logger_;
+  logging::Logger<Configure> & logger_;
   // Home location for this executable
   std::string minifi_home_;
 

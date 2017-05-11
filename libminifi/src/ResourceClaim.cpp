@@ -35,7 +35,8 @@ char *ResourceClaim::default_directory_path = const_cast<char*>(DEFAULT_CONTENT_
 
 ResourceClaim::ResourceClaim(const std::string contentDirectory)
     : _id(_localResourceClaimNumber.load()),
-      _flowFileRecordOwnedCount(0) {
+      _flowFileRecordOwnedCount(0),
+      logger_(logging::Logger<ResourceClaim>::getLogger()) {
 
   char uuidStr[37];
 
@@ -47,8 +48,7 @@ ResourceClaim::ResourceClaim(const std::string contentDirectory)
   // Create the full content path for the content
   _contentFullPath = contentDirectory + "/" + uuidStr;
 
-  logger_ = logging::Logger::getLogger();
-  logger_->log_debug("Resource Claim created %s", _contentFullPath.c_str());
+  logger_.log_debug("Resource Claim created %s", _contentFullPath.c_str());
 }
 
 } /* namespace minifi */

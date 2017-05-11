@@ -118,7 +118,7 @@ void RemoteProcessorGroupPort::onTrigger(core::ProcessContext *context,
     context->yield();
     std::shared_ptr<Processor> processor = std::static_pointer_cast < Processor
         > (context->getProcessorNode().getProcessor());
-    logger_->log_error("Site2Site bootstrap failed yield period %d peer ",
+    logger_.log_error("Site2Site bootstrap failed yield period %d peer ",
         processor->getYieldPeriodMsec());
     returnSite2SiteProtocol(protocol_);
     return;

@@ -63,7 +63,8 @@ FlowController::FlowController(
       protocol_(0),
       _timerScheduler(provenance_repo_, configure),
       _eventScheduler(provenance_repo_, configure),
-      flow_configuration_(std::move(flow_configuration)) {
+      flow_configuration_(std::move(flow_configuration)),
+      logger_(logging::Logger<FlowController>::getLogger()) {
   if (provenance_repo == nullptr)
     throw std::runtime_error("Provenance Repo should not be null");
   if (flow_file_repo == nullptr)
@@ -119,7 +120,7 @@ void FlowController::initializePaths(const std::string &adjustedFilename) {
   }
   std::string pathString(path);
   configuration_filename_ = pathString;
-  logger_->log_info("FlowController NiFi Configuration file %s",
+  logger_.log_info("FlowController NiFi Configuration file %s",
                     pathString.c_str());
 
   // Create the content repo directory if needed
@@ -128,10 +129,10 @@ void FlowController::initializePaths(const std::string &adjustedFilename) {
   if (stat(ResourceClaim::default_directory_path, &contentDirStat)
       != -1&& S_ISDIR(contentDirStat.st_mode)) {
     path = realpath(ResourceClaim::default_directory_path, full_path);
-    logger_->log_info("FlowController content directory %s", full_path);
+    logger_.log_info("FlowController content directory %s", full_path);
   } else {
     if (mkdir(ResourceClaim::default_directory_path, 0777) == -1) {
-      logger_->log_error("FlowController content directory creation failed");
+      logger_.log_error("FlowController content directory creation failed");
       exit(1);
     }
   }
@@ -139,7 +140,7 @@ void FlowController::initializePaths(const std::string &adjustedFilename) {
   std::string clientAuthStr;
 
   if (!path) {
-    logger_->log_error(
+    logger_.log_error(
         "Could not locate path from provided configuration file name (%s).  Exiting.",
         full_path);
     exit(1);
@@ -161,7 +162,7 @@ void FlowController::stop(bool force) {
     // immediately indicate that we are not running
     running_ = false;
 
-    logger_->log_info("Stop Flow Controller");
+    logger_.log_info("Stop Flow Controller");
     this->_timerScheduler.stop();
     this->_eventScheduler.stop();
     this->flow_file_repo_->stop();
@@ -206,7 +207,7 @@ void FlowController::unload() {
     stop(true);
   }
   if (initialized_) {
-    logger_->log_info("Unload Flow Controller");
+    logger_.log_info("Unload Flow Controller");
     root_ = nullptr;
     initialized_ = false;
     name_ = "";
@@ -221,7 +222,7 @@ void FlowController::load() {
     stop(true);
   }
   if (!initialized_) {
-    logger_->log_info("Load Flow Controller from file %s",
+    logger_.log_info("Load Flow Controller from file %s",
                       configuration_filename_.c_str());
 
     this->root_ = flow_configuration_->getRoot(configuration_filename_);
@@ -235,7 +236,7 @@ void FlowController::load() {
 
 void FlowController::reload(std::string yamlFile) {
   std::lock_guard<std::recursive_mutex> flow_lock(mutex_);
-  logger_->log_info("Starting to reload Flow Controller with yaml %s",
+  logger_.log_info("Starting to reload Flow Controller with yaml %s",
                     yamlFile.c_str());
   stop(true);
   unload();
@@ -245,7 +246,7 @@ void FlowController::reload(std::string yamlFile) {
   start();
   if (this->root_ != nullptr) {
     this->configuration_filename_ = oldYamlFile;
-    logger_->log_info("Rollback Flow Controller to YAML %s",
+    logger_.log_info("Rollback Flow Controller to YAML %s",
                       oldYamlFile.c_str());
     stop(true);
     unload();
@@ -270,12 +271,12 @@ void FlowController::loadFlowRepo() {
 bool FlowController::start() {
   std::lock_guard<std::recursive_mutex> flow_lock(mutex_);
   if (!initialized_) {
-    logger_->log_error(
+    logger_.log_error(
         "Can not start Flow Controller because it has not been initialized");
     return false;
   } else {
     if (!running_) {
-      logger_->log_info("Starting Flow Controller");
+      logger_.log_info("Starting Flow Controller");
       this->_timerScheduler.start();
       this->_eventScheduler.start();
       if (this->root_ != nullptr) {
@@ -286,7 +287,7 @@ bool FlowController::start() {
       this->protocol_->start();
       this->provenance_repo_->start();
       this->flow_file_repo_->start();
-      logger_->log_info("Started Flow Controller");
+      logger_.log_info("Started Flow Controller");
     }
     return true;
   }

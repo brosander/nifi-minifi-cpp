@@ -43,9 +43,9 @@ class RemoteProcessorGroupPort : public core::Processor {
   RemoteProcessorGroupPort(const std::shared_ptr<io::StreamFactory> &stream_factory, std::string name, uuid_t uuid = NULL)
       : core::Processor(name, uuid),
         direction_(SEND),
-        transmitting_(false) {
+        transmitting_(false),
+        logger_(logging::Logger<RemoteProcessorGroupPort>::getLogger()) {
     stream_factory_ = stream_factory;
-    logger_ = logging::Logger::getLogger();
     uuid_copy(protocol_uuid_, uuid);
   }
   // Destructor
@@ -91,7 +91,7 @@ class RemoteProcessorGroupPort : public core::Processor {
   std::stack<std::unique_ptr<Site2SiteClientProtocol>> available_protocols_;
   std::mutex protocol_mutex_;
   // Logger
-  std::shared_ptr<logging::Logger> logger_;
+  logging::Logger<RemoteProcessorGroupPort> & logger_;
   // Transaction Direction
   TransferDirection direction_;
   // Transmitting

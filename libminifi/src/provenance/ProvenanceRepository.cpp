@@ -46,7 +46,7 @@ void ProvenanceRepository::run() {
           if ((curTime - eventRead.getEventTime()) > max_partition_millis_)
             purgeList.push_back(key);
         } else {
-          logger_->log_debug("NiFi Provenance retrieve event %s fail",
+          logger_.log_debug("NiFi Provenance retrieve event %s fail",
                              key.c_str());
           purgeList.push_back(key);
         }
@@ -56,7 +56,7 @@ void ProvenanceRepository::run() {
 
       for (itPurge = purgeList.begin(); itPurge != purgeList.end(); itPurge++) {
         std::string eventId = *itPurge;
-        logger_->log_info("ProvenanceRepository Repo Purge %s",
+        logger_.log_info("ProvenanceRepository Repo Purge %s",
                           eventId.c_str());
         Delete(eventId);
       }

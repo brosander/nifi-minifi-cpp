@@ -86,8 +86,7 @@ class CoreComponent {
    * Constructor that sets the name and uuid.
    */
   explicit CoreComponent(const std::string name, uuid_t uuid = 0)
-      : logger_(logging::Logger::getLogger()),
-        name_(name) {
+      : name_(name) {
     if (!uuid)
       // Generate the global UUID for the flow record
       uuid_generate(uuid_);
@@ -103,8 +102,7 @@ class CoreComponent {
    * Move Constructor.
    */
   explicit CoreComponent(const CoreComponent &&other)
-      : name_(std::move(other.name_)),
-        logger_(logging::Logger::getLogger()) {
+      : name_(std::move(other.name_)) {
     uuid_copy(uuid_, other.uuid_);
   }
 
@@ -147,9 +145,6 @@ class CoreComponent {
   uuid_t uuid_;
   // UUID string
   std::string uuidStr_;
-
-  // logger shared ptr
-  std::shared_ptr<org::apache::nifi::minifi::core::logging::Logger> logger_;
 
   // Connectable's name
   std::string name_;

@@ -48,8 +48,8 @@ Socket::Socket(const std::shared_ptr<SocketContext> &context, const std::string 
       socket_file_descriptor_(-1),
       socket_max_(0),
       listeners_(listeners),
-      canonical_hostname_("") {
-  logger_ = logging::Logger::getLogger();
+      canonical_hostname_(""),
+      logger_(logging::Logger<Socket>::getLogger()) {
   FD_ZERO(&total_list_);
   FD_ZERO(&read_fds_);
 }
@@ -67,8 +67,8 @@ Socket::Socket(const Socket &&other)
       listeners_(other.listeners_),
       total_list_(other.total_list_),
       read_fds_(other.read_fds_),
-      canonical_hostname_(std::move(other.canonical_hostname_)) {
-  logger_ = logging::Logger::getLogger();
+      canonical_hostname_(std::move(other.canonical_hostname_)),
+      logger_(other.logger_) {
 }
 
 Socket::~Socket() {
@@ -89,7 +89,7 @@ void Socket::closeStream() {
 int8_t Socket::createConnection(const addrinfo *p, in_addr_t &addr) {
   if ((socket_file_descriptor_ = socket(p->ai_family, p->ai_socktype,
                                         p->ai_protocol)) == -1) {
-    logger_->log_error("error while connecting to server socket");
+    logger_.log_error("error while connecting to server socket");
     return -1;
   }
 
@@ -101,7 +101,7 @@ int8_t Socket::createConnection(const addrinfo *p, in_addr_t &addr) {
     sa_loc->sin_port = htons(port_);
     sa_loc->sin_addr.s_addr = htonl(INADDR_ANY);
     if (bind(socket_file_descriptor_, p->ai_addr, p->ai_addrlen) == -1) {
-      logger_->log_error("Could not bind to socket", strerror(errno));
+      logger_.log_error("Could not bind to socket", strerror(errno));
       return -1;
     }
   }
@@ -154,7 +154,7 @@ int16_t Socket::initialize() {
                             &addr_info_);
 
   if (errcode != 0) {
-    logger_->log_error("Saw error during getaddrinfo, error: %s",
+    logger_.log_error("Saw error during getaddrinfo, error: %s",
                        strerror(errno));
     return -1;
   }
@@ -211,7 +211,7 @@ int16_t Socket::select_descriptor(const uint16_t msec) {
     retval = select(socket_max_ + 1, &read_fds_, NULL, NULL, NULL);
 
   if (retval < 0) {
-    logger_->log_error("Saw error during selection, error:%i %s", retval,
+    logger_.log_error("Saw error during selection, error:%i %s", retval,
                        strerror(errno));
     return retval;
   }
@@ -251,13 +251,13 @@ int16_t Socket::setSocketOptions(const int sock) {
   if (nagle_off) {
     if (setsockopt(sock, SOL_TCP, TCP_NODELAY, static_cast<void*>(&opt), sizeof(opt))
         < 0) {
-      logger_->log_error("setsockopt() TCP_NODELAY failed");
+      logger_.log_error("setsockopt() TCP_NODELAY failed");
       close(sock);
       return -1;
     }
     if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char*>(&opt),
             sizeof(opt)) < 0) {
-      logger_->log_error("setsockopt() SO_REUSEADDR failed");
+      logger_.log_error("setsockopt() SO_REUSEADDR failed");
       close(sock);
       return -1;
     }
@@ -266,7 +266,7 @@ int16_t Socket::setSocketOptions(const int sock) {
   int sndsize = 256 * 1024;
   if (setsockopt(sock, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char *>( &sndsize),
           sizeof(sndsize)) < 0) {
-    logger_->log_error("setsockopt() SO_SNDBUF failed");
+    logger_.log_error("setsockopt() SO_SNDBUF failed");
     close(sock);
     return -1;
   }
@@ -305,7 +305,7 @@ int Socket::writeData(uint8_t *value, int size) {
     // check for errors
     if (ret <= 0) {
       close(socket_file_descriptor_);
-      logger_->log_error("Could not send to %d, error: %s",
+      logger_.log_error("Could not send to %d, error: %s",
                          socket_file_descriptor_, strerror(errno));
       return ret;
     }
@@ -313,7 +313,7 @@ int Socket::writeData(uint8_t *value, int size) {
   }
 
   if (ret)
-    logger_->log_trace("Send data size %d over socket %d", size,
+    logger_.log_trace("Send data size %d over socket %d", size,
                        socket_file_descriptor_);
   return bytes;
 }
@@ -389,16 +389,16 @@ int Socket::readData(uint8_t *buf, int buflen) {
   while (buflen) {
     int16_t fd = select_descriptor(1000);
     if (fd < 0) {
-      logger_->log_info("fd close %i", buflen);
+      logger_.log_info("fd close %i", buflen);
       close(socket_file_descriptor_);
       return -1;
     }
     int bytes_read = recv(fd, buf, buflen, 0);
     if (bytes_read <= 0) {
       if (bytes_read == 0) {
-        logger_->log_info("Other side hung up on %d", fd);
+        logger_.log_info("Other side hung up on %d", fd);
       } else {
-        logger_->log_error("Could not recv on %d, error: %s", fd,
+        logger_.log_error("Could not recv on %d, error: %s", fd,
                            strerror(errno));
       }
       return -1;

@@ -49,8 +49,7 @@ class SchedulingAgent {
   /*!
    * Create a new processor
    */
-  SchedulingAgent(std::shared_ptr<core::Repository> repo) {
-    logger_ = logging::Logger::getLogger();
+  SchedulingAgent(std::shared_ptr<core::Repository> repo) : logger_(logging::Logger<SchedulingAgent>::getLogger()) {
     running_ = false;
     repo_ = repo;
   }
@@ -85,7 +84,7 @@ class SchedulingAgent {
   SchedulingAgent &operator=(const SchedulingAgent &parent) = delete;
  protected:
   // Logger
-  std::shared_ptr<logging::Logger> logger_;
+  logging::Logger<SchedulingAgent> & logger_;
   // Mutex for protection
   std::mutex mutex_;
   // Whether it is running

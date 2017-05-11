@@ -51,7 +51,8 @@ class Site2SitePeer : public org::apache::nifi::minifi::io::BaseStream {
   Site2SitePeer()
       : stream_(nullptr),
         host_(""),
-        port_(-1) {
+        port_(-1),
+        logger_(logging::Logger<Site2SitePeer>::getLogger()){
 
   }
   /*
@@ -62,8 +63,8 @@ class Site2SitePeer : public org::apache::nifi::minifi::io::BaseStream {
       const std::string host_, uint16_t port_)
       : host_(host_),
         port_(port_),
-        stream_(injected_socket.release()) {
-    logger_ = logging::Logger::getLogger();
+        stream_(injected_socket.release()),
+        logger_(logging::Logger<Site2SitePeer>::getLogger()) {
     _yieldExpiration = 0;
     _timeOut = 30000;  // 30 seconds
     _url = "nifi://" + host_ + ":" + std::to_string(port_);
@@ -72,8 +73,8 @@ class Site2SitePeer : public org::apache::nifi::minifi::io::BaseStream {
   explicit Site2SitePeer(Site2SitePeer &&ss)
       : stream_(ss.stream_.release()),
         host_(std::move(ss.host_)),
-        port_(std::move(ss.port_)) {
-    logger_ = logging::Logger::getLogger();
+        port_(std::move(ss.port_)),
+        logger_(ss.logger_) {
     _yieldExpiration.store(ss._yieldExpiration);
     _timeOut.store(ss._timeOut);
     _url = std::move(ss._url);
@@ -235,7 +236,6 @@ class Site2SitePeer : public org::apache::nifi::minifi::io::BaseStream {
         other.stream_.release());
     host_ = std::move(other.host_);
     port_ = std::move(other.port_);
-    logger_ = logging::Logger::getLogger();
     _yieldExpiration = 0;
     _timeOut = 30000;  // 30 seconds
     _url = "nifi://" + host_ + ":" + std::to_string(port_);
@@ -262,7 +262,7 @@ class Site2SitePeer : public org::apache::nifi::minifi::io::BaseStream {
   // socket timeout;
   std::atomic<uint64_t> _timeOut;
   // Logger
-  std::shared_ptr<logging::Logger> logger_;
+  logging::Logger<Site2SitePeer> & logger_;
   // Yield Period in Milliseconds
   std::atomic<uint64_t> _yieldPeriodMsec;
   // Yield Expiration

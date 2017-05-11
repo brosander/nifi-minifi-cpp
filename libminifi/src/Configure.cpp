@@ -133,11 +133,11 @@ void Configure::loadConfigureFile(const char *fileName) {
   char *path = NULL;
   char full_path[PATH_MAX];
   path = realpath(adjustedFilename.c_str(), full_path);
-  logger_->log_info("Using configuration file located at %s", path);
+  logger_.log_info("Using configuration file located at %s", path);
 
   std::ifstream file(path, std::ifstream::in);
   if (!file.good()) {
-    logger_->log_error("load configure file failed %s", path);
+    logger_.log_error("load configure file failed %s", path);
     return;
   }
   this->clear();

@@ -56,7 +56,8 @@ class Repository : public CoreComponent {
              int64_t maxPartitionMillis, int64_t maxPartitionBytes,
              uint64_t purgePeriod)
       : CoreComponent(repo_name),
-        thread_() {
+        thread_(),
+        logger_(logging::Logger<Repository>::getLogger()) {
     directory_ = directory;
     max_partition_millis_ = maxPartitionMillis;
     max_partition_bytes_ = maxPartitionBytes;
@@ -134,6 +135,7 @@ class Repository : public CoreComponent {
   uint64_t repoSize();
   // size of the directory
   std::atomic<uint64_t> repo_size_;
+  logging::Logger<Repository> & logger_;
   // Run function for the thread
   void threadExecutor() {
     run();

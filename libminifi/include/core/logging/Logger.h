@@ -31,6 +31,7 @@
 
 #include "BaseLogger.h"
 #include "spdlog/spdlog.h"
+#include "spdlog/fmt/bundled/ostream.h"
 
 namespace org {
 namespace apache {
@@ -38,180 +39,83 @@ namespace nifi {
 namespace minifi {
 namespace core {
 namespace logging {
-
-/**
- * Logger class
- * Design: Extends BaseLogger, leaving this class to be the facade to the underlying
- * logging mechanism. Is a facade to BaseLogger's underlying log stream. This allows
- * the underlying implementation to be replaced real time.
- */
-class Logger : public BaseLogger {
- protected:
-  struct singleton;
+ 
+class LoggerFactory {
  public:
-
-  /**
-   * Returns a shared pointer to the logger instance.
-   * Note that while there is no synchronization this is expected
-   * to be called and initialized first
-   * @returns shared pointer to the base logger.
-   */
-  static std::shared_ptr<Logger> getLogger() {
-
-    if (singleton_logger_ == nullptr)
-      singleton_logger_ = std::make_shared<Logger>(singleton { 0 });
-    return singleton_logger_;
+  static LoggerFactory * getInstance() {
+   if (!loggerFactory_) {
+    loggerFactory_ = new LoggerFactory();
+   }
+   return loggerFactory_;
   }
+ private:
+  static LoggerFactory * loggerFactory_;
+};
 
-  /**
-   * Returns the log level for this instance.
-   */
-  LOG_LEVEL_E getLogLevel() const {
-    return current_logger_.load()->getLogLevel();
+template<typename T>
+class Logger {
+ public:
+  static Logger<T>& getLogger() {
+   static Logger<T> logger;
+   return logger;
   }
-
-  /**
-   * Sets the log level atomic and sets it
-   * within logger if it can
-   * @param level desired log level.
-   */
-  void setLogLevel(LOG_LEVEL_E level) {
-    current_logger_.load()->setLogLevel(level);
-  }
-
-  /**
-   * Sets the log level for this instance based on the string
-   * @param level desired log leve.
-   * @param defaultLevel default level if we cannot match level.
-   */
-  void setLogLevel(const std::string &level, LOG_LEVEL_E defaultLevel = info) {
-    current_logger_.load()->setLogLevel(level, info);
-  }
-
-  void updateLogger(std::unique_ptr<BaseLogger> logger) {
-
-    if (logger == nullptr)
-      return;
-    current_logger_.store(logger.release());
-  }
-
+  
   /**
    * @brief Log error message
    * @param format format string ('man printf' for syntax)
    * @warning does not check @p log or @p format for null. Caller must ensure parameters and format string lengths match
    */
   template<typename ... Args>
-  void log_error(const char * const format, Args ... args) {
-    if (!current_logger_.load()->shouldLog(err))
-      return;
-
-    current_logger_.load()->log_str(
-        err, format_string(format, conditional_conversion(args)...));
+  void log_error(const char * const format, const Args& ... args) {
+   delegate_->log(spdlog::level::err, format, args...);
   }
+  
   /**
    * @brief Log warn message
    * @param format format string ('man printf' for syntax)
    * @warning does not check @p log or @p format for null. Caller must ensure parameters and format string lengths match
    */
   template<typename ... Args>
-  void log_warn(const char * const format, Args ... args) {
-    if (!current_logger_.load()->shouldLog(warn))
-      return;
-
-    current_logger_.load()->log_str(
-        warn, format_string(format, conditional_conversion(args)...));
+  void log_warn(const char * const format, const Args& ... args) {
+   delegate_->log(spdlog::level::warn, format, args...);
   }
+  
   /**
    * @brief Log info message
    * @param format format string ('man printf' for syntax)
    * @warning does not check @p log or @p format for null. Caller must ensure parameters and format string lengths match
    */
   template<typename ... Args>
-  void log_info(const char * const format, Args ... args) {
-    if (!current_logger_.load()->shouldLog(info))
-      return;
-
-    current_logger_.load()->log_str(
-        info, format_string(format, conditional_conversion(args)...));
+  void log_info(const char * const format, const Args& ... args) {
+   delegate_->log(spdlog::level::info, format, args...);
   }
+  
   /**
    * @brief Log debug message
    * @param format format string ('man printf' for syntax)
    * @warning does not check @p log or @p format for null. Caller must ensure parameters and format string lengths match
    */
   template<typename ... Args>
-  void log_debug(const char * const format, Args ... args) {
-
-    if (!current_logger_.load()->shouldLog(debug))
-      return;
-
-    current_logger_.load()->log_str(
-        debug, format_string(format, conditional_conversion(args)...));
+  void log_debug(const char * const format, const Args& ... args) {
+   delegate_->log(spdlog::level::debug, format, args...);
   }
+  
   /**
    * @brief Log trace message
    * @param format format string ('man printf' for syntax)
    * @warning does not check @p log or @p format for null. Caller must ensure parameters and format string lengths match
    */
   template<typename ... Args>
-  void log_trace(const char * const format, Args ... args) {
-
-    if (!current_logger_.load()->shouldLog(trace))
-      return;
-
-    current_logger_.load()->log_str(
-        trace, format_string(format, conditional_conversion(args)...));
+  void log_trace(const char * const format, const Args& ... args) {
+   delegate_->log(spdlog::level::trace, format, args...);
   }
-
-  /**
-   * @brief Log message
-   * @param format format string ('man printf' for syntax)
-   * @warning does not check @p log or @p format for null. Caller must ensure parameters and format string lengths match
-   */
-  virtual void log_str(LOG_LEVEL_E level, const std::string &buffer) {
-    current_logger_.load()->log_str(level, buffer);
-  }
-
-  // Destructor
-  ~Logger() {
-  }
-
-  explicit Logger(const singleton &a) {
-
-    /**
-     * flush on info to maintain current functionality
-     */
-    std::shared_ptr<spdlog::logger> defaultsink = spdlog::rotating_logger_mt(
-        LOG_NAME,
-        LOG_FILE_NAME,
-        DEFAULT_LOG_FILE_SIZE, DEFAULT_LOG_FILE_NUMBER);
-    defaultsink->flush_on(spdlog::level::level_enum::info);
-
-    std::unique_ptr<BaseLogger> new_logger_ = std::unique_ptr<BaseLogger>(
-        new BaseLogger("info", defaultsink));
-
-    new_logger_->setLogLevel(info);
-    current_logger_.store(new_logger_.release());
-  }
-
-  Logger(const Logger &parent) = delete;
-  Logger &operator=(const Logger &parent) = delete;
-
- protected:
-
-  /**
-   * Allows for a null constructor above so that we can have a public constructor that
-   * effectively limits us to being a singleton by having a protected argument in the constructor
-   */
-  struct singleton {
-    explicit singleton(int) {
-    }
-  };
-
-  std::atomic<BaseLogger*> current_logger_;
-
-// Singleton logger instance
-  static std::shared_ptr<Logger> singleton_logger_;
+  
+ private:
+  Logger();
+  Logger(Logger<T> const&);
+  Logger& operator=(Logger<T> const&);
+  
+  std::shared_ptr<spdlog::logger> delegate_;
 };
 
 } /* namespace logging */

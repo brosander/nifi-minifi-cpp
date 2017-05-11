@@ -40,8 +40,8 @@ class AppendHostInfo : public core::Processor {
    * Create a new processor
    */
   AppendHostInfo(std::string name, uuid_t uuid = NULL)
-      : core::Processor(name, uuid) {
-    logger_ = logging::Logger::getLogger();
+      : core::Processor(name, uuid),
+        logger_(logging::Logger<AppendHostInfo>::getLogger()){
   }
   // Destructor
   virtual ~AppendHostInfo() {
@@ -67,7 +67,7 @@ class AppendHostInfo : public core::Processor {
 
  private:
   // Logger
-  std::shared_ptr<logging::Logger> logger_;
+  logging::Logger<AppendHostInfo> & logger_;
 };
 
 } /* namespace processors */

@@ -49,14 +49,14 @@ void FlowFileRepository::run() {
           if ((curTime - eventRead->getEventTime()) > max_partition_millis_)
             purgeList.push_back(key);
         } else {
-          logger_->log_debug("NiFi %s retrieve event %s fail", name_.c_str(),
+          logger_.log_debug("NiFi %s retrieve event %s fail", name_.c_str(),
                              key.c_str());
           purgeList.push_back(key);
         }
       }
       delete it;
       for (auto eventId : purgeList) {
-        logger_->log_info("Repository Repo %s Purge %s", name_.c_str(),
+        logger_.log_info("Repository Repo %s Purge %s", name_.c_str(),
                           eventId.c_str());
         Delete(eventId);
       }
@@ -105,7 +105,7 @@ void FlowFileRepository::loadComponent() {
   std::vector<std::string>::iterator itPurge;
   for (itPurge = purgeList.begin(); itPurge != purgeList.end(); itPurge++) {
     std::string eventId = *itPurge;
-    logger_->log_info("Repository Repo %s Purge %s", name_.c_str(),
+    logger_.log_info("Repository Repo %s Purge %s", name_.c_str(),
                       eventId.c_str());
     Delete(eventId);
   }

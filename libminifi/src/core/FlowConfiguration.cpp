@@ -76,7 +76,7 @@ std::shared_ptr<core::Processor> FlowConfiguration::createProcessor(
     processor = std::make_shared<
         org::apache::nifi::minifi::processors::AppendHostInfo>(name, uuid);
   } else {
-    logger_->log_error("No Processor defined for %s", name.c_str());
+    logger_.log_error("No Processor defined for %s", name.c_str());
     return nullptr;
   }
 

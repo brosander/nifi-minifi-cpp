@@ -39,8 +39,8 @@ class LogAttribute : public core::Processor {
    * Create a new processor
    */
   LogAttribute(std::string name, uuid_t uuid = NULL)
-      : Processor(name, uuid) {
-    logger_ = logging::Logger::getLogger();
+      : Processor(name, uuid),
+        logger_(logging::Logger<LogAttribute>::getLogger()) {
   }
   // Destructor
   virtual ~LogAttribute() {
@@ -117,7 +117,7 @@ class LogAttribute : public core::Processor {
 
  private:
   // Logger
-  std::shared_ptr<logging::Logger> logger_;
+  logging::Logger<LogAttribute> & logger_;
 };
 
 } /* namespace processors */
