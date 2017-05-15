@@ -83,8 +83,6 @@ class SchedulingAgent {
   SchedulingAgent(const SchedulingAgent &parent) = delete;
   SchedulingAgent &operator=(const SchedulingAgent &parent) = delete;
  protected:
-  // Logger
-  logging::Logger<SchedulingAgent> & logger_;
   // Mutex for protection
   std::mutex mutex_;
   // Whether it is running
@@ -97,6 +95,8 @@ class SchedulingAgent {
   std::shared_ptr<core::Repository> repo_;
 
  private:
+  // Logger
+  logging::Logger<SchedulingAgent> & logger_;
   // Prevent default copy constructor and assignment operation
   // Only support pass by reference or pointer
 

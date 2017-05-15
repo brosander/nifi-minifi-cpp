@@ -158,9 +158,10 @@ class TLSSocket : public Socket {
 
  protected:
   std::shared_ptr<TLSContext> context_;
-  logging::Logger<TLSSocket> & logger_;
   SSL* ssl;
 
+ private:
+  logging::Logger<TLSSocket> & logger_;
 };
 
 } /* namespace io */

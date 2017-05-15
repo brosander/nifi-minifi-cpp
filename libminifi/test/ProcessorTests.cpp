@@ -20,7 +20,6 @@
 #include <fstream>
 #include "unit/ProvenanceTestHelper.h"
 #include "TestBase.h"
-#include "core/logging/LogAppenders.h"
 #include "core/logging/BaseLogger.h"
 #include "processors/GetFile.h"
 #include "core/Core.h"
@@ -43,7 +42,7 @@ TEST_CASE("Test Find file", "[getfileCreate2]") {
 
   TestController testController;
 
-  testController.enableDebug();
+  testController.enableDebug("");
 
   std::shared_ptr<core::Processor> processor = std::make_shared<
       org::apache::nifi::minifi::processors::GetFile>("getfileCreate2");
@@ -181,7 +180,7 @@ TEST_CASE("Test GetFileLikeIt'sThreaded", "[getfileCreate3]") {
 
   TestController testController;
 
-  testController.enableDebug();
+  testController.enableDebug("");
 
   std::shared_ptr<core::Processor> processor = std::make_shared<
       org::apache::nifi::minifi::processors::GetFile>("getfileCreate2");
@@ -273,16 +272,12 @@ TEST_CASE("Test GetFileLikeIt'sThreaded", "[getfileCreate3]") {
 
 TEST_CASE("LogAttributeTest", "[getfileCreate3]") {
   std::ostringstream oss;
-  std::unique_ptr<logging::BaseLogger> outputLogger = std::unique_ptr<
-      logging::BaseLogger>(
-      new org::apache::nifi::minifi::core::logging::OutputStreamAppender(oss,
-                                                                         0));
-  std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
-  logger->updateLogger(std::move(outputLogger));
+//   std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
+//   logger->updateLogger(std::move(outputLogger));
 
   TestController testController;
 
-  testController.enableDebug();
+  testController.enableDebug("");
 
   std::shared_ptr<core::Repository> repo = std::make_shared<TestRepository>();
 
@@ -391,9 +386,8 @@ TEST_CASE("LogAttributeTest", "[getfileCreate3]") {
       log_attribute_output.find("key:path value:" + std::string(dir))
           != std::string::npos);
 
-  outputLogger = std::unique_ptr<logging::BaseLogger>(
-      new org::apache::nifi::minifi::core::logging::NullAppender());
-  logger->updateLogger(std::move(outputLogger));
+//   
+//   logger->updateLogger(std::move(outputLogger));
 
 }
 

@@ -44,7 +44,7 @@ namespace minifi {
 namespace core {
 
 Processor::Processor(std::string name, uuid_t uuid)
-    : Connectable(name, uuid),
+    : Connectable(name, uuid), ConfigurableComponent(),
     logger_(logging::Logger<Processor>::getLogger()) {
   has_work_.store(false);
   // Setup the default values

@@ -24,23 +24,27 @@
 #include "ResourceClaim.h"
 #include "catch.hpp"
 #include <vector>
-#include "core/logging/LogAppenders.h"
 #include "core/logging/Logger.h"
 #include "core/Core.h"
 #include "properties/Configure.h"
+#include "properties/Properties.h"
+#include "core/logging/LoggerConfiguration.h"
 
 class LogTestController {
  public:
   LogTestController(const std::string level = "debug") {
-    logging::Logger::getLogger()->setLogLevel(level);
+//     logging::Logger::getLogger()->setLogLevel(level);
+   logging::LoggerProperties *logger_properties = new logging::LoggerProperties();
+   logging::LoggerConfiguration::initialize(logger_properties);
+   delete logger_properties;
   }
 
   void enableDebug() {
-    logging::Logger::getLogger()->setLogLevel("debug");
+//     logging::Logger::getLogger()->setLogLevel("debug");
   }
 
   ~LogTestController() {
-    logging::Logger::getLogger()->setLogLevel(logging::LOG_LEVEL_E::info);
+//     logging::Logger::getLogger()->setLogLevel(logging::LOG_LEVEL_E::info);
   }
 };
 
@@ -73,17 +77,8 @@ class TestController {
     }
   }
 
-  void setNullAppender() {
-
-    std::unique_ptr<logging::BaseLogger> outputLogger = std::unique_ptr<
-        logging::BaseLogger>(
-        new org::apache::nifi::minifi::core::logging::NullAppender());
-    std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
-    logger->updateLogger(std::move(outputLogger));
-  }
-
-  void enableDebug() {
-    log.enableDebug();
+  void enableDebug(const std::string name) {
+    logging::LoggerConfiguration::getConfiguration()->get_logger(name)->set_level(spdlog::level::debug);
   }
 
   char *createTempDirectory(char *format) {

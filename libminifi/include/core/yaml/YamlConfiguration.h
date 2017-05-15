@@ -247,6 +247,7 @@ class YamlConfiguration : public FlowConfiguration {
 
  protected:
   std::shared_ptr<io::StreamFactory> stream_factory_;
+ private:
   logging::Logger<YamlConfiguration> & logger_;
 };
 

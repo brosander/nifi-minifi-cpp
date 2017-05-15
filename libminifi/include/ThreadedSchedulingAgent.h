@@ -43,7 +43,7 @@ class ThreadedSchedulingAgent : public SchedulingAgent {
    * Create a new processor
    */
   ThreadedSchedulingAgent(std::shared_ptr<core::Repository> repo, std::shared_ptr<Configure> configure)
-      : SchedulingAgent(repo) {
+      : SchedulingAgent(repo), logger_(logging::Logger<ThreadedSchedulingAgent>::getLogger()) {
        configure_ = configure;
   }
   // Destructor
@@ -71,6 +71,7 @@ class ThreadedSchedulingAgent : public SchedulingAgent {
   ThreadedSchedulingAgent(const ThreadedSchedulingAgent &parent);
   ThreadedSchedulingAgent &operator=(const ThreadedSchedulingAgent &parent);
   std::shared_ptr<Configure> configure_;
+  logging::Logger<ThreadedSchedulingAgent> & logger_;
 };
 
 } /* namespace minifi */

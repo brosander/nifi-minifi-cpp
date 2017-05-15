@@ -21,17 +21,12 @@
 #ifndef __LOGGER_H__
 #define __LOGGER_H__
 
-#include <string>
-#include <atomic>
 #include <memory>
-#include <utility>
-#include <algorithm>
-#include <cstdio>
-#include <iostream>
 
-#include "BaseLogger.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/fmt/bundled/ostream.h"
+
+#include "core/Core.h"
 
 namespace org {
 namespace apache {
@@ -40,17 +35,7 @@ namespace minifi {
 namespace core {
 namespace logging {
  
-class LoggerFactory {
- public:
-  static LoggerFactory * getInstance() {
-   if (!loggerFactory_) {
-    loggerFactory_ = new LoggerFactory();
-   }
-   return loggerFactory_;
-  }
- private:
-  static LoggerFactory * loggerFactory_;
-};
+std::shared_ptr<spdlog::logger> getInitializedSpdlog(const std::string &logger_name);
 
 template<typename T>
 class Logger {
@@ -111,7 +96,9 @@ class Logger {
   }
   
  private:
-  Logger();
+  Logger() {
+   delegate_ = getInitializedSpdlog(core::getClassName<T>());
+  }
   Logger(Logger<T> const&);
   Logger& operator=(Logger<T> const&);
   

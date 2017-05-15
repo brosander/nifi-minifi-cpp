@@ -236,8 +236,6 @@ class Socket : public BaseStream {
    */
   virtual int16_t select_descriptor(const uint16_t msec);
 
-  logging::Logger<Socket> & logger_;
-
   addrinfo *addr_info_;
 
   std::recursive_mutex selection_mutex_;
@@ -254,6 +252,8 @@ class Socket : public BaseStream {
   std::atomic<uint16_t> socket_max_;
   uint16_t listeners_;
 
+ private:
+  logging::Logger<Socket> & logger_;
 };
 
 } /* namespace io */

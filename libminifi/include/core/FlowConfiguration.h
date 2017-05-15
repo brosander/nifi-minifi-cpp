@@ -112,6 +112,8 @@ class FlowConfiguration : public CoreComponent {
   // flow file repo
   std::shared_ptr<core::Repository> flow_file_repo_;
   std::shared_ptr<io::StreamFactory> stream_factory_;
+  
+ private:
   logging::Logger<FlowConfiguration> & logger_;
 };
 

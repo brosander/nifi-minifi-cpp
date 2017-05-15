@@ -60,9 +60,9 @@ int main(int argc, char **argv) {
       logging::BaseLogger>(
       new org::apache::nifi::minifi::core::logging::OutputStreamAppender(oss,
                                                                          0));
-  std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
-  logger->updateLogger(std::move(outputLogger));
-  logger->setLogLevel("debug");
+//   std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
+//   logger->updateLogger(std::move(outputLogger));
+//   logger->setLogLevel("debug");
 
   std::shared_ptr<minifi::Configure> configuration = std::make_shared<minifi::Configure>();
 

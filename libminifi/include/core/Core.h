@@ -18,9 +18,9 @@
 #ifndef LIBMINIFI_INCLUDE_CORE_CORE_H_
 #define LIBMINIFI_INCLUDE_CORE_CORE_H_
 
+#include <memory>
 #include <uuid/uuid.h>
 #include <cxxabi.h>
-#include "core/logging/Logger.h"
 /**
  * namespace aliasing
  */

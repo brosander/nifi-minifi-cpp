@@ -18,6 +18,7 @@
  * limitations under the License.
  */
 #include "core/logging/Logger.h"
+#include "core/logging/LoggerConfiguration.h"
 
 #include <vector>
 #include <queue>
@@ -30,6 +31,10 @@ namespace nifi {
 namespace minifi {
 namespace core {
 namespace logging {
+
+std::shared_ptr<spdlog::logger> getInitializedSpdlog (const std::__cxx11::string& logger_name) {
+  return LoggerConfiguration::getConfiguration()->get_logger(logger_name);
+}
 
 
 } /* namespace logging */

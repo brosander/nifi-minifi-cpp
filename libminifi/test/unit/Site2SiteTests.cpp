@@ -106,9 +106,9 @@ TEST_CASE("TestSiteToSiteVerifySend", "[S2S3]") {
        logging::BaseLogger>(
        new org::apache::nifi::minifi::core::logging::OutputStreamAppender(
            std::cout, std::make_shared<minifi::Configure>()));
-   std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
-   logger->updateLogger(std::move(outputLogger));
-   logger->setLogLevel("trace");
+//    std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
+//    logger->updateLogger(std::move(outputLogger));
+//    logger->setLogLevel("trace");
   SiteToSiteResponder *collector = new SiteToSiteResponder();
 
   sunny_path_bootstrap(collector);

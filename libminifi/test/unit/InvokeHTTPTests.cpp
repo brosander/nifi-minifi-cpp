@@ -36,8 +36,8 @@ TEST_CASE("HTTPTestsPostNoResourceClaim", "[httptest1]") {
   std::unique_ptr<logging::BaseLogger> outputLogger = std::unique_ptr<
       logging::BaseLogger>(
       new org::apache::nifi::minifi::core::logging::OutputStreamAppender(oss,0));
-  std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
-  logger->updateLogger(std::move(outputLogger));
+//   std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
+//   logger->updateLogger(std::move(outputLogger));
 
   TestController testController;
 
@@ -161,8 +161,8 @@ TEST_CASE("HTTPTestsWithNoResourceClaimPOST", "[httptest1]") {
   std::unique_ptr<logging::BaseLogger> outputLogger = std::unique_ptr<
       logging::BaseLogger>(
       new org::apache::nifi::minifi::core::logging::OutputStreamAppender(oss,0));
-  std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
-  logger->updateLogger(std::move(outputLogger));
+//   std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
+//   logger->updateLogger(std::move(outputLogger));
 
   TestController testController;
 
@@ -316,8 +316,8 @@ TEST_CASE("HTTPTestsWithResourceClaimPOST", "[httptest1]") {
   std::unique_ptr<logging::BaseLogger> outputLogger = std::unique_ptr<
       logging::BaseLogger>(
       new org::apache::nifi::minifi::core::logging::OutputStreamAppender(oss,0));
-  std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
-  logger->updateLogger(std::move(outputLogger));
+//   std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
+//   logger->updateLogger(std::move(outputLogger));
 
   TestController testController;
 

@@ -37,6 +37,7 @@
 #include "core/ConfigurationFactory.h"
 #include "core/RepositoryFactory.h"
 #include "core/logging/Logger.h"
+#include "properties/Properties.h"
 #include "properties/Configure.h"
 #include "FlowController.h"
 
@@ -48,6 +49,8 @@
 #define DEFAULT_NIFI_CONFIG_YML "./conf/config.yml"
 //! Default nifi properties file path
 #define DEFAULT_NIFI_PROPERTIES_FILE "./conf/minifi.properties"
+
+#define DEFAULT_LOG_PROPERTIES_FILE "./conf/minifi.properties"
 //! Define home environment variable
 #define MINIFI_HOME_ENV_KEY "MINIFI_HOME"
 
@@ -120,6 +123,11 @@ int main(int argc, char **argv) {
     return -1;
   }
 
+  std::shared_ptr<minifi::Properties> log_properties = std::make_shared<minifi::Properties>();
+  log_properties->setHome(minifiHome);
+  log_properties->loadConfigureFile(DEFAULT_LOG_PROPERTIES_FILE);
+  logging::LoggerFactory::initialize(log_properties);
+  
   std::shared_ptr<minifi::Configure> configure = std::make_shared<minifi::Configure>();
   configure->setHome(minifiHome);
   configure->loadConfigureFile(DEFAULT_NIFI_PROPERTIES_FILE);

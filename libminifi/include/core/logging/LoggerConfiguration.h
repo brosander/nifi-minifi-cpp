@@ -1,4 +1,7 @@
 /**
+ * @file LoggerConfiguration.h
+ * Logger class declaration
+ * This is a C++ wrapper for spdlog, a lightweight C++ logging library
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -15,24 +18,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef __LOGGER_CONFIGURATION_H__
+#define __LOGGER_CONFIGURATION_H__
 
-#include "core/logging/LogAppenders.h"
+#include <map>
+#include <string>
+#include "properties/Properties.h"
+
+#include "spdlog/spdlog.h"
+
 namespace org {
 namespace apache {
 namespace nifi {
 namespace minifi {
 namespace core {
 namespace logging {
+ 
+class LoggerProperties : public Properties {
+public:
+ std::vector<std::string> get_appenders();
+ std::vector<std::string> get_loggers();
+};
 
-const char *OutputStreamAppender::nifi_log_output_stream_error_stderr =
-    "nifi.log.outputstream.appender.error.stderr";
-
-const char *RollingAppender::nifi_log_rolling_apender_file =
-    "nifi.log.rolling.appender.file";
-const char *RollingAppender::nifi_log_rolling_appender_max_files =
-    "nifi.log.rolling.appender.max.files";
-const char *RollingAppender::nifi_log_rolling_appender_max_file_size =
-    "nifi.log.rolling.appender.max.file_size";
+class LoggerConfiguration {
+ public:
+  static std::shared_ptr<LoggerConfiguration> getConfiguration() {
+   return configuration_;
+  }
+  static void initialize(LoggerProperties *logger_properties) {
+   configuration_ = std::shared_ptr<LoggerConfiguration>(new LoggerConfiguration(logger_properties));
+  }
+  std::shared_ptr<spdlog::logger> get_logger(const std::string & name);
+ private:
+  LoggerConfiguration(LoggerProperties *logger_properties);
+  static std::shared_ptr<LoggerConfiguration> configuration_;
+  std::map<std::string, std::shared_ptr<spdlog::sinks::sink>> sink_map;
+};
 
 } /* namespace logging */
 } /* namespace core */
@@ -40,3 +61,5 @@ const char *RollingAppender::nifi_log_rolling_appender_max_file_size =
 } /* namespace nifi */
 } /* namespace apache */
 } /* namespace org */
+
+#endif

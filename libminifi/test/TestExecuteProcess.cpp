@@ -38,13 +38,13 @@ int main(int argc, char  **argv)
       logging::BaseLogger>(
       new org::apache::nifi::minifi::core::logging::OutputStreamAppender(oss,
                                                                          0));
-  std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
-  logger->updateLogger(std::move(outputLogger));
+//   std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
+//   logger->updateLogger(std::move(outputLogger));
 
 
   outputLogger = std::unique_ptr<logging::BaseLogger>(
         new org::apache::nifi::minifi::core::logging::NullAppender());
-    logger->updateLogger(std::move(outputLogger));
+//     logger->updateLogger(std::move(outputLogger));
 
   std::shared_ptr<core::Processor> processor = std::make_shared<
       org::apache::nifi::minifi::processors::ExecuteProcess>("executeProcess");
@@ -121,7 +121,7 @@ int main(int argc, char  **argv)
 
     outputLogger = std::unique_ptr<logging::BaseLogger>(
       new org::apache::nifi::minifi::core::logging::NullAppender());
-  logger->updateLogger(std::move(outputLogger));
+//   logger->updateLogger(std::move(outputLogger));
 
 
   std::shared_ptr<org::apache::nifi::minifi::processors::ExecuteProcess> execp =
