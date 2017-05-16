@@ -30,8 +30,6 @@
 
 #include "core/Core.h"
 
-#include "core/logging/BaseLogger.h"
-#include "core/logging/LogAppenders.h"
 #include "spdlog/spdlog.h"
 #include "core/FlowConfiguration.h"
 #include "core/ConfigurationFactory.h"

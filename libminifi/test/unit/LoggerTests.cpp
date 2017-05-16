@@ -19,7 +19,6 @@
 #include <memory>
 #include <ctime>
 #include "../TestBase.h"
-#include "core/logging/LogAppenders.h"
 
 using namespace logging;
 

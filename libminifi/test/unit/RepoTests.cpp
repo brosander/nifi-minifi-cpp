@@ -48,7 +48,7 @@ TEST_CASE("Test Repo Empty Value Attribute", "[TestFFR1]") {
   repository->stop();
 
 
-  testController.setNullAppender();
+//   testController.setNullAppender();
 
 
 }
@@ -83,7 +83,7 @@ TEST_CASE("Test Repo Empty Key Attribute ", "[TestFFR2]") {
   repository->stop();
 
 
-  testController.setNullAppender();
+//   testController.setNullAppender();
 
 
 }

@@ -27,7 +27,6 @@
 #include <sys/stat.h>
 #include "utils/StringUtils.h"
 #include "../include/core/Core.h"
-#include "../include/core/logging/BaseLogger.h"
 #include "../include/core/logging/Logger.h"
 #include "../include/core/ProcessGroup.h"
 #include "../include/core/yaml/YamlConfiguration.h"

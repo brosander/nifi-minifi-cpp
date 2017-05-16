@@ -20,7 +20,6 @@
 #include <fstream>
 #include "unit/ProvenanceTestHelper.h"
 #include "TestBase.h"
-#include "core/logging/BaseLogger.h"
 #include "processors/GetFile.h"
 #include "core/Core.h"
 #include "core/FlowFile.h"

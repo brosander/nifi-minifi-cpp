@@ -34,6 +34,12 @@ namespace minifi {
 namespace core {
 namespace logging {
  
+struct LoggerNamespace {
+ spdlog::level::level_enum level;
+ std::vector<std::shared_ptr<spdlog::sinks::sink>> sinks;
+ std::map<std::string, std::shared_ptr<LoggerNamespace>> children;
+};
+ 
 class LoggerProperties : public Properties {
 public:
  std::vector<std::string> get_appenders();
@@ -52,7 +58,7 @@ class LoggerConfiguration {
  private:
   LoggerConfiguration(LoggerProperties *logger_properties);
   static std::shared_ptr<LoggerConfiguration> configuration_;
-  std::map<std::string, std::shared_ptr<spdlog::sinks::sink>> sink_map;
+  std::shared_ptr<LoggerNamespace> root_namespace;
 };
 
 } /* namespace logging */

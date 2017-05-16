@@ -27,8 +27,6 @@
 #include <sys/stat.h>
 #include "utils/StringUtils.h"
 #include "../include/core/Core.h"
-#include "../include/core/logging/LogAppenders.h"
-#include "../include/core/logging/BaseLogger.h"
 #include "../include/core/logging/Logger.h"
 #include "../include/core/ProcessGroup.h"
 #include "../include/core/yaml/YamlConfiguration.h"
@@ -56,10 +54,10 @@ int main(int argc, char **argv) {
   myfile.close();
   mkdir("content_repository", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
   std::ostringstream oss;
-  std::unique_ptr<logging::BaseLogger> outputLogger = std::unique_ptr<
-      logging::BaseLogger>(
-      new org::apache::nifi::minifi::core::logging::OutputStreamAppender(oss,
-                                                                         0));
+//   std::unique_ptr<logging::BaseLogger> outputLogger = std::unique_ptr<
+//       logging::BaseLogger>(
+//       new org::apache::nifi::minifi::core::logging::OutputStreamAppender(oss,
+//                                                                          0));
 //   std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
 //   logger->updateLogger(std::move(outputLogger));
 //   logger->setLogLevel("debug");

@@ -32,7 +32,7 @@ namespace minifi {
 namespace core {
 namespace logging {
 
-std::shared_ptr<spdlog::logger> getInitializedSpdlog (const std::__cxx11::string& logger_name) {
+std::shared_ptr<spdlog::logger> getInitializedSpdlog (const std::string& logger_name) {
   return LoggerConfiguration::getConfiguration()->get_logger(logger_name);
 }
 

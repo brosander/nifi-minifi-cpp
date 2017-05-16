@@ -20,8 +20,6 @@
 #include "FlowController.h"
 #include "ProvenanceTestHelper.h"
 #include "../TestBase.h"
-#include "core/logging/LogAppenders.h"
-#include "core/logging/BaseLogger.h"
 #include "processors/GetFile.h"
 #include "core/Core.h"
 #include "../../include/core/FlowFile.h"
@@ -33,15 +31,15 @@
 TEST_CASE("HTTPTestsPostNoResourceClaim", "[httptest1]") {
 
   std::stringstream oss;
-  std::unique_ptr<logging::BaseLogger> outputLogger = std::unique_ptr<
-      logging::BaseLogger>(
-      new org::apache::nifi::minifi::core::logging::OutputStreamAppender(oss,0));
+//   /*std::unique_ptr<logging::BaseLogger> outputLogger = std::unique_ptr<
+//       logging::BaseLogger>(
+//       new org::apache::nifi::minifi::core::logging::OutputStreamAppender(oss,0));*/
 //   std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
 //   logger->updateLogger(std::move(outputLogger));
 
   TestController testController;
 
-  testController.enableDebug();
+//   testController.enableDebug();
 
 
   std::shared_ptr<TestRepository> repo = std::make_shared<
@@ -158,15 +156,15 @@ std::cout << log_attribute_output << std::endl;
 TEST_CASE("HTTPTestsWithNoResourceClaimPOST", "[httptest1]") {
 
   std::stringstream oss;
-  std::unique_ptr<logging::BaseLogger> outputLogger = std::unique_ptr<
-      logging::BaseLogger>(
-      new org::apache::nifi::minifi::core::logging::OutputStreamAppender(oss,0));
+//   std::unique_ptr<logging::BaseLogger> outputLogger = std::unique_ptr<
+//       logging::BaseLogger>(
+//       new org::apache::nifi::minifi::core::logging::OutputStreamAppender(oss,0));
 //   std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
 //   logger->updateLogger(std::move(outputLogger));
 
   TestController testController;
 
-  testController.enableDebug();
+//   testController.enableDebug();
 
 
 
@@ -313,15 +311,15 @@ class CallBack : public minifi::OutputStreamCallback
 TEST_CASE("HTTPTestsWithResourceClaimPOST", "[httptest1]") {
 
   std::stringstream oss;
-  std::unique_ptr<logging::BaseLogger> outputLogger = std::unique_ptr<
-      logging::BaseLogger>(
-      new org::apache::nifi::minifi::core::logging::OutputStreamAppender(oss,0));
+//   std::unique_ptr<logging::BaseLogger> outputLogger = std::unique_ptr<
+//       logging::BaseLogger>(
+//       new org::apache::nifi::minifi::core::logging::OutputStreamAppender(oss,0));
 //   std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
 //   logger->updateLogger(std::move(outputLogger));
 
   TestController testController;
 
-  testController.enableDebug();
+//   testController.enableDebug();
 
 
 

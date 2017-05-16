@@ -20,8 +20,6 @@
 #include <fstream>
 #include "FlowController.h"
 #include "unit/ProvenanceTestHelper.h"
-#include "core/logging/LogAppenders.h"
-#include "core/logging/BaseLogger.h"
 #include "processors/GetFile.h"
 #include "core/Core.h"
 #include "core/FlowFile.h"
@@ -34,16 +32,16 @@ int main(int argc, char  **argv)
 {
 
   std::ostringstream oss;
-  std::unique_ptr<logging::BaseLogger> outputLogger = std::unique_ptr<
-      logging::BaseLogger>(
-      new org::apache::nifi::minifi::core::logging::OutputStreamAppender(oss,
-                                                                         0));
+//   std::unique_ptr<logging::BaseLogger> outputLogger = std::unique_ptr<
+//       logging::BaseLogger>(
+//       new org::apache::nifi::minifi::core::logging::OutputStreamAppender(oss,
+//                                                                          0));
 //   std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
 //   logger->updateLogger(std::move(outputLogger));
 
 
-  outputLogger = std::unique_ptr<logging::BaseLogger>(
-        new org::apache::nifi::minifi::core::logging::NullAppender());
+//   outputLogger = std::unique_ptr<logging::BaseLogger>(
+//         new org::apache::nifi::minifi::core::logging::NullAppender());
 //     logger->updateLogger(std::move(outputLogger));
 
   std::shared_ptr<core::Processor> processor = std::make_shared<
@@ -119,8 +117,8 @@ int main(int argc, char  **argv)
                   t.join();
                 });
 
-    outputLogger = std::unique_ptr<logging::BaseLogger>(
-      new org::apache::nifi::minifi::core::logging::NullAppender());
+//     outputLogger = std::unique_ptr<logging::BaseLogger>(
+//       new org::apache::nifi::minifi::core::logging::NullAppender());
 //   logger->updateLogger(std::move(outputLogger));
 
 
