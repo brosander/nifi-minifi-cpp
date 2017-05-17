@@ -38,21 +38,37 @@ namespace nifi {
 namespace minifi {
 namespace core {
 namespace logging {
-  
+const std::string appender_prefix = "appender.";
+
 std::vector< std::string > LoggerProperties::get_appenders() {
   std::vector<std::string> appenders;
+  for (auto const & entry : properties_) {
+    if (utils::StringUtils::starts_with(entry.first, appender_prefix) && entry.first.rfind(".", appender_prefix.length()) == std::string::npos) {
+      appenders.push_back(entry.first);
+    }
+  }
   return appenders;
 }
 
 std::vector< std::string > LoggerProperties::get_loggers() {
   std::vector<std::string> loggers;
+  for (auto const & entry : properties_) {
+    if (utils::StringUtils::starts_with(entry.first, appender_prefix) && entry.first.rfind(".", appender_prefix.length()) == std::string::npos) {
+      loggers.push_back(entry.first);
+    }
+  }
   return loggers;
 }
+
+void LoggerProperties::add_sink ( const std::string& name, std::shared_ptr< spdlog::sinks::sink > sink ) {
+  sinks_[name] = sink;
+}
+
   
 std::shared_ptr<LoggerConfiguration> LoggerConfiguration::configuration_;
 
 LoggerConfiguration::LoggerConfiguration (LoggerProperties* logger_properties) {
-  std::map<std::string, std::shared_ptr<spdlog::sinks::sink>> sink_map;
+  std::map<std::string, std::shared_ptr<spdlog::sinks::sink>> sink_map = logger_properties->initial_sinks();
   
   for (auto const & appender_name : logger_properties->get_appenders()) {
     std::string appender_type;
@@ -146,7 +162,6 @@ LoggerConfiguration::LoggerConfiguration (LoggerProperties* logger_properties) {
     current_namespace->level = level;
     current_namespace->sinks = sinks;
   }
-//   std::vector<std::string> logger_properties->get_loggers();
 };
 
 std::shared_ptr<spdlog::logger> LoggerConfiguration::get_logger (const std::string& name) {

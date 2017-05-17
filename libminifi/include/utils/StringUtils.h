@@ -100,6 +100,13 @@ class StringUtils {
     }
     return result;
   }
+  
+  static inline bool starts_with(const std::string & str, const std::string & prefix) {
+    if (str.length() < prefix.length()) {
+     return false;
+    }
+    return str.rfind(prefix, 0) == 0;
+  }
 
   /**
    * Converts a string to a float

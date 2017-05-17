@@ -44,6 +44,12 @@ class LoggerProperties : public Properties {
 public:
  std::vector<std::string> get_appenders();
  std::vector<std::string> get_loggers();
+ void add_sink(const std::string & name, std::shared_ptr<spdlog::sinks::sink> sink);
+ std::map<std::string, std::shared_ptr<spdlog::sinks::sink>> initial_sinks() {
+  return sinks_;
+ }
+private:
+ std::map<std::string, std::shared_ptr<spdlog::sinks::sink>> sinks_;
 };
 
 class LoggerConfiguration {

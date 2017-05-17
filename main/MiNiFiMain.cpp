@@ -35,6 +35,7 @@
 #include "core/ConfigurationFactory.h"
 #include "core/RepositoryFactory.h"
 #include "core/logging/Logger.h"
+#include "core/logging/LoggerConfiguration.h"
 #include "properties/Properties.h"
 #include "properties/Configure.h"
 #include "FlowController.h"
@@ -124,7 +125,7 @@ int main(int argc, char **argv) {
   std::shared_ptr<minifi::Properties> log_properties = std::make_shared<minifi::Properties>();
   log_properties->setHome(minifiHome);
   log_properties->loadConfigureFile(DEFAULT_LOG_PROPERTIES_FILE);
-  logging::LoggerFactory::initialize(log_properties);
+  logging::LoggerConfiguration::initialize(log_properties);
   
   std::shared_ptr<minifi::Configure> configure = std::make_shared<minifi::Configure>();
   configure->setHome(minifiHome);
