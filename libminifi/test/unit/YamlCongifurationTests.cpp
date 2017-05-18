@@ -22,6 +22,7 @@
 #include "core/yaml/YamlConfiguration.h"
 #include "../TestBase.h"
 
+LogTestController & controller = LogTestController::getInstance();
 static const std::shared_ptr<core::Repository> TEST_PROV_REPO = core::createRepository("provenancerepository", true);
 static const std::shared_ptr<core::Repository> TEST_FF_REPO = core::createRepository("flowfilerepository", true);
 

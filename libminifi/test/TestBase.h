@@ -31,6 +31,7 @@
 #include "properties/Properties.h"
 #include "core/logging/LoggerConfiguration.h"
 #include "spdlog/sinks/ostream_sink.h"
+#include "spdlog/sinks/dist_sink.h"
 
 class LogTestController {
  public:
@@ -46,7 +47,7 @@ class LogTestController {
   
   template<typename T>
   void setInfo() {
-    setLevel<T>(spdlog::level::debug);
+    setLevel<T>(spdlog::level::info);
   }
   
   template<typename T>
@@ -57,6 +58,7 @@ class LogTestController {
   }
   
   bool contains(std::string ending) {
+    logger_->info("Looking for {} in {}.", ending, log_output.str());
     return (ending.length() > 0 && log_output.str().find(ending) != std::string::npos);
   }
   
@@ -65,7 +67,8 @@ class LogTestController {
       setLevel(name, spdlog::level::err);
     }
     modified_loggers = std::vector<std::string>();
-    log_output = std::ostringstream();
+    log_output.str("");
+    log_output.clear();
   }
   
   std::ostringstream log_output;
@@ -73,13 +76,7 @@ class LogTestController {
  private:
    class TestBootstrapLogger: public logging::Logger {
     public:
-      TestBootstrapLogger():Logger(init()){};
-    private:
-      static std::shared_ptr<spdlog::logger> init() {
-        std::shared_ptr<spdlog::logger> delegate = std::make_shared<spdlog::logger>("test main", spdlog::sinks::stderr_sink_mt::instance());
-        delegate->set_level(spdlog::level::info);
-        return delegate;
-      }
+      TestBootstrapLogger(std::shared_ptr<spdlog::logger> logger):Logger(logger){};
    };
    class TestLoggerProperties : public logging::LoggerProperties {
     public:
@@ -88,9 +85,14 @@ class LogTestController {
      }
    };
   LogTestController() {
-   TestBootstrapLogger testBootstrapLogger;
+   logger_ = std::make_shared<spdlog::logger>("test main", spdlog::sinks::stderr_sink_mt::instance());
+   logger_->set_level(spdlog::level::info);
+   TestBootstrapLogger testBootstrapLogger(logger_);
    std::shared_ptr<logging::LoggerProperties> logger_properties = std::shared_ptr<logging::LoggerProperties>(new TestLoggerProperties(testBootstrapLogger));
-   logger_properties->add_sink("ostream", std::make_shared<spdlog::sinks::ostream_sink_mt>(log_output, true));
+   std::shared_ptr<spdlog::sinks::dist_sink_mt> dist_sink = std::make_shared<spdlog::sinks::dist_sink_mt>();
+   dist_sink->add_sink(std::make_shared<spdlog::sinks::ostream_sink_mt>(log_output, true));
+   dist_sink->add_sink(spdlog::sinks::stderr_sink_mt::instance());
+   logger_properties->add_sink("ostream", dist_sink);
    logging::LoggerConfiguration::initialize(logger_properties);
   }
   LogTestController(LogTestController const&);
@@ -98,9 +100,11 @@ class LogTestController {
   ~LogTestController() {};
 
   void setLevel(const std::string name, spdlog::level::level_enum level) {
-    logging::LoggerConfiguration::getConfiguration()->get_logger(name)->set_level(spdlog::level::debug);
+    logger_->info("Setting log level for {} to {}", name, spdlog::level::to_str(level));
+    logging::LoggerConfiguration::getConfiguration()->get_logger(name)->set_level(level);
   }
   std::vector<std::string> modified_loggers;
+  std::shared_ptr<spdlog::logger> logger_;
 };
 
 class TestController {

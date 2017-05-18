@@ -80,21 +80,12 @@ class Socket : public BaseStream {
    */
   explicit Socket(const Socket &&);
 
-  static char *HOSTNAME;
-
   /**
    * Static function to return the current machine's host name
    */
-  static std::string getMyHostName(const char *str = HOSTNAME) {
-    if (__builtin_expect(!IsNullOrEmpty(str), 0))
-      return str;
-    else {
-      char hostname[1024];
-      gethostname(hostname, 1024);
-      Socket mySock(nullptr, hostname, 0);
-      mySock.initialize();
-      return mySock.getHostname();
-    }
+  static std::string getMyHostName() {
+    static char *HOSTNAME = init_hostname();
+    return HOSTNAME;
   }
 
   /**
@@ -254,6 +245,13 @@ class Socket : public BaseStream {
 
  private:
   logging::Logger & logger_;
+  static char* init_hostname() {
+    char hostname[1024];
+    gethostname(hostname, 1024);
+    Socket mySock(nullptr, hostname, 0);
+    mySock.initialize();
+    return const_cast<char*>(mySock.getHostname().c_str());
+  }
 };
 
 } /* namespace io */

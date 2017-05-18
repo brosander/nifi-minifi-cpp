@@ -359,7 +359,7 @@ void InvokeHTTP::onTrigger(core::ProcessContext *context,
                         method_.c_str());
       flowFile = std::static_pointer_cast<FlowFileRecord>(session->create());
     } else {
-      logger_.log_info("exiting because method is %s", method_.c_str());
+      logger_.log_info("exiting because method is {}", method_.c_str());
       return;
     }
   } else {

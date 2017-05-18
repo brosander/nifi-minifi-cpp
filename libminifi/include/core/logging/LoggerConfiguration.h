@@ -35,6 +35,9 @@ namespace minifi {
 namespace core {
 namespace logging {
  
+static const char *appender_prefix;
+static const char *logger_prefix;
+
 struct LoggerNamespace {
  spdlog::level::level_enum level;
  std::vector<std::shared_ptr<spdlog::sinks::sink>> sinks;
@@ -50,6 +53,9 @@ public:
  std::map<std::string, std::shared_ptr<spdlog::sinks::sink>> initial_sinks() {
   return sinks_;
  }
+ 
+ static const char* appender_prefix;
+ static const char* logger_prefix;
 private:
  std::map<std::string, std::shared_ptr<spdlog::sinks::sink>> sinks_;
 };

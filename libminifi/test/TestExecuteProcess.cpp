@@ -16,6 +16,16 @@
  * limitations under the License.
  */
 
+
+#include <cassert>
+#include <chrono>
+#include <fstream>
+#include <memory>
+#include <string>
+#include <thread>
+#include <type_traits>
+#include <vector>
+#include <sys/stat.h>
 #include <uuid/uuid.h>
 #include <fstream>
 #include "FlowController.h"
@@ -30,19 +40,6 @@
 
 int main(int argc, char  **argv)
 {
-
-  std::ostringstream oss;
-//   std::unique_ptr<logging::BaseLogger> outputLogger = std::unique_ptr<
-//       logging::BaseLogger>(
-//       new org::apache::nifi::minifi::core::logging::OutputStreamAppender(oss,
-//                                                                          0));
-//   std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
-//   logger->updateLogger(std::move(outputLogger));
-
-
-//   outputLogger = std::unique_ptr<logging::BaseLogger>(
-//         new org::apache::nifi::minifi::core::logging::NullAppender());
-//     logger->updateLogger(std::move(outputLogger));
 
   std::shared_ptr<core::Processor> processor = std::make_shared<
       org::apache::nifi::minifi::processors::ExecuteProcess>("executeProcess");

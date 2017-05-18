@@ -38,13 +38,14 @@ namespace nifi {
 namespace minifi {
 namespace core {
 namespace logging {
-const std::string appender_prefix = "appender.";
-const std::string logger_prefix = "logger.";
+
+const char* LoggerProperties::appender_prefix = "appender.";
+const char* LoggerProperties::logger_prefix = "logger.";
 
 std::vector< std::string > LoggerProperties::get_appenders() {
   std::vector<std::string> appenders;
   for (auto const & entry : properties_) {
-    if (utils::StringUtils::starts_with(entry.first, appender_prefix) && entry.first.rfind(".", appender_prefix.length()) == std::string::npos) {
+    if (utils::StringUtils::starts_with(entry.first, appender_prefix) && entry.first.find(".", strlen(appender_prefix) + 1) == std::string::npos) {
       appenders.push_back(entry.first);
     }
   }
@@ -54,8 +55,12 @@ std::vector< std::string > LoggerProperties::get_appenders() {
 std::vector< std::string > LoggerProperties::get_loggers() {
   std::vector<std::string> loggers;
   for (auto const & entry : properties_) {
-    if (utils::StringUtils::starts_with(entry.first, logger_prefix) && entry.first.rfind(".", logger_prefix.length()) == std::string::npos) {
-      loggers.push_back(entry.first);
+    if (utils::StringUtils::starts_with(entry.first, logger_prefix)) {
+      int prefix_length = strlen(logger_prefix);
+      int pos = entry.first.find(".", prefix_length + 1);
+      if (pos == std::string::npos) {
+        loggers.push_back(entry.first);
+      }
     }
   }
   return loggers;
@@ -68,11 +73,11 @@ void LoggerProperties::add_sink ( const std::string& name, std::shared_ptr< spdl
   
 std::shared_ptr<LoggerConfiguration> LoggerConfiguration::configuration_;
 
-LoggerConfiguration::LoggerConfiguration (const std::shared_ptr<LoggerProperties> & logger_properties) {
+LoggerConfiguration::LoggerConfiguration (const std::shared_ptr<LoggerProperties> & logger_properties) : root_namespace(std::make_shared<LoggerNamespace>()) {
   std::map<std::string, std::shared_ptr<spdlog::sinks::sink>> sink_map = logger_properties->initial_sinks();
   
   for (auto const & appender_key : logger_properties->get_appenders()) {
-    std::string appender_name = appender_key.substr(appender_prefix.length());
+    std::string appender_name = appender_key.substr(strlen(LoggerProperties::appender_prefix));
     std::string appender_type;
     if (!logger_properties->get(appender_name + ".type", appender_type)) {
       appender_type = "stderr";
@@ -147,9 +152,8 @@ LoggerConfiguration::LoggerConfiguration (const std::shared_ptr<LoggerProperties
       }
     }
     std::shared_ptr<LoggerNamespace> current_namespace = root_namespace;
-    std::string prefix = "logger.";
     if (logger_key != "logger.root") {
-      for (auto const & name : utils::StringUtils::split(logger_key.substr(prefix.length(), logger_key.length() - prefix.length()), "::")) {
+      for (auto const & name : utils::StringUtils::split(logger_key.substr(strlen(LoggerProperties::logger_prefix), logger_key.length() - strlen(LoggerProperties::logger_prefix)), "::")) {
         auto child_pair = current_namespace->children.find(name);
         std::shared_ptr<LoggerNamespace> child;
         if (child_pair == current_namespace->children.end()) {
@@ -172,7 +176,7 @@ std::shared_ptr<spdlog::logger> LoggerConfiguration::get_logger (const std::stri
     return logger;
   }
   std::shared_ptr<LoggerNamespace> current_namespace = root_namespace;
-  std::vector<std::shared_ptr<spdlog::sinks::sink>> sinks;
+  std::vector<std::shared_ptr<spdlog::sinks::sink>> sinks = root_namespace->sinks;
   for (auto const & name_segment : utils::StringUtils::split(name, "::")) {
     auto child_pair = current_namespace->children.find(name_segment);
     if (child_pair == current_namespace->children.end()) {
@@ -183,7 +187,7 @@ std::shared_ptr<spdlog::logger> LoggerConfiguration::get_logger (const std::stri
       sinks = current_namespace->sinks;
     }
   }
-  logger = std::make_shared<spdlog::logger>("mylogger", begin(sinks), end(sinks));
+  logger = std::make_shared<spdlog::logger>(name, begin(sinks), end(sinks));
   logger->set_level(current_namespace->level);
   try {
     spdlog::register_logger(logger);

@@ -34,6 +34,7 @@
 #include "../include/properties/Configure.h"
 #include "unit/ProvenanceTestHelper.h"
 #include "../include/io/StreamFactory.h"
+#include "../test/TestBase.h"
 
 std::string test_file_location;
 
@@ -42,12 +43,11 @@ void waitToVerifyProcessor() {
 }
 
 int main(int argc, char **argv) {
-
+  LogTestController::getInstance();
   if (argc > 1) {
     test_file_location = argv[1];
   }
   mkdir("content_repository", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-  std::ostringstream oss;
 //   std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
 //   logger->updateLogger(std::move(outputLogger));
 //   logger->setLogLevel("debug");
@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
   waitToVerifyProcessor();
 
   controller->waitUnload(60000);
-  std::string logs = oss.str();
+  std::string logs = LogTestController::getInstance().log_output.str();
   assert(logs.find("key:filename value:") != std::string::npos);
   assert(
       logs.find(

@@ -39,8 +39,6 @@ namespace nifi {
 namespace minifi {
 namespace io {
 
-char *Socket::HOSTNAME = const_cast<char*>(Socket::getMyHostName(0).c_str());
-
 Socket::Socket(const std::shared_ptr<SocketContext> &context, const std::string &hostname, const uint16_t port,
                const uint16_t listeners = -1)
     : requested_hostname_(hostname),

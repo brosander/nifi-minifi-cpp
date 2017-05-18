@@ -30,7 +30,7 @@ TEST_CASE("Test log Levels", "[ttl1]") {
   REQUIRE(
       true
           == LogTestController::getInstance().contains(
-              "[minifi log -- org::apache::nifi::minifi::core::logging::Logger] [info] hello world"));
+              "[org::apache::nifi::minifi::core::logging::Logger] [info] hello world"));
   LogTestController::getInstance().reset();
 }
 
@@ -42,7 +42,7 @@ TEST_CASE("Test log Levels debug", "[ttl2]") {
   REQUIRE(
       true
           == LogTestController::getInstance().contains(
-              "[minifi log -- org::apache::nifi::minifi::core::logging::Logger] [debug] hello world"));
+              "[org::apache::nifi::minifi::core::logging::Logger] [debug] hello world"));
   LogTestController::getInstance().reset();
 }
 
@@ -54,7 +54,7 @@ TEST_CASE("Test log Levels trace", "[ttl3]") {
   REQUIRE(
       true
           == LogTestController::getInstance().contains(
-              "[minifi log -- org::apache::nifi::minifi::core::logging::Logger] [trace] hello world"));
+              "[org::apache::nifi::minifi::core::logging::Logger] [trace] hello world"));
   LogTestController::getInstance().reset();
 }
 
@@ -66,22 +66,22 @@ TEST_CASE("Test log Levels error", "[ttl4]") {
   REQUIRE(
       true
           == LogTestController::getInstance().contains(
-              "[minifi log -- org::apache::nifi::minifi::core::logging::Logger] [error] hello world"));
+              "[org::apache::nifi::minifi::core::logging::Logger] [error] hello world"));
   LogTestController::getInstance().reset();
 }
 
 TEST_CASE("Test log Levels change", "[ttl5]") {
   LogTestController::getInstance().setLevel<logging::Logger>(spdlog::level::trace);
   logging::Logger & logger = logging::LoggerFactory<logging::Logger>::getLogger();
-  logger.log_error("hello world");
+  logger.log_error("hello {}", "world");
 
   REQUIRE(
       true
           == LogTestController::getInstance().contains(
-              "[minifi log -- org::apache::nifi::minifi::core::logging::OutputStreamAppender] [error] hello world"));
+              "[org::apache::nifi::minifi::core::logging::Logger] [error] hello world"));
   LogTestController::getInstance().reset();
   LogTestController::getInstance().setLevel<logging::Logger>(spdlog::level::off);
-  logger.log_error("hello world");
+  logger.log_error("hello {}", "world");
 
   REQUIRE(0 == LogTestController::getInstance().log_output.str().length());
   LogTestController::getInstance().reset();

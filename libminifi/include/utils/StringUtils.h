@@ -98,6 +98,7 @@ class StringUtils {
       result.push_back(str.substr(last, next - last));
       last = next + 1;
     }
+    result.push_back(str.substr(last, next - last));
     return result;
   }
   

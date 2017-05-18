@@ -35,6 +35,7 @@
 #include "unit/ProvenanceTestHelper.h"
 #include "../include/io/StreamFactory.h"
 #include "../include/properties/Configure.h"
+#include "../test/TestBase.h"
 
 std::string test_file_location;
 
@@ -43,7 +44,7 @@ void waitToVerifyProcessor() {
 }
 
 int main(int argc, char **argv) {
-
+  LogTestController::getInstance();
   if (argc > 1) {
     test_file_location = argv[1];
   }
