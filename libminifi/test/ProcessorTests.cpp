@@ -28,10 +28,11 @@
 #include "core/ProcessSession.h"
 #include "core/ProcessorNode.h"
 #include "core/reporting/SiteToSiteProvenanceReportingTask.h"
-
+#include "TestBase.h"
 
 
 TEST_CASE("Test Creation of GetFile", "[getfileCreate]") {
+  TestController testController;
   std::shared_ptr<core::Processor> processor = std::make_shared<
         org::apache::nifi::minifi::processors::GetFile>("processorname");
   REQUIRE(processor->getName() == "processorname");
@@ -265,6 +266,7 @@ TEST_CASE("Test GetFileLikeIt'sThreaded", "[getfileCreate3]") {
 
 TEST_CASE("LogAttributeTest", "[getfileCreate3]") {
   TestController testController;
+  LogTestController::getInstance().setDebug<minifi::processors::LogAttribute>();
 
   std::shared_ptr<core::Repository> repo = std::make_shared<TestRepository>();
 
@@ -354,7 +356,6 @@ TEST_CASE("LogAttributeTest", "[getfileCreate3]") {
 
   records = reporter->getEvents();
   session.commit();
-  LogTestController::getInstance().reset();
 
   logAttribute->incrementActiveTasks();
   logAttribute->setScheduledState(core::ScheduledState::RUNNING);
@@ -366,6 +367,7 @@ TEST_CASE("LogAttributeTest", "[getfileCreate3]") {
   REQUIRE(true == LogTestController::getInstance().contains("key:absolute.path value:" + ss.str()));
   REQUIRE(true == LogTestController::getInstance().contains("Size:8 Offset:0"));
   REQUIRE(true == LogTestController::getInstance().contains("key:path value:" + std::string(dir)));
+  LogTestController::getInstance().reset();
 }
 
 int fileSize(const char *add) {

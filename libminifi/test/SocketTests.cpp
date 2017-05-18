@@ -23,7 +23,7 @@
 
 using namespace org::apache::nifi::minifi::io;
 TEST_CASE("TestSocket", "[TestSocket1]") {
-
+  TestController testController;
   Socket socket(std::make_shared<SocketContext>(std::make_shared<minifi::Configure>()), "localhost", 8183);
   REQUIRE(-1 == socket.initialize());
   REQUIRE("localhost" == socket.getHostname());
@@ -32,7 +32,7 @@ TEST_CASE("TestSocket", "[TestSocket1]") {
 }
 
 TEST_CASE("TestSocketWriteTest1", "[TestSocket2]") {
-
+  TestController testController;
   Socket socket(std::make_shared<SocketContext>(std::make_shared<minifi::Configure>()), "localhost", 8183);
   REQUIRE(-1 == socket.initialize());
 
@@ -48,7 +48,7 @@ TEST_CASE("TestSocketWriteTest1", "[TestSocket2]") {
 }
 
 TEST_CASE("TestSocketWriteTest2", "[TestSocket3]") {
-
+  TestController testController;
   std::vector<uint8_t> buffer;
   buffer.push_back('a');
   
@@ -78,13 +78,13 @@ TEST_CASE("TestSocketWriteTest2", "[TestSocket3]") {
 }
 
 TEST_CASE("TestGetHostName", "[TestSocket4]") {
-
+  TestController testController;
   REQUIRE(Socket::getMyHostName().length() > 0);
 
 }
 
 TEST_CASE("TestWriteEndian64", "[TestSocket4]") {
-
+  TestController testController;
   std::vector<uint8_t> buffer;
   buffer.push_back('a');
   
@@ -113,7 +113,7 @@ TEST_CASE("TestWriteEndian64", "[TestSocket4]") {
 }
 
 TEST_CASE("TestWriteEndian32", "[TestSocket5]") {
-
+  TestController testController;
   std::vector<uint8_t> buffer;
   buffer.push_back('a');
 
@@ -153,7 +153,7 @@ TEST_CASE("TestWriteEndian32", "[TestSocket5]") {
 }
 
 TEST_CASE("TestSocketWriteTestAfterClose", "[TestSocket6]") {
-
+  TestController testController;
   std::vector<uint8_t> buffer;
   buffer.push_back('a');
 

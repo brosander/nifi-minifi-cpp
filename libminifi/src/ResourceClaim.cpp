@@ -21,6 +21,7 @@
 #include <queue>
 #include <map>
 #include <string>
+#include <uuid/uuid.h>
 
 #include "ResourceClaim.h"
 #include "core/logging/LoggerConfiguration.h"

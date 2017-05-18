@@ -43,7 +43,7 @@ void waitToVerifyProcessor() {
 }
 
 int main(int argc, char **argv) {
-  LogTestController::getInstance();
+  LogTestController::getInstance().setInfo<minifi::processors::InvokeHTTP>();
   if (argc > 1) {
     test_file_location = argv[1];
   }
@@ -109,6 +109,7 @@ int main(int argc, char **argv) {
     if ( loc == std::string::npos)
       break;
   }
+  LogTestController::getInstance().reset();
   rmdir("./content_repository");
   return 0;
 }

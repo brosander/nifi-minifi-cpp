@@ -210,6 +210,7 @@ enable_testing(test)
     
     file(GLOB LIBMINIFI_TEST_EXECUTE_PROCESS "libminifi/test/TestExecuteProcess.cpp")
     add_executable(testExecuteProcess ${LIBMINIFI_TEST_EXECUTE_PROCESS} ${SPD_SOURCES})
+    target_include_directories(testExecuteProcess PRIVATE BEFORE "thirdparty/catch")
     target_include_directories(testExecuteProcess PRIVATE BEFORE "thirdparty/yaml-cpp-yaml-cpp-0.5.3/include")
     target_include_directories(testExecuteProcess PRIVATE BEFORE ${LEVELDB_INCLUDE_DIRS})
     target_include_directories(testExecuteProcess PRIVATE BEFORE "include")
