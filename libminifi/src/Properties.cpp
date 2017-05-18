@@ -19,6 +19,7 @@
 #include <string>
 #include "utils/StringUtils.h"
 #include "core/Core.h"
+#include "core/logging/LoggerConfiguration.h"
 
 namespace org {
 namespace apache {
@@ -26,6 +27,10 @@ namespace nifi {
 namespace minifi {
 
 #define BUFFER_SIZE 512
+  
+Properties::Properties() : logger_(logging::LoggerFactory<Properties>::getLogger()) {
+
+}
 
 // Get the config value
 bool Properties::get(std::string key, std::string &value) {

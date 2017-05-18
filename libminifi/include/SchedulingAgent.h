@@ -29,7 +29,7 @@
 #include <thread>
 #include "utils/TimeUtil.h"
 #include "core/Core.h"
-#include "core/logging/Logger.h"
+#include "core/logging/LoggerConfiguration.h"
 #include "properties/Configure.h"
 #include "FlowFileRecord.h"
 #include "core/logging/Logger.h"
@@ -49,7 +49,7 @@ class SchedulingAgent {
   /*!
    * Create a new processor
    */
-  SchedulingAgent(std::shared_ptr<core::Repository> repo) : logger_(logging::Logger<SchedulingAgent>::getLogger()) {
+  SchedulingAgent(std::shared_ptr<core::Repository> repo) : logger_(logging::LoggerFactory<SchedulingAgent>::getLogger()) {
     running_ = false;
     repo_ = repo;
   }
@@ -96,7 +96,7 @@ class SchedulingAgent {
 
  private:
   // Logger
-  logging::Logger<SchedulingAgent> & logger_;
+  logging::Logger & logger_;
   // Prevent default copy constructor and assignment operation
   // Only support pass by reference or pointer
 

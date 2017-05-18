@@ -26,25 +26,15 @@
 #include "spdlog/spdlog.h"
 #include "spdlog/fmt/bundled/ostream.h"
 
-#include "core/Core.h"
-
 namespace org {
 namespace apache {
 namespace nifi {
 namespace minifi {
 namespace core {
 namespace logging {
- 
-std::shared_ptr<spdlog::logger> getInitializedSpdlog(const std::string &logger_name);
 
-template<typename T>
 class Logger {
  public:
-  static Logger<T>& getLogger() {
-   static Logger<T> logger;
-   return logger;
-  }
-  
   /**
    * @brief Log error message
    * @param format format string ('man printf' for syntax)
@@ -95,12 +85,13 @@ class Logger {
    delegate_->log(spdlog::level::trace, format, args...);
   }
   
- private:
-  Logger() {
-   delegate_ = getInitializedSpdlog(core::getClassName<T>());
+ protected:
+  Logger(std::shared_ptr<spdlog::logger> delegate) {
+   delegate_ = delegate;
   }
-  Logger(Logger<T> const&);
-  Logger& operator=(Logger<T> const&);
+ private:
+  Logger(Logger const&);
+  Logger& operator=(Logger const&);
   
   std::shared_ptr<spdlog::logger> delegate_;
 };

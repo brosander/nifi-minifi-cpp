@@ -24,6 +24,7 @@
 #include "core/Repository.h"
 #include "core/Core.h"
 #include "provenance/Provenance.h"
+#include "core/logging/LoggerConfiguration.h"
 namespace org {
 namespace apache {
 namespace nifi {
@@ -49,7 +50,7 @@ class ProvenanceRepository : public core::Repository,
                        uint64_t purgePeriod = PROVENANCE_PURGE_PERIOD)
       : Repository(core::getClassName<ProvenanceRepository>(), directory,
                    maxPartitionMillis, maxPartitionBytes, purgePeriod),
-        logger_(logging::Logger<ProvenanceRepository>::getLogger()){
+        logger_(logging::LoggerFactory<ProvenanceRepository>::getLogger()){
 
     db_ = NULL;
   }
@@ -198,7 +199,7 @@ class ProvenanceRepository : public core::Repository,
 
  private:
   leveldb::DB* db_;
-  logging::Logger<ProvenanceRepository> & logger_;
+  logging::Logger & logger_;
 };
 
 } /* namespace provenance */

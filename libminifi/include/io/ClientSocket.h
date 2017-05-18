@@ -253,7 +253,7 @@ class Socket : public BaseStream {
   uint16_t listeners_;
 
  private:
-  logging::Logger<Socket> & logger_;
+  logging::Logger & logger_;
 };
 
 } /* namespace io */

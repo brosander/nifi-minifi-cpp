@@ -183,7 +183,7 @@ class Connection : public core::Connectable,
   std::queue<std::shared_ptr<core::FlowFile>> queue_;
   // flow repository
   // Logger
-  logging::Logger<Connection> & logger_;
+  logging::Logger & logger_;
   // Prevent default copy constructor and assignment operation
   // Only support pass by reference or pointer
   Connection(const Connection &parent);

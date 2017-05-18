@@ -265,8 +265,8 @@ class Processor : public Connectable, public ConfigurableComponent,
   Processor(const Processor &parent);
   Processor &operator=(const Processor &parent);
 
- protected:
-  logging::Logger<Processor> & logger_;
+ private:
+  logging::Logger & logger_;
 };
 
 }

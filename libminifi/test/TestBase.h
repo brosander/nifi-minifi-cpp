@@ -21,6 +21,7 @@
 #include <dirent.h>
 #include <cstdio>
 #include <cstdlib>
+#include <sstream>
 #include "ResourceClaim.h"
 #include "catch.hpp"
 #include <vector>
@@ -29,31 +30,86 @@
 #include "properties/Configure.h"
 #include "properties/Properties.h"
 #include "core/logging/LoggerConfiguration.h"
+#include "spdlog/sinks/ostream_sink.h"
 
 class LogTestController {
  public:
-  LogTestController(const std::string level = "debug") {
-//     logging::Logger::getLogger()->setLogLevel(level);
-   logging::LoggerProperties *logger_properties = new logging::LoggerProperties();
+  static LogTestController& getInstance() {
+   static LogTestController instance;
+   return instance;
+  }
+  
+  template<typename T>
+  void setDebug() {
+    setLevel<T>(spdlog::level::debug);
+  }
+  
+  template<typename T>
+  void setInfo() {
+    setLevel<T>(spdlog::level::debug);
+  }
+  
+  template<typename T>
+  void setLevel(spdlog::level::level_enum level) {
+    std::string name = core::getClassName<T>();
+    modified_loggers.push_back(name);
+    setLevel(name, level);
+  }
+  
+  bool contains(std::string ending) {
+    return (ending.length() > 0 && log_output.str().find(ending) != std::string::npos);
+  }
+  
+  void reset() {
+    for (auto const & name : modified_loggers) {
+      setLevel(name, spdlog::level::err);
+    }
+    modified_loggers = std::vector<std::string>();
+    log_output = std::ostringstream();
+  }
+  
+  std::ostringstream log_output;
+  
+ private:
+   class TestBootstrapLogger: public logging::Logger {
+    public:
+      TestBootstrapLogger():Logger(init()){};
+    private:
+      static std::shared_ptr<spdlog::logger> init() {
+        std::shared_ptr<spdlog::logger> delegate = std::make_shared<spdlog::logger>("test main", spdlog::sinks::stderr_sink_mt::instance());
+        delegate->set_level(spdlog::level::info);
+        return delegate;
+      }
+   };
+   class TestLoggerProperties : public logging::LoggerProperties {
+    public:
+     TestLoggerProperties(logging::Logger & logger) : LoggerProperties(logger) {
+      set("logger.root", "ERROR,ostream");
+     }
+   };
+  LogTestController() {
+   TestBootstrapLogger testBootstrapLogger;
+   std::shared_ptr<logging::LoggerProperties> logger_properties = std::shared_ptr<logging::LoggerProperties>(new TestLoggerProperties(testBootstrapLogger));
+   logger_properties->add_sink("ostream", std::make_shared<spdlog::sinks::ostream_sink_mt>(log_output, true));
    logging::LoggerConfiguration::initialize(logger_properties);
-   delete logger_properties;
   }
+  LogTestController(LogTestController const&);
+  LogTestController& operator=(LogTestController const&);
+  ~LogTestController() {};
 
-  void enableDebug() {
-//     logging::Logger::getLogger()->setLogLevel("debug");
+  void setLevel(const std::string name, spdlog::level::level_enum level) {
+    logging::LoggerConfiguration::getConfiguration()->get_logger(name)->set_level(spdlog::level::debug);
   }
-
-  ~LogTestController() {
-//     logging::Logger::getLogger()->setLogLevel(logging::LOG_LEVEL_E::info);
-  }
+  std::vector<std::string> modified_loggers;
 };
 
 class TestController {
  public:
 
   TestController()
-      : log("info") {
+      : log(LogTestController::getInstance()) {
     minifi::ResourceClaim::default_directory_path = const_cast<char*>("./");
+    log.reset();
   }
 
   ~TestController() {
@@ -77,10 +133,6 @@ class TestController {
     }
   }
 
-  void enableDebug(const std::string name) {
-    logging::LoggerConfiguration::getConfiguration()->get_logger(name)->set_level(spdlog::level::debug);
-  }
-
   char *createTempDirectory(char *format) {
     char *dir = mkdtemp(format);
     directories.push_back(dir);
@@ -88,7 +140,7 @@ class TestController {
   }
 
  protected:
-  LogTestController log;
+  LogTestController & log;
   std::vector<char*> directories;
 
 };

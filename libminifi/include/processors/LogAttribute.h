@@ -24,6 +24,7 @@
 #include "core/Processor.h"
 #include "core/ProcessSession.h"
 #include "core/Core.h"
+#include "core/logging/LoggerConfiguration.h"
 
 namespace org {
 namespace apache {
@@ -40,7 +41,7 @@ class LogAttribute : public core::Processor {
    */
   LogAttribute(std::string name, uuid_t uuid = NULL)
       : Processor(name, uuid),
-        logger_(logging::Logger<LogAttribute>::getLogger()) {
+        logger_(logging::LoggerFactory<LogAttribute>::getLogger()) {
   }
   // Destructor
   virtual ~LogAttribute() {
@@ -117,7 +118,7 @@ class LogAttribute : public core::Processor {
 
  private:
   // Logger
-  logging::Logger<LogAttribute> & logger_;
+  logging::Logger & logger_;
 };
 
 } /* namespace processors */

@@ -21,7 +21,7 @@
 #include <memory>
 #include <string>
 #include <set>
-#include "core/logging/Logger.h"
+#include "core/logging/LoggerConfiguration.h"
 #include "core/Relationship.h"
 
 namespace org {
@@ -33,7 +33,7 @@ namespace core {
 Connectable::Connectable(std::string name, uuid_t uuid)
     : CoreComponent(name, uuid),
       max_concurrent_tasks_(1),
-      logger_(logging::Logger<Connectable>::getLogger()) {
+      logger_(logging::LoggerFactory<Connectable>::getLogger()) {
 }
 
 Connectable::Connectable(const Connectable &&other)

@@ -31,6 +31,7 @@
 #include <iostream>
 #include <string>
 #include "io/validation.h"
+#include "core/logging/LoggerConfiguration.h"
 
 namespace org {
 namespace apache {
@@ -49,7 +50,7 @@ Socket::Socket(const std::shared_ptr<SocketContext> &context, const std::string 
       socket_max_(0),
       listeners_(listeners),
       canonical_hostname_(""),
-      logger_(logging::Logger<Socket>::getLogger()) {
+      logger_(logging::LoggerFactory<Socket>::getLogger()) {
   FD_ZERO(&total_list_);
   FD_ZERO(&read_fds_);
 }

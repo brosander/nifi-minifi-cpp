@@ -85,7 +85,7 @@ class ResourceClaim {
 
  private:
   // Logger
-  logging::Logger<ResourceClaim> & logger_;
+  logging::Logger & logger_;
   // Prevent default copy constructor and assignment operation
   // Only support pass by reference or pointer
   ResourceClaim(const ResourceClaim &parent);

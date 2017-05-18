@@ -34,7 +34,7 @@
 #include "io/Serializable.h"
 #include "core/FlowFile.h"
 #include "utils/TimeUtil.h"
-#include "core/logging/Logger.h"
+#include "core/logging/LoggerConfiguration.h"
 #include "ResourceClaim.h"
 #include "Connection.h"
 
@@ -111,7 +111,7 @@ class FlowFileRecord : public core::FlowFile, public io::Serializable {
       : FlowFile(),
         flow_repository_(flow_repository),
         snapshot_(""),
-      logger_(logging::Logger<FlowFileRecord>::getLogger())  {
+      logger_(logging::LoggerFactory<FlowFileRecord>::getLogger())  {
 
   }
   // Destructor
@@ -182,7 +182,7 @@ class FlowFileRecord : public core::FlowFile, public io::Serializable {
   // Only support pass by reference or pointer
 
  private:
-  logging::Logger<FlowFileRecord> & logger_;
+  logging::Logger & logger_;
 };
 
 } /* namespace minifi */

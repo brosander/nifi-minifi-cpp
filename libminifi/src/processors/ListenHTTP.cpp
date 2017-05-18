@@ -34,6 +34,7 @@
 #include "core/ProcessContext.h"
 #include "core/ProcessSession.h"
 #include "core/ProcessSessionFactory.h"
+#include "core/logging/LoggerConfiguration.h"
 
 namespace org {
 namespace apache {
@@ -256,7 +257,7 @@ ListenHTTP::Handler::Handler(core::ProcessContext *context,
                              std::string &&headersAsAttributesPattern)
     : _authDNRegex(std::move(authDNPattern)),
       _headersAsAttributesRegex(std::move(headersAsAttributesPattern)),
-      logger_(logging::Logger<ListenHTTP::Handler>::getLogger()) {
+      logger_(logging::LoggerFactory<ListenHTTP::Handler>::getLogger()) {
   _processContext = context;
   _processSessionFactory = sessionFactory;
 }
@@ -337,7 +338,7 @@ bool ListenHTTP::Handler::handlePost(CivetServer *server,
 }
 
 ListenHTTP::WriteCallback::WriteCallback(
-    struct mg_connection *conn, const struct mg_request_info *reqInfo) : logger_(logging::Logger<ListenHTTP::WriteCallback>::getLogger()) {
+    struct mg_connection *conn, const struct mg_request_info *reqInfo) : logger_(logging::LoggerFactory<ListenHTTP::WriteCallback>::getLogger()) {
   _conn = conn;
   _reqInfo = reqInfo;
 }

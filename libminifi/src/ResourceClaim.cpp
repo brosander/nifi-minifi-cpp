@@ -23,6 +23,7 @@
 #include <string>
 
 #include "ResourceClaim.h"
+#include "core/logging/LoggerConfiguration.h"
 
 namespace org {
 namespace apache {
@@ -36,7 +37,7 @@ char *ResourceClaim::default_directory_path = const_cast<char*>(DEFAULT_CONTENT_
 ResourceClaim::ResourceClaim(const std::string contentDirectory)
     : _id(_localResourceClaimNumber.load()),
       _flowFileRecordOwnedCount(0),
-      logger_(logging::Logger<ResourceClaim>::getLogger()) {
+      logger_(logging::LoggerFactory<ResourceClaim>::getLogger()) {
 
   char uuidStr[37];
 

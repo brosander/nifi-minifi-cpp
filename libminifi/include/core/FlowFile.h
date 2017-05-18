@@ -270,7 +270,7 @@ class FlowFile {
 
  private:
   // Logger
-  logging::Logger<FlowFile> & logger_;
+  logging::Logger & logger_;
 };
 
 } /* namespace core */

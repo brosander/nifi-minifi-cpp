@@ -23,6 +23,7 @@
 
 #include <map>
 #include <string>
+#include "core/logging/Logger.h"
 #include "properties/Properties.h"
 
 #include "spdlog/spdlog.h"
@@ -42,6 +43,7 @@ struct LoggerNamespace {
  
 class LoggerProperties : public Properties {
 public:
+ LoggerProperties(Logger & logger) : Properties(logger) {};
  std::vector<std::string> get_appenders();
  std::vector<std::string> get_loggers();
  void add_sink(const std::string & name, std::shared_ptr<spdlog::sinks::sink> sink);
@@ -57,14 +59,29 @@ class LoggerConfiguration {
   static std::shared_ptr<LoggerConfiguration> getConfiguration() {
    return configuration_;
   }
-  static void initialize(LoggerProperties *logger_properties) {
+  static void initialize(const std::shared_ptr<LoggerProperties> & logger_properties) {
    configuration_ = std::shared_ptr<LoggerConfiguration>(new LoggerConfiguration(logger_properties));
   }
   std::shared_ptr<spdlog::logger> get_logger(const std::string & name);
  private:
-  LoggerConfiguration(LoggerProperties *logger_properties);
+  LoggerConfiguration(const std::shared_ptr<LoggerProperties>  & logger_properties);
   static std::shared_ptr<LoggerConfiguration> configuration_;
   std::shared_ptr<LoggerNamespace> root_namespace;
+};
+
+template<typename T>
+class LoggerFactory {
+ public:
+  static Logger& getLogger() {
+   static LoggerImpl logger;
+   return logger;
+  }
+ private:
+  class LoggerImpl : public Logger {
+    public:
+     LoggerImpl():Logger(LoggerConfiguration::getConfiguration()->get_logger(core::getClassName<T>())) {
+     }
+  };
 };
 
 } /* namespace logging */

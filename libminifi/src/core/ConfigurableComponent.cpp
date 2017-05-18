@@ -22,7 +22,7 @@
 #include <string>
 #include <set>
 #include "core/Property.h"
-#include "core/logging/Logger.h"
+#include "core/logging/LoggerConfiguration.h"
 
 namespace org {
 namespace apache {
@@ -30,13 +30,13 @@ namespace nifi {
 namespace minifi {
 namespace core {
 ConfigurableComponent::ConfigurableComponent()
-    : logger_(logging::Logger<ConfigurableComponent>::getLogger()) {
+    : logger_(logging::LoggerFactory<ConfigurableComponent>::getLogger()) {
 }
 
 ConfigurableComponent::ConfigurableComponent(
     const ConfigurableComponent &&other)
     : properties_(std::move(other.properties_)),
-      logger_(logging::Logger<ConfigurableComponent>::getLogger()) {
+      logger_(logging::LoggerFactory<ConfigurableComponent>::getLogger()) {
 }
 
 ConfigurableComponent::~ConfigurableComponent() {

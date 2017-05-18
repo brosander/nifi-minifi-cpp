@@ -36,6 +36,7 @@
 #include "core/ProcessSession.h"
 #include "core/ProcessSessionFactory.h"
 #include "../include/io/StreamFactory.h"
+#include "core/logging/LoggerConfiguration.h"
 
 namespace org {
 namespace apache {
@@ -45,7 +46,7 @@ namespace core {
 
 Processor::Processor(std::string name, uuid_t uuid)
     : Connectable(name, uuid), ConfigurableComponent(),
-    logger_(logging::Logger<Processor>::getLogger()) {
+    logger_(logging::LoggerFactory<Processor>::getLogger()) {
   has_work_.store(false);
   // Setup the default values
   state_ = DISABLED;

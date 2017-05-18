@@ -28,6 +28,7 @@
 #include "core/ProcessSession.h"
 #include "Site2SiteClientProtocol.h"
 #include "io/StreamFactory.h"
+#include "core/logging/LoggerConfiguration.h"
 
 namespace org {
 namespace apache {
@@ -44,7 +45,7 @@ class RemoteProcessorGroupPort : public core::Processor {
       : core::Processor(name, uuid),
         direction_(SEND),
         transmitting_(false),
-        logger_(logging::Logger<RemoteProcessorGroupPort>::getLogger()) {
+        logger_(logging::LoggerFactory<RemoteProcessorGroupPort>::getLogger()) {
     stream_factory_ = stream_factory;
     uuid_copy(protocol_uuid_, uuid);
   }
@@ -91,7 +92,7 @@ class RemoteProcessorGroupPort : public core::Processor {
   std::stack<std::unique_ptr<Site2SiteClientProtocol>> available_protocols_;
   std::mutex protocol_mutex_;
   // Logger
-  logging::Logger<RemoteProcessorGroupPort> & logger_;
+  logging::Logger & logger_;
   // Transaction Direction
   TransferDirection direction_;
   // Transmitting

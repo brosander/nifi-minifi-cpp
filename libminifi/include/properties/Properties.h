@@ -37,7 +37,7 @@ namespace minifi {
 
 class Properties {
  public:
-  Properties() : logger_(logging::Logger<Properties>::getLogger()) {}
+  Properties();
   
   virtual ~Properties() {
 
@@ -80,11 +80,13 @@ class Properties {
   // Mutex for protection
   std::mutex mutex_;
   // Logger
-  logging::Logger<Properties> & logger_;
+  logging::Logger & logger_;
   // Home location for this executable
   std::string minifi_home_;
 
  protected:
+  Properties(logging::Logger & logger) : logger_(logger) {
+  }
   std::map<std::string, std::string> properties_;
 };
 

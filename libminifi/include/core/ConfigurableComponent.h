@@ -95,7 +95,7 @@ class ConfigurableComponent {
   std::map<std::string, Property> properties_;
 
  private:
-  logging::Logger<ConfigurableComponent> & logger_;
+  logging::Logger & logger_;
 
 };
 

@@ -29,6 +29,7 @@
 #include <chrono>
 #include <thread>
 #include "core/Processor.h"
+#include "core/logging/LoggerConfiguration.h"
 
 namespace org {
 namespace apache {
@@ -38,7 +39,7 @@ namespace core {
 
 ProcessGroup::ProcessGroup(ProcessGroupType type, std::string name, uuid_t uuid,
                            ProcessGroup *parent)
-    : logger_(logging::Logger<ProcessGroup>::getLogger()),
+    : logger_(logging::LoggerFactory<ProcessGroup>::getLogger()),
       name_(name),
       type_(type),
       parent_process_group_(parent) {

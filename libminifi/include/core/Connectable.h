@@ -154,7 +154,7 @@ class Connectable : public CoreComponent {
   std::condition_variable work_condition_;
 
  private:
-  logging::Logger<Connectable> & logger_;
+  logging::Logger & logger_;
 };
 
 }

@@ -21,7 +21,7 @@
 #define __THREADED_SCHEDULING_AGENT_H__
 
 #include "properties/Configure.h"
-#include "core/logging/Logger.h"
+#include "core/logging/LoggerConfiguration.h"
 #include "core/Processor.h"
 #include "core/Repository.h"
 #include "core/ProcessContext.h"
@@ -43,7 +43,7 @@ class ThreadedSchedulingAgent : public SchedulingAgent {
    * Create a new processor
    */
   ThreadedSchedulingAgent(std::shared_ptr<core::Repository> repo, std::shared_ptr<Configure> configure)
-      : SchedulingAgent(repo), logger_(logging::Logger<ThreadedSchedulingAgent>::getLogger()) {
+      : SchedulingAgent(repo), logger_(logging::LoggerFactory<ThreadedSchedulingAgent>::getLogger()) {
        configure_ = configure;
   }
   // Destructor
@@ -71,7 +71,7 @@ class ThreadedSchedulingAgent : public SchedulingAgent {
   ThreadedSchedulingAgent(const ThreadedSchedulingAgent &parent);
   ThreadedSchedulingAgent &operator=(const ThreadedSchedulingAgent &parent);
   std::shared_ptr<Configure> configure_;
-  logging::Logger<ThreadedSchedulingAgent> & logger_;
+  logging::Logger & logger_;
 };
 
 } /* namespace minifi */

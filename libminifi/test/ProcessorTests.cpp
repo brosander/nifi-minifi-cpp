@@ -38,10 +38,7 @@ TEST_CASE("Test Creation of GetFile", "[getfileCreate]") {
 }
 
 TEST_CASE("Test Find file", "[getfileCreate2]") {
-
   TestController testController;
-
-  testController.enableDebug("");
 
   std::shared_ptr<core::Processor> processor = std::make_shared<
       org::apache::nifi::minifi::processors::GetFile>("getfileCreate2");
@@ -176,10 +173,7 @@ TEST_CASE("Test Find file", "[getfileCreate2]") {
 }
 
 TEST_CASE("Test GetFileLikeIt'sThreaded", "[getfileCreate3]") {
-
   TestController testController;
-
-  testController.enableDebug("");
 
   std::shared_ptr<core::Processor> processor = std::make_shared<
       org::apache::nifi::minifi::processors::GetFile>("getfileCreate2");
@@ -270,13 +264,7 @@ TEST_CASE("Test GetFileLikeIt'sThreaded", "[getfileCreate3]") {
 }
 
 TEST_CASE("LogAttributeTest", "[getfileCreate3]") {
-  std::ostringstream oss;
-//   std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
-//   logger->updateLogger(std::move(outputLogger));
-
   TestController testController;
-
-  testController.enableDebug("");
 
   std::shared_ptr<core::Repository> repo = std::make_shared<TestRepository>();
 
@@ -366,8 +354,7 @@ TEST_CASE("LogAttributeTest", "[getfileCreate3]") {
 
   records = reporter->getEvents();
   session.commit();
-  oss.str("");
-  oss.clear();
+  LogTestController::getInstance().reset();
 
   logAttribute->incrementActiveTasks();
   logAttribute->setScheduledState(core::ScheduledState::RUNNING);
@@ -376,18 +363,9 @@ TEST_CASE("LogAttributeTest", "[getfileCreate3]") {
   //session2.commit();
   records = reporter->getEvents();
 
-  std::string log_attribute_output = oss.str();
-  REQUIRE(
-      log_attribute_output.find("key:absolute.path value:" + ss.str())
-          != std::string::npos);
-  REQUIRE(log_attribute_output.find("Size:8 Offset:0") != std::string::npos);
-  REQUIRE(
-      log_attribute_output.find("key:path value:" + std::string(dir))
-          != std::string::npos);
-
-//   
-//   logger->updateLogger(std::move(outputLogger));
-
+  REQUIRE(true == LogTestController::getInstance().contains("key:absolute.path value:" + ss.str()));
+  REQUIRE(true == LogTestController::getInstance().contains("Size:8 Offset:0"));
+  REQUIRE(true == LogTestController::getInstance().contains("key:path value:" + std::string(dir)));
 }
 
 int fileSize(const char *add) {

@@ -28,6 +28,7 @@
 #include "core/ProcessSession.h"
 #include "Site2SiteClientProtocol.h"
 #include "io/StreamFactory.h"
+#include "core/logging/LoggerConfiguration.h"
 
 namespace org {
 namespace apache {
@@ -45,7 +46,7 @@ public:
 	 */
 	SiteToSiteProvenanceReportingTask(const std::shared_ptr<io::StreamFactory> &stream_factory) :
 			core::Processor(ReportTaskName),
-			logger_(logging::Logger<SiteToSiteProvenanceReportingTask>::getLogger()) {
+			logger_(logging::LoggerFactory<SiteToSiteProvenanceReportingTask>::getLogger()) {
 		this->setTriggerWhenEmpty(true);
 		port_ = 0;
 		batch_size_ = 100;
@@ -108,7 +109,7 @@ private:
 	uint16_t port_;
 	int batch_size_;
 	//! Logger
-	logging::Logger<SiteToSiteProvenanceReportingTask> & logger_;
+	logging::Logger & logger_;
         std::shared_ptr<io::StreamFactory> stream_factory_;
 };
 

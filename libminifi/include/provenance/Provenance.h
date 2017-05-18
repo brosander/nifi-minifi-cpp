@@ -35,7 +35,7 @@
 #include "properties/Configure.h"
 #include "Connection.h"
 #include "FlowFileRecord.h"
-#include "core/logging/Logger.h"
+#include "core/logging/LoggerConfiguration.h"
 #include "ResourceClaim.h"
 #include "io/Serializable.h"
 #include "utils/TimeUtil.h"
@@ -162,7 +162,7 @@ class ProvenanceEventRecord :
    * Create a new provenance event record
    */
   ProvenanceEventRecord(ProvenanceEventType event, std::string componentId,
-                        std::string componentType): logger_(logging::Logger<ProvenanceEventRecord>::getLogger()) {
+                        std::string componentType): logger_(logging::LoggerFactory<ProvenanceEventRecord>::getLogger()) {
     _eventType = event;
     _componentId = componentId;
     _componentType = componentType;
@@ -174,7 +174,7 @@ class ProvenanceEventRecord :
     _eventIdStr = eventIdStr;
   }
 
-  ProvenanceEventRecord(): logger_(logging::Logger<ProvenanceEventRecord>::getLogger()) {
+  ProvenanceEventRecord(): logger_(logging::LoggerFactory<ProvenanceEventRecord>::getLogger()) {
     _eventTime = getTimeMillis();
   }
 
@@ -424,7 +424,7 @@ class ProvenanceEventRecord :
  private:
 
   // Logger
-  logging::Logger<ProvenanceEventRecord> & logger_;
+  logging::Logger & logger_;
 
   // Prevent default copy constructor and assignment operation
   // Only support pass by reference or pointer
@@ -441,7 +441,7 @@ class ProvenanceReporter {
    * Create a new provenance reporter associated with the process session
    */
   ProvenanceReporter(std::shared_ptr<core::Repository> repo,
-                     std::string componentId, std::string componentType) : logger_(logging::Logger<ProvenanceReporter>::getLogger()) {
+                     std::string componentId, std::string componentType) : logger_(logging::LoggerFactory<ProvenanceReporter>::getLogger()) {
     _componentId = componentId;
     _componentType = componentType;
     repo_ = repo;
@@ -536,7 +536,7 @@ class ProvenanceReporter {
   // Incoming connection Iterator
   std::set<ProvenanceEventRecord *> _events;
   // Logger
-  logging::Logger<ProvenanceReporter> & logger_;
+  logging::Logger & logger_;
   // provenance repository.
   std::shared_ptr<core::Repository> repo_;
 

@@ -34,7 +34,7 @@
 #include "processors/ExecuteProcess.h"
 #include "processors/AppendHostInfo.h"
 #include "core/Processor.h"
-#include "core/logging/Logger.h"
+#include "core/logging/LoggerConfiguration.h"
 #include "core/ProcessContext.h"
 #include "core/ProcessSession.h"
 #include "core/ProcessGroup.h"
@@ -63,7 +63,7 @@ class FlowConfiguration : public CoreComponent {
       : CoreComponent(core::getClassName<FlowConfiguration>()),
         flow_file_repo_(flow_file_repo),
         config_path_(path),
-        logger_(logging::Logger<FlowConfiguration>::getLogger()){
+        logger_(logging::LoggerFactory<FlowConfiguration>::getLogger()){
 
   }
 
@@ -114,7 +114,7 @@ class FlowConfiguration : public CoreComponent {
   std::shared_ptr<io::StreamFactory> stream_factory_;
   
  private:
-  logging::Logger<FlowConfiguration> & logger_;
+  logging::Logger & logger_;
 };
 
 } /* namespace core */

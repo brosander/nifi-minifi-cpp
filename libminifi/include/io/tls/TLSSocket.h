@@ -84,7 +84,7 @@ class TLSContext: public SocketContext {
   }
 
 
-  logging::Logger<TLSContext> & logger_;
+  logging::Logger & logger_;
   std::shared_ptr<Configure> configure_;
   SSL_CTX *ctx;
 
@@ -161,7 +161,7 @@ class TLSSocket : public Socket {
   SSL* ssl;
 
  private:
-  logging::Logger<TLSSocket> & logger_;
+  logging::Logger & logger_;
 };
 
 } /* namespace io */

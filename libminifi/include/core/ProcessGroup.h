@@ -176,7 +176,7 @@ class ProcessGroup {
   // Mutex for protection
   std::mutex mutex_;
   // Logger
-  logging::Logger<ProcessGroup> & logger_;
+  logging::Logger & logger_;
   // Prevent default copy constructor and assignment operation
   // Only support pass by reference or pointer
   ProcessGroup(const ProcessGroup &parent);

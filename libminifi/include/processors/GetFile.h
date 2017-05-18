@@ -23,6 +23,7 @@
 #include "core/Processor.h"
 #include "core/ProcessSession.h"
 #include "core/Core.h"
+#include "core/logging/LoggerConfiguration.h"
 
 namespace org {
 namespace apache {
@@ -52,7 +53,7 @@ class GetFile : public core::Processor {
    * Create a new processor
    */
   explicit GetFile(std::string name, uuid_t uuid = NULL)
-      : Processor(name, uuid), logger_(logging::Logger<GetFile>::getLogger()) {
+      : Processor(name, uuid), logger_(logging::LoggerFactory<GetFile>::getLogger()) {
 
   }
   // Destructor
@@ -132,7 +133,7 @@ class GetFile : public core::Processor {
   // as the top level time.
   std::atomic<uint64_t> last_listing_time_;
 
-  logging::Logger<GetFile> & logger_;
+  logging::Logger & logger_;
 };
 
 } /* namespace processors */

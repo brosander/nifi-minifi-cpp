@@ -81,10 +81,19 @@ void sigHandler(int signal) {
   }
 }
 
-int main(int argc, char **argv) {
-  std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
+class BootstrapLogger: public logging::Logger {
+ public:
+   BootstrapLogger():Logger(init()){};
+ private:
+   static std::shared_ptr<spdlog::logger> init() {
+     std::shared_ptr<spdlog::logger> delegate = std::make_shared<spdlog::logger>("main", spdlog::sinks::stderr_sink_mt::instance());
+     delegate->set_level(spdlog::level::info);
+     return delegate;
+   }
+};
 
-  logger->setLogLevel(logging::info);
+int main(int argc, char **argv) {
+  BootstrapLogger logger;
 
   uint16_t stop_wait_time = STOP_WAIT_TIME_MS;
 
@@ -96,7 +105,7 @@ int main(int argc, char **argv) {
   running = sem_open("MiNiFiMain", O_CREAT, 0644, 0);
   if (running == SEM_FAILED || running == 0) {
 
-    logger->log_error("could not initialize semaphore");
+    logger.log_error("could not initialize semaphore");
     perror("initialization failure");
   }
   // assumes POSIX compliant environment
@@ -104,7 +113,7 @@ int main(int argc, char **argv) {
   if (const char* env_p = std::getenv(MINIFI_HOME_ENV_KEY)) {
     minifiHome = env_p;
   } else {
-    logger->log_info(
+    logger.log_info(
         "MINIFI_HOME was not found, determining based on executable path.");
     char *path = NULL;
     char full_path[PATH_MAX];
@@ -118,11 +127,11 @@ int main(int argc, char **argv) {
   if (signal(SIGINT, sigHandler) == SIG_ERR
       || signal(SIGTERM, sigHandler) == SIG_ERR
       || signal(SIGPIPE, SIG_IGN) == SIG_ERR) {
-    logger->log_error("Can not install signal handler");
+    logger.log_error("Can not install signal handler");
     return -1;
   }
 
-  std::shared_ptr<minifi::Properties> log_properties = std::make_shared<minifi::Properties>();
+  std::shared_ptr<logging::LoggerProperties> log_properties = std::make_shared<logging::LoggerProperties>(logger);
   log_properties->setHome(minifiHome);
   log_properties->loadConfigureFile(DEFAULT_LOG_PROPERTIES_FILE);
   logging::LoggerConfiguration::initialize(log_properties);
@@ -136,31 +145,19 @@ int main(int argc, char **argv) {
     try {
       stop_wait_time = std::stoi(graceful_shutdown_seconds);
     } catch (const std::out_of_range &e) {
-      logger->log_error("%s is out of range. %s",
+      logger.log_error("%s is out of range. %s",
                         minifi::Configure::nifi_graceful_shutdown_seconds,
                         e.what());
     } catch (const std::invalid_argument &e) {
-      logger->log_error("%s contains an invalid argument set. %s",
+      logger.log_error("%s contains an invalid argument set. %s",
                         minifi::Configure::nifi_graceful_shutdown_seconds,
                         e.what());
     }
   } else {
-    logger->log_debug("%s not set, defaulting to %d",
+    logger.log_debug("%s not set, defaulting to %d",
                       minifi::Configure::nifi_graceful_shutdown_seconds,
                       STOP_WAIT_TIME_MS);
   }
-
-  std::string log_level;
-  if (configure->get(minifi::Configure::nifi_log_level,
-                     log_level)) {
-    logger->setLogLevel(log_level);
-  }
-
-  // set the log configuration.
-  std::unique_ptr<logging::BaseLogger> configured_logger =
-      logging::LogInstance::getConfiguredLogger(configure);
-
-  logger->updateLogger(std::move(configured_logger));
 
   configure->get(minifi::Configure::nifi_provenance_repository_class_name,
                  prov_repo_class);
@@ -194,7 +191,7 @@ int main(int argc, char **argv) {
   // Start Processing the flow
 
   controller->start();
-  logger->log_info("MiNiFi started");
+  logger.log_info("MiNiFi started");
 
   /**
    * Sem wait provides us the ability to have a controlled
@@ -211,7 +208,7 @@ int main(int argc, char **argv) {
    */
   controller->waitUnload(stop_wait_time);
 
-  logger->log_info("MiNiFi exit");
+  logger.log_info("MiNiFi exit");
 
   return 0;
 }

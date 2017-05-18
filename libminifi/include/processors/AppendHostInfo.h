@@ -25,6 +25,7 @@
 #include "core/Processor.h"
 #include "core/ProcessSession.h"
 #include "core/Core.h"
+#include "core/logging/LoggerConfiguration.h"
 
 namespace org {
 namespace apache {
@@ -41,7 +42,7 @@ class AppendHostInfo : public core::Processor {
    */
   AppendHostInfo(std::string name, uuid_t uuid = NULL)
       : core::Processor(name, uuid),
-        logger_(logging::Logger<AppendHostInfo>::getLogger()){
+        logger_(logging::LoggerFactory<AppendHostInfo>::getLogger()){
   }
   // Destructor
   virtual ~AppendHostInfo() {
@@ -67,7 +68,7 @@ class AppendHostInfo : public core::Processor {
 
  private:
   // Logger
-  logging::Logger<AppendHostInfo> & logger_;
+  logging::Logger & logger_;
 };
 
 } /* namespace processors */

@@ -20,7 +20,7 @@
 #include <memory>
 #include <string>
 #include <set>
-#include "core/logging/Logger.h"
+#include "core/logging/LoggerConfiguration.h"
 namespace org {
 namespace apache {
 namespace nifi {
@@ -39,7 +39,7 @@ FlowFile::FlowFile()
       marked_delete_(false),
       connection_(nullptr),
       original_connection_(),
-      logger_(logging::Logger<FlowFile>::getLogger()) {
+      logger_(logging::LoggerFactory<FlowFile>::getLogger()) {
   entry_date_ = getTimeMillis();
   lineage_start_date_ = entry_date_;
 

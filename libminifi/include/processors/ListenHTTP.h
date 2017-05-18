@@ -29,6 +29,7 @@
 #include "core/Processor.h"
 #include "core/ProcessSession.h"
 #include "core/Core.h"
+#include "core/logging/LoggerConfiguration.h"
 
 namespace org {
 namespace apache {
@@ -46,7 +47,7 @@ class ListenHTTP : public core::Processor {
    */
   ListenHTTP(std::string name, uuid_t uuid = NULL)
       : Processor(name, uuid),
-        logger_(logging::Logger<ListenHTTP>::getLogger()) {
+        logger_(logging::LoggerFactory<ListenHTTP>::getLogger()) {
   }
   // Destructor
   virtual ~ListenHTTP();
@@ -82,7 +83,7 @@ class ListenHTTP : public core::Processor {
     // Send HTTP 500 error response to client
     void sendErrorResponse(struct mg_connection *conn);
     // Logger
-    logging::Logger<ListenHTTP::Handler> & logger_;
+    logging::Logger & logger_;
 
     std::regex _authDNRegex;
     std::regex _headersAsAttributesRegex;
@@ -99,7 +100,7 @@ class ListenHTTP : public core::Processor {
 
    private:
     // Logger
-    logging::Logger<ListenHTTP::WriteCallback> & logger_;
+    logging::Logger & logger_;
 
     struct mg_connection *_conn;
     const struct mg_request_info *_reqInfo;
@@ -109,7 +110,7 @@ class ListenHTTP : public core::Processor {
 
  private:
   // Logger
-  logging::Logger<ListenHTTP> & logger_;
+  logging::Logger & logger_;
 
   std::unique_ptr<CivetServer> _server;
   std::unique_ptr<Handler> _handler;

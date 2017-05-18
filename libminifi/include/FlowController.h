@@ -185,7 +185,7 @@ class FlowController : public core::CoreComponent {
   std::unique_ptr<core::FlowConfiguration> flow_configuration_;
 
  private:
-  logging::Logger<FlowController> & logger_;
+  logging::Logger & logger_;
 };
 
 } /* namespace minifi */

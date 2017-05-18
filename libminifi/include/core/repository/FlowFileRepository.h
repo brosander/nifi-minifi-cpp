@@ -25,6 +25,7 @@
 #include "core/Repository.h"
 #include "core/Core.h"
 #include "Connection.h"
+#include "core/logging/LoggerConfiguration.h"
 
 namespace org {
 namespace apache {
@@ -51,7 +52,7 @@ class FlowFileRepository : public core::Repository,
                      int64_t maxPartitionBytes, uint64_t purgePeriod)
       : Repository(core::getClassName<FlowFileRepository>(), directory,
                    maxPartitionMillis, maxPartitionBytes, purgePeriod),
-        logger_(logging::Logger<FlowFileRepository>::getLogger())
+        logger_(logging::LoggerFactory<FlowFileRepository>::getLogger())
   {
     db_ = NULL;
   }
@@ -169,7 +170,7 @@ class FlowFileRepository : public core::Repository,
  private:
   std::map<std::string, std::shared_ptr<minifi::Connection>> connectionMap;
   leveldb::DB* db_;
-  logging::Logger<FlowFileRepository> & logger_;
+  logging::Logger & logger_;
 };
 
 } /* namespace repository */

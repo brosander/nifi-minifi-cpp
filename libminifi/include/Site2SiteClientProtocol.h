@@ -39,7 +39,7 @@
 #include "properties/Configure.h"
 #include "Site2SitePeer.h"
 #include "FlowFileRecord.h"
-#include "core/logging/Logger.h"
+#include "core/logging/LoggerConfiguration.h"
 #include "core/ProcessContext.h"
 #include "core/ProcessSession.h"
 #include "io/CRCStream.h"
@@ -398,7 +398,7 @@ class Site2SiteClientProtocol {
   /*!
    * Create a new control protocol
    */
-  Site2SiteClientProtocol(std::unique_ptr<Site2SitePeer> peer) : logger_(logging::Logger<Site2SiteClientProtocol>::getLogger()) {
+  Site2SiteClientProtocol(std::unique_ptr<Site2SitePeer> peer) : logger_(logging::LoggerFactory<Site2SiteClientProtocol>::getLogger()) {
     peer_ = std::move(peer);
     _batchSize = 0;
     _batchCount = 0;
@@ -598,7 +598,7 @@ class Site2SiteClientProtocol {
   // Mutex for protection
   std::mutex mutex_;
   // Logger
-  logging::Logger<Site2SiteClientProtocol> & logger_;
+  logging::Logger & logger_;
   // Batch Count
   std::atomic<uint64_t> _batchCount;
   // Batch Size

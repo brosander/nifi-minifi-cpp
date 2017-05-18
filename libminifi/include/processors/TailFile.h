@@ -24,6 +24,7 @@
 #include "core/Processor.h"
 #include "core/ProcessSession.h"
 #include "core/Core.h"
+#include "core/logging/LoggerConfiguration.h"
 
 namespace org {
 namespace apache {
@@ -39,7 +40,7 @@ class TailFile : public core::Processor {
    * Create a new processor
    */
   explicit TailFile(std::string name, uuid_t uuid = NULL)
-      : core::Processor(name, uuid), logger_(logging::Logger<TailFile>::getLogger()) {
+      : core::Processor(name, uuid), logger_(logging::LoggerFactory<TailFile>::getLogger()) {
     _stateRecovered = false;
   }
   // Destructor
@@ -86,7 +87,7 @@ class TailFile : public core::Processor {
    * Check roll over for the provided file.
    */
   void checkRollOver(const std::string &, const std::string&);
-  logging::Logger<TailFile> & logger_;
+  logging::Logger & logger_;
 };
 
 // Matched File Item for Roll over check

@@ -35,7 +35,7 @@
 
 #include "core/Property.h"
 #include "properties/Configure.h"
-#include "core/logging/Logger.h"
+#include "core/logging/LoggerConfiguration.h"
 
 namespace org {
 namespace apache {
@@ -157,7 +157,7 @@ class FlowControlProtocol {
   /*!
    * Create a new control protocol
    */
-  FlowControlProtocol(FlowController *controller, const std::shared_ptr<Configure> &configure) : logger_(logging::Logger<FlowControlProtocol>::getLogger()) {
+  FlowControlProtocol(FlowController *controller, const std::shared_ptr<Configure> &configure) : logger_(logging::LoggerFactory<FlowControlProtocol>::getLogger()) {
     _controller = controller;
     _socket = 0;
     _serverName = "localhost";
@@ -273,7 +273,7 @@ class FlowControlProtocol {
   // Mutex for protection
   std::mutex mutex_;
   // Logger
-  logging::Logger<FlowControlProtocol> & logger_;
+  logging::Logger & logger_;
   // NiFi server Name
   std::string _serverName;
   // NiFi server port

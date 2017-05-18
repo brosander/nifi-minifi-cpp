@@ -31,7 +31,7 @@
 #include <memory>
 
 #include "core/Property.h"
-#include "core/logging/Logger.h"
+#include "core/logging/LoggerConfiguration.h"
 #include "properties/Configure.h"
 #include "io/ClientSocket.h"
 #include "io/BaseStream.h"
@@ -52,7 +52,7 @@ class Site2SitePeer : public org::apache::nifi::minifi::io::BaseStream {
       : stream_(nullptr),
         host_(""),
         port_(-1),
-        logger_(logging::Logger<Site2SitePeer>::getLogger()){
+        logger_(logging::LoggerFactory<Site2SitePeer>::getLogger()){
 
   }
   /*
@@ -64,7 +64,7 @@ class Site2SitePeer : public org::apache::nifi::minifi::io::BaseStream {
       : host_(host_),
         port_(port_),
         stream_(injected_socket.release()),
-        logger_(logging::Logger<Site2SitePeer>::getLogger()) {
+        logger_(logging::LoggerFactory<Site2SitePeer>::getLogger()) {
     _yieldExpiration = 0;
     _timeOut = 30000;  // 30 seconds
     _url = "nifi://" + host_ + ":" + std::to_string(port_);
@@ -262,7 +262,7 @@ class Site2SitePeer : public org::apache::nifi::minifi::io::BaseStream {
   // socket timeout;
   std::atomic<uint64_t> _timeOut;
   // Logger
-  logging::Logger<Site2SitePeer> & logger_;
+  logging::Logger & logger_;
   // Yield Period in Milliseconds
   std::atomic<uint64_t> _yieldPeriodMsec;
   // Yield Expiration

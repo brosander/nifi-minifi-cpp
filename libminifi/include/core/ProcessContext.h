@@ -27,7 +27,7 @@
 #include <algorithm>
 
 #include "Property.h"
-#include "core/logging/Logger.h"
+#include "core/logging/LoggerConfiguration.h"
 #include "ProcessorNode.h"
 #include "core/Repository.h"
 
@@ -46,7 +46,7 @@ class ProcessContext {
    */
   ProcessContext(ProcessorNode &processor,
                  std::shared_ptr<core::Repository> repo)
-      : processor_node_(processor), logger_(logging::Logger<ProcessContext>::getLogger()) {
+      : processor_node_(processor), logger_(logging::LoggerFactory<ProcessContext>::getLogger()) {
     repo_ = repo;
   }
   // Destructor
@@ -101,7 +101,7 @@ class ProcessContext {
   // Processor
   ProcessorNode processor_node_;
   // Logger
-  logging::Logger<ProcessContext> & logger_;
+  logging::Logger & logger_;
 
 };
 
