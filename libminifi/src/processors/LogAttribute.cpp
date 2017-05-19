@@ -138,19 +138,19 @@ void LogAttribute::onTrigger(core::ProcessContext *context,
 
   switch (level) {
     case LogAttrLevelInfo:
-      logger_.log_info("{}", output.c_str());
+      logger_.log_info("%s", output.c_str());
       break;
     case LogAttrLevelDebug:
-      logger_.log_debug("{}", output.c_str());
+      logger_.log_debug("%s", output.c_str());
       break;
     case LogAttrLevelError:
-      logger_.log_error("{}", output.c_str());
+      logger_.log_error("%s", output.c_str());
       break;
     case LogAttrLevelTrace:
-      logger_.log_trace("{}", output.c_str());
+      logger_.log_trace("%s", output.c_str());
       break;
     case LogAttrLevelWarn:
-      logger_.log_warn("{}", output.c_str());
+      logger_.log_warn("%s", output.c_str());
       break;
     default:
       break;

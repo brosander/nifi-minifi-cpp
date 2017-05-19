@@ -25,7 +25,7 @@ using namespace logging;
 TEST_CASE("Test log Levels", "[ttl1]") {
   LogTestController::getInstance().setLevel<logging::Logger>(spdlog::level::trace);
   logging::Logger & logger = logging::LoggerFactory<logging::Logger>::getLogger();
-  logger.log_info("hello {}", "world");
+  logger.log_info("hello %s", "world");
 
   REQUIRE(
       true
@@ -37,7 +37,7 @@ TEST_CASE("Test log Levels", "[ttl1]") {
 TEST_CASE("Test log Levels debug", "[ttl2]") {
   LogTestController::getInstance().setLevel<logging::Logger>(spdlog::level::trace);
   logging::Logger & logger = logging::LoggerFactory<logging::Logger>::getLogger();
-  logger.log_debug("hello {}", "world");
+  logger.log_debug("hello %s", "world");
 
   REQUIRE(
       true
@@ -49,7 +49,7 @@ TEST_CASE("Test log Levels debug", "[ttl2]") {
 TEST_CASE("Test log Levels trace", "[ttl3]") {
   LogTestController::getInstance().setLevel<logging::Logger>(spdlog::level::trace);
   logging::Logger & logger = logging::LoggerFactory<logging::Logger>::getLogger();
-  logger.log_trace("hello world");
+  logger.log_trace("hello %s", "world");
 
   REQUIRE(
       true
@@ -61,7 +61,7 @@ TEST_CASE("Test log Levels trace", "[ttl3]") {
 TEST_CASE("Test log Levels error", "[ttl4]") {
   LogTestController::getInstance().setLevel<logging::Logger>(spdlog::level::trace);
   logging::Logger & logger = logging::LoggerFactory<logging::Logger>::getLogger();
-  logger.log_error("hello {}", "world");
+  logger.log_error("hello %s", "world");
 
   REQUIRE(
       true
@@ -73,7 +73,7 @@ TEST_CASE("Test log Levels error", "[ttl4]") {
 TEST_CASE("Test log Levels change", "[ttl5]") {
   LogTestController::getInstance().setLevel<logging::Logger>(spdlog::level::trace);
   logging::Logger & logger = logging::LoggerFactory<logging::Logger>::getLogger();
-  logger.log_error("hello {}", "world");
+  logger.log_error("hello %s", "world");
 
   REQUIRE(
       true
@@ -81,7 +81,7 @@ TEST_CASE("Test log Levels change", "[ttl5]") {
               "[org::apache::nifi::minifi::core::logging::Logger] [error] hello world"));
   LogTestController::getInstance().reset();
   LogTestController::getInstance().setLevel<logging::Logger>(spdlog::level::off);
-  logger.log_error("hello {}", "world");
+  logger.log_error("hello %s", "world");
 
   REQUIRE(0 == LogTestController::getInstance().log_output.str().length());
   LogTestController::getInstance().reset();

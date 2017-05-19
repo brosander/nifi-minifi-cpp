@@ -198,14 +198,14 @@ void InvokeHTTP::onSchedule(core::ProcessContext *context,
                             core::ProcessSessionFactory *sessionFactory) {
   if (!context->getProperty(Method.getName(), method_)) {
     logger_.log_info(
-        "{} attribute is missing, so default value of {} will be used",
+        "%s attribute is missing, so default value of %s will be used",
         Method.getName().c_str(), Method.getValue().c_str());
     return;
   }
 
   if (!context->getProperty(URL.getName(), url_)) {
     logger_.log_info(
-        "{} attribute is missing, so default value of {} will be used",
+        "%s attribute is missing, so default value of %s will be used",
         URL.getName().c_str(), URL.getValue().c_str());
     return;
   }
@@ -218,7 +218,7 @@ void InvokeHTTP::onSchedule(core::ProcessContext *context,
 
   } else {
     logger_.log_info(
-        "{} attribute is missing, so default value of {} will be used",
+        "%s attribute is missing, so default value of %s will be used",
         ConnectTimeout.getName().c_str(), ConnectTimeout.getValue().c_str());
 
     return;
@@ -229,14 +229,14 @@ void InvokeHTTP::onSchedule(core::ProcessContext *context,
 
   } else {
     logger_.log_info(
-        "{} attribute is missing, so default value of {} will be used",
+        "%s attribute is missing, so default value of %s will be used",
         ReadTimeout.getName().c_str(), ReadTimeout.getValue().c_str());
   }
 
   std::string dateHeaderStr;
   if (!context->getProperty(DateHeader.getName(), dateHeaderStr)) {
     logger_.log_info(
-        "{} attribute is missing, so default value of {} will be used",
+        "%s attribute is missing, so default value of %s will be used",
         DateHeader.getName().c_str(), DateHeader.getValue().c_str());
   }
 
@@ -246,7 +246,7 @@ void InvokeHTTP::onSchedule(core::ProcessContext *context,
   if (!context->getProperty(PropPutOutputAttributes.getName(),
                             put_attribute_name_)) {
     logger_.log_info(
-        "{} attribute is missing, so default value of {} will be used",
+        "%s attribute is missing, so default value of %s will be used",
         PropPutOutputAttributes.getName().c_str(),
         PropPutOutputAttributes.getValue().c_str());
   }
@@ -254,7 +254,7 @@ void InvokeHTTP::onSchedule(core::ProcessContext *context,
   if (!context->getProperty(AttributesToSend.getName(),
                             attribute_to_send_regex_)) {
     logger_.log_info(
-        "{} attribute is missing, so default value of {} will be used",
+        "%s attribute is missing, so default value of %s will be used",
         AttributesToSend.getName().c_str(),
         AttributesToSend.getValue().c_str());
   }
@@ -263,7 +263,7 @@ void InvokeHTTP::onSchedule(core::ProcessContext *context,
   if (!context->getProperty(AlwaysOutputResponse.getName(),
                             always_output_response)) {
     logger_.log_info(
-        "{} attribute is missing, so default value of {} will be used",
+        "%s attribute is missing, so default value of %s will be used",
         AttributesToSend.getName().c_str(),
         AttributesToSend.getValue().c_str());
   }
@@ -274,7 +274,7 @@ void InvokeHTTP::onSchedule(core::ProcessContext *context,
   std::string penalize_no_retry = "false";
   if (!context->getProperty(PenalizeOnNoRetry.getName(), penalize_no_retry)) {
     logger_.log_info(
-        "{} attribute is missing, so default value of {} will be used",
+        "%s attribute is missing, so default value of %s will be used",
         AttributesToSend.getName().c_str(),
         AttributesToSend.getValue().c_str());
   }
@@ -307,7 +307,7 @@ inline bool InvokeHTTP::matches(const std::string &value,
       return false;
     }
   } catch (std::regex_error e) {
-    logger_.log_error("Invalid File Filter regex: {}.", e.what());
+    logger_.log_error("Invalid File Filter regex: %s.", e.what());
     return false;
   }
 #endif
@@ -351,15 +351,15 @@ void InvokeHTTP::onTrigger(core::ProcessContext *context,
   std::shared_ptr<FlowFileRecord> flowFile = std::static_pointer_cast<
       FlowFileRecord>(session->get());
 
-  logger_.log_info("onTrigger InvokeHTTP with  {}", method_.c_str());
+  logger_.log_info("onTrigger InvokeHTTP with  %s", method_.c_str());
 
   if (flowFile == nullptr) {
     if (!emitFlowFile(method_)) {
-      logger_.log_info("InvokeHTTP -- create flow file with  {}",
+      logger_.log_info("InvokeHTTP -- create flow file with  %s",
                         method_.c_str());
       flowFile = std::static_pointer_cast<FlowFileRecord>(session->create());
     } else {
-      logger_.log_info("exiting because method is {}", method_.c_str());
+      logger_.log_info("exiting because method is %s", method_.c_str());
       return;
     }
   } else {
@@ -445,7 +445,7 @@ void InvokeHTTP::onTrigger(core::ProcessContext *context,
     bool output_body_to_content = isSuccess && !putToAttribute;
     bool body_empty = IsNullOrEmpty(content.data);
 
-    logger_.log_info("isSuccess: {}", isSuccess);
+    logger_.log_info("isSuccess: %d", isSuccess);
     std::shared_ptr<FlowFileRecord> response_flow = nullptr;
 
     if (output_body_to_content) {
@@ -474,7 +474,7 @@ void InvokeHTTP::onTrigger(core::ProcessContext *context,
     }
     route(flowFile, response_flow, session, context, isSuccess, http_code);
   } else {
-    logger_.log_error("InvokeHTTP -- curl_easy_perform() failed {}\n",
+    logger_.log_error("InvokeHTTP -- curl_easy_perform() failed %s\n",
                        curl_easy_strerror(res));
   }
   curl_slist_free_all(headers);
