@@ -27,10 +27,8 @@ namespace nifi {
 namespace minifi {
 
 #define BUFFER_SIZE 512
-  
-Properties::Properties() : logger_(logging::LoggerFactory<Properties>::getLogger()) {
 
-}
+Properties::Properties() : logger_(logging::LoggerFactory<Properties>::getLogger()) {}
 
 // Get the config value
 bool Properties::get(std::string key, std::string &value) {

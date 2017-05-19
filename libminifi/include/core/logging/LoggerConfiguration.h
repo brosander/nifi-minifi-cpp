@@ -86,7 +86,7 @@ class LoggerFactory {
   class LoggerImpl : public Logger {
     public:
      LoggerImpl():Logger(LoggerConfiguration::getConfiguration()->get_logger(core::getClassName<T>())) {
-     }
+   }
   };
 };
 

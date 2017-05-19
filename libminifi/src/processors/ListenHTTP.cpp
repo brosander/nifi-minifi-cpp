@@ -337,8 +337,8 @@ bool ListenHTTP::Handler::handlePost(CivetServer *server,
   return true;
 }
 
-ListenHTTP::WriteCallback::WriteCallback(
-    struct mg_connection *conn, const struct mg_request_info *reqInfo) : logger_(logging::LoggerFactory<ListenHTTP::WriteCallback>::getLogger()) {
+ListenHTTP::WriteCallback::WriteCallback(struct mg_connection *conn, const struct mg_request_info *reqInfo) :
+    logger_(logging::LoggerFactory<ListenHTTP::WriteCallback>::getLogger()) {
   _conn = conn;
   _reqInfo = reqInfo;
 }

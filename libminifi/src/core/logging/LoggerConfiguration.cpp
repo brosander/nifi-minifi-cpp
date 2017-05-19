@@ -17,8 +17,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "core/logging/LoggerConfiguration.h"
-#include "utils/StringUtils.h"
 
 #include <algorithm>
 #include <vector>
@@ -27,7 +25,9 @@
 #include <map>
 #include <string>
 
+#include "core/logging/LoggerConfiguration.h"
 #include "utils/StringUtils.h"
+
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_sinks.h"
 #include "spdlog/sinks/null_sink.h"
@@ -45,7 +45,8 @@ const char* LoggerProperties::logger_prefix = "logger.";
 std::vector< std::string > LoggerProperties::get_appenders() {
   std::vector<std::string> appenders;
   for (auto const & entry : properties_) {
-    if (utils::StringUtils::starts_with(entry.first, appender_prefix) && entry.first.find(".", strlen(appender_prefix) + 1) == std::string::npos) {
+    if (utils::StringUtils::starts_with(entry.first, appender_prefix) &&
+      entry.first.find(".", strlen(appender_prefix) + 1) == std::string::npos) {
       appenders.push_back(entry.first);
     }
   }
@@ -66,16 +67,16 @@ std::vector< std::string > LoggerProperties::get_loggers() {
   return loggers;
 }
 
-void LoggerProperties::add_sink ( const std::string& name, std::shared_ptr< spdlog::sinks::sink > sink ) {
+void LoggerProperties::add_sink(const std::string& name, std::shared_ptr< spdlog::sinks::sink > sink) {
   sinks_[name] = sink;
 }
 
-  
 std::shared_ptr<LoggerConfiguration> LoggerConfiguration::configuration_;
 
-LoggerConfiguration::LoggerConfiguration (const std::shared_ptr<LoggerProperties> & logger_properties) : root_namespace(std::make_shared<LoggerNamespace>()) {
+LoggerConfiguration::LoggerConfiguration(const std::shared_ptr<LoggerProperties> & logger_properties) :
+      root_namespace(std::make_shared<LoggerNamespace>()) {
   std::map<std::string, std::shared_ptr<spdlog::sinks::sink>> sink_map = logger_properties->initial_sinks();
-  
+
   for (auto const & appender_key : logger_properties->get_appenders()) {
     std::string appender_name = appender_key.substr(strlen(LoggerProperties::appender_prefix));
     std::string appender_type;
@@ -89,7 +90,7 @@ LoggerConfiguration::LoggerConfiguration (const std::shared_ptr<LoggerProperties
     } else if ("rollingappender" == appender_type || "rolling appender" == appender_type || "rolling" == appender_type) {
       std::string file_name = "";
       if (!logger_properties->get(appender_key + ".file_name", file_name)) {
-        file_name = "minifi-app";
+        file_name = "minifi-app.log";
       }
 
       int max_files = 3;
@@ -116,7 +117,7 @@ LoggerConfiguration::LoggerConfiguration (const std::shared_ptr<LoggerProperties
       sink_map[appender_name] = spdlog::sinks::stderr_sink_mt::instance();
     }
   }
-  
+
   for (auto const & logger_key : logger_properties->get_loggers()) {
     std::string logger_def;
     if (!logger_properties->get(logger_key, logger_def)) {
@@ -149,7 +150,8 @@ LoggerConfiguration::LoggerConfiguration (const std::shared_ptr<LoggerProperties
     }
     std::shared_ptr<LoggerNamespace> current_namespace = root_namespace;
     if (logger_key != "logger.root") {
-      for (auto const & name : utils::StringUtils::split(logger_key.substr(strlen(LoggerProperties::logger_prefix), logger_key.length() - strlen(LoggerProperties::logger_prefix)), "::")) {
+      for (auto const & name : utils::StringUtils::split(logger_key.substr(strlen(LoggerProperties::logger_prefix),
+          logger_key.length() - strlen(LoggerProperties::logger_prefix)), "::")) {
         auto child_pair = current_namespace->children.find(name);
         std::shared_ptr<LoggerNamespace> child;
         if (child_pair == current_namespace->children.end()) {
@@ -164,9 +166,9 @@ LoggerConfiguration::LoggerConfiguration (const std::shared_ptr<LoggerProperties
     current_namespace->level = level;
     current_namespace->sinks = sinks;
   }
-};
+}
 
-std::shared_ptr<spdlog::logger> LoggerConfiguration::get_logger (const std::string& name) {
+std::shared_ptr<spdlog::logger> LoggerConfiguration::get_logger(const std::string& name) {
   std::shared_ptr<spdlog::logger> logger = spdlog::get(name);
   if (logger) {
     return logger;

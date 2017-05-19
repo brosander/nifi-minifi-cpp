@@ -17,11 +17,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <vector>
-#include <queue>
-#include <map>
-#include <string>
 #include <uuid/uuid.h>
+
+#include <map>
+#include <queue>
+#include <string>
+#include <vector>
 
 #include "ResourceClaim.h"
 #include "core/logging/LoggerConfiguration.h"
