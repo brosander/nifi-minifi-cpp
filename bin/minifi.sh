@@ -332,7 +332,10 @@ case "$1" in
     install)
       install "$@"
       ;;
+    gdb)
+      gdb ${minifi_executable} "$@"
+      ;;
     *)
-      echo "Usage: minifi.sh {start|stop|run|restart|status|install}"
+      echo "Usage: minifi.sh {start|stop|run|restart|status|gdb|install}"
       ;;
 esac

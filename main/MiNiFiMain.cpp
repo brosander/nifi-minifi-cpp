@@ -49,7 +49,7 @@
 //! Default nifi properties file path
 #define DEFAULT_NIFI_PROPERTIES_FILE "./conf/minifi.properties"
 
-#define DEFAULT_LOG_PROPERTIES_FILE "./conf/minifi.properties"
+#define DEFAULT_LOG_PROPERTIES_FILE "./conf/minifi-log.properties"
 //! Define home environment variable
 #define MINIFI_HOME_ENV_KEY "MINIFI_HOME"
 

@@ -79,7 +79,7 @@ LoggerConfiguration::LoggerConfiguration (const std::shared_ptr<LoggerProperties
   for (auto const & appender_key : logger_properties->get_appenders()) {
     std::string appender_name = appender_key.substr(strlen(LoggerProperties::appender_prefix));
     std::string appender_type;
-    if (!logger_properties->get(appender_name + ".type", appender_type)) {
+    if (!logger_properties->get(appender_key, appender_type)) {
       appender_type = "stderr";
     }
     std::transform(appender_type.begin(), appender_type.end(), appender_type.begin(), ::tolower);
@@ -88,17 +88,17 @@ LoggerConfiguration::LoggerConfiguration (const std::shared_ptr<LoggerProperties
       sink_map[appender_name] = std::make_shared<spdlog::sinks::null_sink_st>();
     } else if ("rollingappender" == appender_type || "rolling appender" == appender_type || "rolling" == appender_type) {
       std::string file_name = "";
-      if (!logger_properties->get(appender_name + ".file_name", file_name)) {
+      if (!logger_properties->get(appender_key + ".file_name", file_name)) {
         file_name = "minifi-app";
       }
       std::string file_ext = "";
-      if (!logger_properties->get(appender_name + ".file_extension", file_ext)) {
+      if (!logger_properties->get(appender_key + ".file_extension", file_ext)) {
         file_ext = "log";
       }
 
       int max_files = 3;
       std::string max_files_str = "";
-      if (logger_properties->get(appender_name + ".max_files", max_files_str)) {
+      if (logger_properties->get(appender_key + ".max_files", max_files_str)) {
         try {
           max_files = std::stoi(max_files_str);
         } catch (const std::invalid_argument &ia) {
@@ -107,14 +107,14 @@ LoggerConfiguration::LoggerConfiguration (const std::shared_ptr<LoggerProperties
 
       int max_file_size = 5*1024*1024;
       std::string max_file_size_str = "";
-      if (logger_properties->get(appender_name + ".max_file_size", max_file_size_str)) {
+      if (logger_properties->get(appender_key + ".max_file_size", max_file_size_str)) {
         try {
           max_file_size = std::stoi(max_file_size_str);
         } catch (const std::invalid_argument &ia) {
         } catch (const std::out_of_range &oor) {}
       }
       sink_map[appender_name] = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(file_name, file_ext, max_file_size, max_files);
-    } else if ("outputstream" == appender_name || "outputstreamappender" == appender_name || "outputstream appender" == appender_name) {
+    } else if ("stdout" == appender_type) {
       sink_map[appender_name] = spdlog::sinks::stdout_sink_mt::instance();
     } else {
       sink_map[appender_name] = spdlog::sinks::stderr_sink_mt::instance();
