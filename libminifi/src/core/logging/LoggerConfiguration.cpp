@@ -39,46 +39,27 @@ namespace minifi {
 namespace core {
 namespace logging {
 
-const char* LoggerProperties::appender_prefix = "appender.";
-const char* LoggerProperties::logger_prefix = "logger.";
-
-std::vector< std::string > LoggerProperties::get_appenders() {
+std::vector< std::string > LoggerProperties::get_keys_of_type(const std::string & type) {
   std::vector<std::string> appenders;
+  std::string prefix = type + ".";
   for (auto const & entry : properties_) {
-    if (utils::StringUtils::starts_with(entry.first, appender_prefix) &&
-      entry.first.find(".", strlen(appender_prefix) + 1) == std::string::npos) {
+    if (utils::StringUtils::starts_with(entry.first, prefix) &&
+      entry.first.find(".", prefix.length() + 1) == std::string::npos) {
       appenders.push_back(entry.first);
     }
   }
   return appenders;
 }
 
-std::vector< std::string > LoggerProperties::get_loggers() {
-  std::vector<std::string> loggers;
-  for (auto const & entry : properties_) {
-    if (utils::StringUtils::starts_with(entry.first, logger_prefix)) {
-      int prefix_length = strlen(logger_prefix);
-      int pos = entry.first.find(".", prefix_length + 1);
-      if (pos == std::string::npos) {
-        loggers.push_back(entry.first);
-      }
-    }
-  }
-  return loggers;
-}
-
-void LoggerProperties::add_sink(const std::string& name, std::shared_ptr< spdlog::sinks::sink > sink) {
-  sinks_[name] = sink;
-}
-
 std::shared_ptr<LoggerConfiguration> LoggerConfiguration::configuration_;
 
-LoggerConfiguration::LoggerConfiguration(const std::shared_ptr<LoggerProperties> & logger_properties) :
-      root_namespace(std::make_shared<LoggerNamespace>()) {
+std::shared_ptr< LoggerNamespace > LoggerConfiguration::
+     initialize_namespaces(const std::shared_ptr< LoggerProperties >& logger_properties) {
   std::map<std::string, std::shared_ptr<spdlog::sinks::sink>> sink_map = logger_properties->initial_sinks();
 
-  for (auto const & appender_key : logger_properties->get_appenders()) {
-    std::string appender_name = appender_key.substr(strlen(LoggerProperties::appender_prefix));
+  std::string appender_type = "appender";
+  for (auto const & appender_key : logger_properties->get_keys_of_type(appender_type)) {
+    std::string appender_name = appender_key.substr(appender_type.length() + 1);
     std::string appender_type;
     if (!logger_properties->get(appender_key, appender_type)) {
       appender_type = "stderr";
@@ -118,7 +99,9 @@ LoggerConfiguration::LoggerConfiguration(const std::shared_ptr<LoggerProperties>
     }
   }
 
-  for (auto const & logger_key : logger_properties->get_loggers()) {
+  std::shared_ptr<LoggerNamespace> root_namespace = std::make_shared<LoggerNamespace>();
+  std::string logger_type = "logger";
+  for (auto const & logger_key : logger_properties->get_keys_of_type(logger_type)) {
     std::string logger_def;
     if (!logger_properties->get(logger_key, logger_def)) {
       continue;
@@ -150,8 +133,8 @@ LoggerConfiguration::LoggerConfiguration(const std::shared_ptr<LoggerProperties>
     }
     std::shared_ptr<LoggerNamespace> current_namespace = root_namespace;
     if (logger_key != "logger.root") {
-      for (auto const & name : utils::StringUtils::split(logger_key.substr(strlen(LoggerProperties::logger_prefix),
-          logger_key.length() - strlen(LoggerProperties::logger_prefix)), "::")) {
+      for (auto const & name : utils::StringUtils::split(logger_key.substr(logger_type.length() + 1,
+          logger_key.length() - logger_type.length()), "::")) {
         auto child_pair = current_namespace->children.find(name);
         std::shared_ptr<LoggerNamespace> child;
         if (child_pair == current_namespace->children.end()) {
@@ -166,9 +149,10 @@ LoggerConfiguration::LoggerConfiguration(const std::shared_ptr<LoggerProperties>
     current_namespace->level = level;
     current_namespace->sinks = sinks;
   }
+  return root_namespace;
 }
 
-std::shared_ptr<spdlog::logger> LoggerConfiguration::get_logger(const std::string& name) {
+std::shared_ptr<spdlog::logger> LoggerConfiguration::get_logger(const std::shared_ptr<LoggerNamespace> & root_namespace, const std::string& name) {
   std::shared_ptr<spdlog::logger> logger = spdlog::get(name);
   if (logger) {
     return logger;

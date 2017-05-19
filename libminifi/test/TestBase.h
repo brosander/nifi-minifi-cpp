@@ -58,7 +58,7 @@ class LogTestController {
   }
   
   bool contains(std::string ending) {
-    logger_->info("Looking for {} in {}.", ending, log_output.str());
+    logger_->info("Looking for %s in %s.", ending, log_output.str());
     return (ending.length() > 0 && log_output.str().find(ending) != std::string::npos);
   }
   
@@ -100,7 +100,7 @@ class LogTestController {
   ~LogTestController() {};
 
   void setLevel(const std::string name, spdlog::level::level_enum level) {
-    logger_->info("Setting log level for {} to {}", name, spdlog::level::to_str(level));
+    logger_->info("Setting log level for %s to %s", name, spdlog::level::to_str(level));
     logging::LoggerConfiguration::getConfiguration()->get_logger(name)->set_level(level);
   }
   std::vector<std::string> modified_loggers;

@@ -34,9 +34,6 @@ namespace nifi {
 namespace minifi {
 namespace core {
 namespace logging {
- 
-static const char *appender_prefix;
-static const char *logger_prefix;
 
 struct LoggerNamespace {
  spdlog::level::level_enum level;
@@ -47,9 +44,10 @@ struct LoggerNamespace {
 class LoggerProperties : public Properties {
 public:
  LoggerProperties(Logger & logger) : Properties(logger) {};
- std::vector<std::string> get_appenders();
- std::vector<std::string> get_loggers();
- void add_sink(const std::string & name, std::shared_ptr<spdlog::sinks::sink> sink);
+ std::vector<std::string> get_keys_of_type(const std::string & type);
+ void add_sink(const std::string & name, std::shared_ptr<spdlog::sinks::sink> sink) {
+   sinks_[name] = sink;
+ }
  std::map<std::string, std::shared_ptr<spdlog::sinks::sink>> initial_sinks() {
   return sinks_;
  }
@@ -68,11 +66,17 @@ class LoggerConfiguration {
   static void initialize(const std::shared_ptr<LoggerProperties> & logger_properties) {
    configuration_ = std::shared_ptr<LoggerConfiguration>(new LoggerConfiguration(logger_properties));
   }
-  std::shared_ptr<spdlog::logger> get_logger(const std::string & name);
+  std::shared_ptr<spdlog::logger> get_logger(const std::string & name) {
+    return get_logger(root_namespace_, name);
+  }
+ protected:
+  static std::shared_ptr<LoggerNamespace> initialize_namespaces(const std::shared_ptr<LoggerProperties>  & logger_properties);
+  static std::shared_ptr<spdlog::logger> get_logger(const std::shared_ptr<LoggerNamespace> & root_namespace, const std::string & name);
  private:
-  LoggerConfiguration(const std::shared_ptr<LoggerProperties>  & logger_properties);
+  LoggerConfiguration(const std::shared_ptr<LoggerProperties>  & logger_properties) :
+      root_namespace_(initialize_namespaces(logger_properties)){};
   static std::shared_ptr<LoggerConfiguration> configuration_;
-  std::shared_ptr<LoggerNamespace> root_namespace;
+  std::shared_ptr<LoggerNamespace> root_namespace_;
 };
 
 template<typename T>
