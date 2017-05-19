@@ -91,10 +91,6 @@ LoggerConfiguration::LoggerConfiguration (const std::shared_ptr<LoggerProperties
       if (!logger_properties->get(appender_key + ".file_name", file_name)) {
         file_name = "minifi-app";
       }
-      std::string file_ext = "";
-      if (!logger_properties->get(appender_key + ".file_extension", file_ext)) {
-        file_ext = "log";
-      }
 
       int max_files = 3;
       std::string max_files_str = "";
@@ -113,7 +109,7 @@ LoggerConfiguration::LoggerConfiguration (const std::shared_ptr<LoggerProperties
         } catch (const std::invalid_argument &ia) {
         } catch (const std::out_of_range &oor) {}
       }
-      sink_map[appender_name] = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(file_name, file_ext, max_file_size, max_files);
+      sink_map[appender_name] = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(file_name, max_file_size, max_files);
     } else if ("stdout" == appender_type) {
       sink_map[appender_name] = spdlog::sinks::stdout_sink_mt::instance();
     } else {
