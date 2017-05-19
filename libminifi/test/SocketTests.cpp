@@ -23,16 +23,16 @@
 
 using namespace org::apache::nifi::minifi::io;
 TEST_CASE("TestSocket", "[TestSocket1]") {
-  TestController testController;
+  LogTestController::getInstance();
   Socket socket(std::make_shared<SocketContext>(std::make_shared<minifi::Configure>()), "localhost", 8183);
   REQUIRE(-1 == socket.initialize());
   REQUIRE("localhost" == socket.getHostname());
   socket.closeStream();
-
+  LogTestController::getInstance().reset();
 }
 
 TEST_CASE("TestSocketWriteTest1", "[TestSocket2]") {
-  TestController testController;
+  LogTestController::getInstance();
   Socket socket(std::make_shared<SocketContext>(std::make_shared<minifi::Configure>()), "localhost", 8183);
   REQUIRE(-1 == socket.initialize());
 
@@ -44,11 +44,11 @@ TEST_CASE("TestSocketWriteTest1", "[TestSocket2]") {
   REQUIRE(-1 == socket.writeData(buffer, 1));
 
   socket.closeStream();
-
+  LogTestController::getInstance().reset();
 }
 
 TEST_CASE("TestSocketWriteTest2", "[TestSocket3]") {
-  TestController testController;
+  LogTestController::getInstance();
   std::vector<uint8_t> buffer;
   buffer.push_back('a');
   
@@ -74,17 +74,17 @@ TEST_CASE("TestSocketWriteTest2", "[TestSocket3]") {
   server.closeStream();
 
   client.closeStream();
-
+  LogTestController::getInstance().reset();
 }
 
 TEST_CASE("TestGetHostName", "[TestSocket4]") {
-  TestController testController;
+  LogTestController::getInstance();
   REQUIRE(Socket::getMyHostName().length() > 0);
-
+  LogTestController::getInstance().reset();
 }
 
 TEST_CASE("TestWriteEndian64", "[TestSocket4]") {
-  TestController testController;
+  LogTestController::getInstance();
   std::vector<uint8_t> buffer;
   buffer.push_back('a');
   
@@ -109,11 +109,11 @@ TEST_CASE("TestWriteEndian64", "[TestSocket4]") {
   server.closeStream();
 
   client.closeStream();
-
+  LogTestController::getInstance().reset();
 }
 
 TEST_CASE("TestWriteEndian32", "[TestSocket5]") {
-  TestController testController;
+  LogTestController::getInstance();
   std::vector<uint8_t> buffer;
   buffer.push_back('a');
 
@@ -149,11 +149,11 @@ TEST_CASE("TestWriteEndian32", "[TestSocket5]") {
   server.closeStream();
 
   client.closeStream();
-
+  LogTestController::getInstance().reset();
 }
 
 TEST_CASE("TestSocketWriteTestAfterClose", "[TestSocket6]") {
-  TestController testController;
+  LogTestController::getInstance();
   std::vector<uint8_t> buffer;
   buffer.push_back('a');
 
@@ -181,5 +181,5 @@ TEST_CASE("TestSocketWriteTestAfterClose", "[TestSocket6]") {
   REQUIRE(-1 == client.writeData(buffer, 1));
 
   server.closeStream();
-
+  LogTestController::getInstance().reset();
 }
