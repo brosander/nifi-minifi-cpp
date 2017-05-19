@@ -115,10 +115,6 @@ int main(int argc, char  **argv)
                   t.join();
                 });
 
-//     outputLogger = std::unique_ptr<logging::BaseLogger>(
-//       new org::apache::nifi::minifi::core::logging::NullAppender());
-//   logger->updateLogger(std::move(outputLogger));
-
 
   std::shared_ptr<org::apache::nifi::minifi::processors::ExecuteProcess> execp =
       std::static_pointer_cast<

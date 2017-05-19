@@ -5,6 +5,7 @@
 .idea
 
 # Ignore kdevelop metadata
+nifi-minifi-cpp.kdev4
 .kdev4
 
 # Filter out generated files from the included libuuid
