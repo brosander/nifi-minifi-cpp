@@ -335,7 +335,10 @@ case "$1" in
     gdb)
       gdb ${minifi_executable} "$@"
       ;;
+    valgrind)
+      valgrind --tool=callgrind ${minifi_executable} "$@"
+      ;;
     *)
-      echo "Usage: minifi.sh {start|stop|run|restart|status|gdb|install}"
+      echo "Usage: minifi.sh {start|stop|run|restart|status|gdb|valgrind|install}"
       ;;
 esac

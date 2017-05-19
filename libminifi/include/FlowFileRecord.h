@@ -111,7 +111,7 @@ class FlowFileRecord : public core::FlowFile, public io::Serializable {
       : FlowFile(),
         flow_repository_(flow_repository),
         snapshot_(""),
-      logger_(logging::LoggerFactory<FlowFileRecord>::getLogger())  {
+        logger_(logging::LoggerFactory<FlowFileRecord>::getLogger())  {
 
   }
   // Destructor

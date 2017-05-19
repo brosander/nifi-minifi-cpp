@@ -44,7 +44,8 @@ void waitToVerifyProcessor() {
 }
 
 int main(int argc, char **argv) {
-  LogTestController::getInstance();
+  LogTestController::getInstance().setDebug<processors::InvokeHTTP>();
+  LogTestController::getInstance().setDebug<minifi::core::ProcessSession>();
   if (argc > 1) {
     test_file_location = argv[1];
   }
@@ -54,14 +55,6 @@ int main(int argc, char **argv) {
   myfile << "Hello world" << std::endl;
   myfile.close();
   mkdir("content_repository", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-  std::ostringstream oss;
-//   std::unique_ptr<logging::BaseLogger> outputLogger = std::unique_ptr<
-//       logging::BaseLogger>(
-//       new org::apache::nifi::minifi::core::logging::OutputStreamAppender(oss,
-//                                                                          0));
-//   std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
-//   logger->updateLogger(std::move(outputLogger));
-//   logger->setLogLevel("debug");
 
   std::shared_ptr<minifi::Configure> configuration = std::make_shared<minifi::Configure>();
 
@@ -98,12 +91,12 @@ int main(int argc, char **argv) {
   waitToVerifyProcessor();
 
   controller->waitUnload(60000);
-  std::string logs = oss.str();
-  assert(logs.find("curl performed") != std::string::npos);
-  assert(logs.find("Import offset 0 length 12") != std::string::npos);
+  assert(LogTestController::getInstance().contains("curl performed") == true);
+  assert(LogTestController::getInstance().contains("Import offset 0 length 12") == true);
 
   std::string stringtofind = "Resource Claim created ./content_repository/";
 
+  std::string logs = LogTestController::getInstance().log_output.str();
   size_t loc = logs.find(stringtofind);
   while (loc > 0 && loc != std::string::npos) {
     std::string id = logs.substr(loc + stringtofind.size(), 36);
@@ -113,7 +106,8 @@ int main(int argc, char **argv) {
     if ( loc == std::string::npos)
       break;
   }
-
+  
   rmdir("./content_repository");
+  LogTestController::getInstance().reset();
   return 0;
 }

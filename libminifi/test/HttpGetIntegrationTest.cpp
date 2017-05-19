@@ -48,9 +48,6 @@ int main(int argc, char **argv) {
     test_file_location = argv[1];
   }
   mkdir("content_repository", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-//   std::shared_ptr<logging::Logger> logger = logging::Logger::getLogger();
-//   logger->updateLogger(std::move(outputLogger));
-//   logger->setLogLevel("debug");
 
   std::shared_ptr<minifi::Configure> configuration = std::make_shared<minifi::Configure>();
 

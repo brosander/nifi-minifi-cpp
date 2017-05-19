@@ -49,7 +49,7 @@
 //! Default nifi properties file path
 #define DEFAULT_NIFI_PROPERTIES_FILE "./conf/minifi.properties"
 
-#define DEFAULT_LOG_PROPERTIES_FILE "./conf/minifi-file:///home/bryan/Github/nifi-minifi-cpp/conf/minifi.propertieslog.properties"
+#define DEFAULT_LOG_PROPERTIES_FILE "./conf/minifi-log.properties"
 //! Define home environment variable
 #define MINIFI_HOME_ENV_KEY "MINIFI_HOME"
 
@@ -112,9 +112,9 @@ int main(int argc, char **argv) {
   std::string minifiHome;
   if (const char* env_p = std::getenv(MINIFI_HOME_ENV_KEY)) {
     minifiHome = env_p;
+    logger.log_info("MINIFI_HOME=%s", minifiHome);
   } else {
-    logger.log_info(
-        "MINIFI_HOME was not found, determining based on executable path.");
+    logger.log_info("MINIFI_HOME was not found, determining based on executable path.");
     char *path = NULL;
     char full_path[PATH_MAX];
     path = realpath(argv[0], full_path);
