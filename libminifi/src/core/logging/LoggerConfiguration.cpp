@@ -185,6 +185,7 @@ std::shared_ptr<spdlog::logger> LoggerConfiguration::get_logger (const std::stri
   }
   logger = std::make_shared<spdlog::logger>(name, begin(sinks), end(sinks));
   logger->set_level(current_namespace->level);
+  logger->flush_on(std::max(spdlog::level::info, current_namespace->level));
   try {
     spdlog::register_logger(logger);
   } catch (const spdlog::spdlog_ex &ex) {
