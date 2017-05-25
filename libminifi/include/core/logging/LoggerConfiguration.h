@@ -28,6 +28,7 @@
 #include "properties/Properties.h"
 
 #include "spdlog/spdlog.h"
+#include "spdlog/formatter.h"
 
 namespace org {
 namespace apache {
@@ -59,12 +60,12 @@ namespace internal {
     LoggerNamespace() : level(spdlog::level::off), has_level(false), sinks(std::vector<std::shared_ptr<spdlog::sinks::sink>>()), children(std::map<std::string, std::shared_ptr<LoggerNamespace>>()) {}
   };
 };
- 
+
 class LoggerProperties : public Properties {
  public:
   /**
    * Gets all keys that start with the given prefix and do not have a "." after the prefix and "." separator.
-   * 
+   *
    * Ex: with type argument "appender"
    * you would get back a property of "appender.rolling" but not "appender.rolling.file_name"
    */
@@ -110,7 +111,7 @@ class LoggerConfiguration {
 
   /**
    * (Re)initializes the logging configuation with the given logger properties.
-   * 
+   *
    * This should NOT be called while other threads are logging.  It is mainly intended so that the startup
    * configuration can be overridden during initialization of the application once MINIFI_HOME is determined
    * and the LoggerProperties can be loaded.
@@ -121,18 +122,20 @@ class LoggerConfiguration {
    * Used by logging framework to register logger implementations
    */
   void init_logger(std::shared_ptr<internal::LoggerImpl> logger_impl);
+  static const char *spdlog_default_pattern;
  protected:
   static std::shared_ptr<internal::LoggerNamespace> initialize_namespaces(const std::shared_ptr<LoggerProperties>  &logger_properties);
-  static std::shared_ptr<spdlog::logger> get_logger(std::shared_ptr<Logger> logger, const std::shared_ptr<internal::LoggerNamespace> &root_namespace, const std::string &name, bool remove_if_present = false);
+  static std::shared_ptr<spdlog::logger> get_logger(std::shared_ptr<Logger> logger, const std::shared_ptr<internal::LoggerNamespace> &root_namespace, const std::string &name, std::shared_ptr<spdlog::formatter> formatter, bool remove_if_present = false);
  private:
   static std::shared_ptr<internal::LoggerNamespace> create_default_root();
-  LoggerConfiguration() : root_namespace_(create_default_root()), loggers(std::vector<std::shared_ptr<internal::LoggerImpl>>()) {
+  LoggerConfiguration() : root_namespace_(create_default_root()), loggers(std::vector<std::shared_ptr<internal::LoggerImpl>>()), formatter_(std::make_shared<spdlog::pattern_formatter>(spdlog_default_pattern)) {
     logger_ = std::make_shared<internal::LoggerImpl>(core::getClassName<LoggerConfiguration>());
-    logger_->set_delegate(get_logger(nullptr, root_namespace_, logger_->name));
+    logger_->set_delegate(get_logger(nullptr, root_namespace_, logger_->name, formatter_));
     loggers.push_back(logger_);
   }
   std::shared_ptr<internal::LoggerNamespace> root_namespace_;
   std::vector<std::shared_ptr<internal::LoggerImpl>> loggers;
+  std::shared_ptr<spdlog::formatter> formatter_;
   std::mutex mutex;
   std::shared_ptr<internal::LoggerImpl> logger_ = nullptr;
 };
