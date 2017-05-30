@@ -55,7 +55,7 @@ class ProcessGroup {
   /*!
    * Create a new process group
    */
-  ProcessGroup(ProcessGroupType type, std::string name, uuid_t uuid = NULL,
+  ProcessGroup(ProcessGroupType type, std::string name, std::shared_ptr<Id> id = nullptr,
                ProcessGroup *parent = NULL);
   // Destructor
   virtual ~ProcessGroup();
@@ -100,15 +100,11 @@ class ProcessGroup {
   }
   // Set UUID
   void setUUID(uuid_t uuid) {
-    uuid_copy(uuid_, uuid);
+    id_->setUUID(uuid);
   }
   // Get UUID
   bool getUUID(uuid_t uuid) {
-    if (uuid) {
-      uuid_copy(uuid, uuid_);
-      return true;
-    } else
-      return false;
+    return id_->getUUID(uuid);
   }
   // Start Processing
   void startProcessing(TimerDrivenSchedulingAgent *timeScheduler,
@@ -169,8 +165,7 @@ class ProcessGroup {
       std::map<std::string, std::shared_ptr<Connection>> &connectionMap);
 
  protected:
-  // A global unique identifier
-  uuid_t uuid_;
+  std::shared_ptr<Id> id_;
   // Processor Group Name
   std::string name_;
   // Process Group Type

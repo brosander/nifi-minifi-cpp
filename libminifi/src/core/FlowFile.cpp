@@ -29,7 +29,6 @@ namespace core {
 
 FlowFile::FlowFile()
     : size_(0),
-      id_(0),
       stored(false),
       offset_(0),
       last_queue_date_(0),
@@ -39,24 +38,17 @@ FlowFile::FlowFile()
       marked_delete_(false),
       connection_(nullptr),
       original_connection_(),
+      id_(std::make_shared<Id>()),
       logger_(logging::LoggerFactory<FlowFile>::getLogger()) {
   entry_date_ = getTimeMillis();
   lineage_start_date_ = entry_date_;
-
-  char uuidStr[37];
-
-  // Generate the global UUID for the flow record
-  uuid_generate(uuid_);
-
-  uuid_unparse_lower(uuid_, uuidStr);
-  uuid_str_ = uuidStr;
 }
 
 FlowFile::~FlowFile() {
 }
 
 FlowFile& FlowFile::operator=(const FlowFile& other) {
-  uuid_copy(uuid_, other.uuid_);
+  id_ = other.id_;
   stored = other.stored;
   marked_delete_ = other.marked_delete_;
   entry_date_ = other.entry_date_;
@@ -69,7 +61,6 @@ FlowFile& FlowFile::operator=(const FlowFile& other) {
   claim_ = other.claim_;
   if (claim_ != nullptr)
     this->claim_->increaseFlowFileRecordOwnedCount();
-  uuid_str_ = other.uuid_str_;
   connection_ = other.connection_;
   original_connection_ = other.original_connection_;
   return *this;

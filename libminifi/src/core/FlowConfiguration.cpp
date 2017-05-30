@@ -59,28 +59,31 @@ std::shared_ptr<core::Processor> FlowConfiguration::createProvenanceReportTask()
 }
 
 std::unique_ptr<core::ProcessGroup> FlowConfiguration::createRootProcessGroup(
-    std::string name, uuid_t uuid) {
+    std::string name, std::shared_ptr<Id> id) {
   return std::unique_ptr<core::ProcessGroup>(
-      new core::ProcessGroup(core::ROOT_PROCESS_GROUP, name, uuid));
+      new core::ProcessGroup(core::ROOT_PROCESS_GROUP, name, id));
 }
 
 std::unique_ptr<core::ProcessGroup> FlowConfiguration::createRemoteProcessGroup(
-    std::string name, uuid_t uuid) {
+    std::string name, std::shared_ptr<Id> id) {
   return std::unique_ptr<core::ProcessGroup>(
-      new core::ProcessGroup(core::REMOTE_PROCESS_GROUP, name, uuid));
+      new core::ProcessGroup(core::REMOTE_PROCESS_GROUP, name, id));
 }
 
 std::shared_ptr<minifi::Connection> FlowConfiguration::createConnection(
-    std::string name, uuid_t uuid) {
-  return std::make_shared<minifi::Connection>(flow_file_repo_, name, uuid);
+    std::string name, std::shared_ptr<Id> id) {
+  return std::make_shared<minifi::Connection>(flow_file_repo_, name, id);
 }
 
 std::shared_ptr<core::controller::ControllerServiceNode> FlowConfiguration::createControllerService(
-    const std::string &class_name, const std::string &name, uuid_t uuid) {
+    const std::string &class_name, const std::string &name, std::shared_ptr<Id> id) {
   std::shared_ptr<core::controller::ControllerServiceNode> controllerServicesNode =
       service_provider_->createControllerService(class_name, name, true);
-  if (nullptr != controllerServicesNode)
+  if (nullptr != controllerServicesNode) {
+    uuid_t uuid;
+    id->getUUID(uuid);
     controllerServicesNode->setUUID(uuid);
+  }
   return controllerServicesNode;
 }
 

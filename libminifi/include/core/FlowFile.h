@@ -181,12 +181,15 @@ class FlowFile {
 
   // Get the UUID as string
   std::string getUUIDStr() {
-    return uuid_str_;
+    return id_->getUUIDStr();
   }
 
   bool getUUID(uuid_t other) {
-    uuid_copy(other, uuid_);
-    return true;
+    return id_->getUUID(other);
+  }
+  
+  std::shared_ptr<Id> getId() {
+    return id_;
   }
 
   // Check whether it is still being penalized
@@ -246,10 +249,8 @@ class FlowFile {
   uint64_t last_queue_date_;
   // Size in bytes of the data corresponding to this flow file
   uint64_t size_;
-  // A global unique identifier
-  uuid_t uuid_;
-  // A local unique identifier
-  uint64_t id_;
+  
+  std::shared_ptr<Id> id_;
   // Offset to the content
   uint64_t offset_;
   // Penalty expiration
@@ -258,8 +259,6 @@ class FlowFile {
   std::map<std::string, std::string> attributes_;
   // Pointer to the associated content resource claim
   std::shared_ptr<ResourceClaim> claim_;
-  // UUID string
-  std::string uuid_str_;
   // UUID string for all parents
   std::set<std::string> lineage_Identifiers_;
 

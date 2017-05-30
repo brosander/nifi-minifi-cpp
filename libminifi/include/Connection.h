@@ -27,6 +27,7 @@
 #include <mutex>
 #include <atomic>
 #include <algorithm>
+#include "core/Id.h"
 #include "core/Core.h"
 #include "core/Connectable.h"
 #include "core/logging/Logger.h"
@@ -44,6 +45,8 @@ namespace minifi {
 class Connection : public core::Connectable,
     public std::enable_shared_from_this<Connection> {
  public:
+  explicit Connection(std::shared_ptr<core::Repository> flow_repository,
+                      std::string name, std::shared_ptr<Id> id = nullptr, std::shared_ptr<Id> sourceId = nullptr, std::shared_ptr<Id> destId = nullptr);
   // Constructor
   /*
    * Create a new processor

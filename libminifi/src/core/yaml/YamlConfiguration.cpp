@@ -31,17 +31,14 @@ namespace core {
 
 core::ProcessGroup *YamlConfiguration::parseRootProcessGroupYaml(
     YAML::Node rootFlowNode) {
-  uuid_t uuid;
-
   checkRequiredField(&rootFlowNode, "name", CONFIG_YAML_REMOTE_PROCESS_GROUP_KEY);
   std::string flowName = rootFlowNode["name"].as<std::string>();
   std::string id = getOrGenerateId(&rootFlowNode);
-  uuid_parse(id.c_str(), uuid);
 
   logger_->log_debug("parseRootProcessGroup: id => [%s], name => [%s]", id,
                      flowName);
   std::unique_ptr<core::ProcessGroup> group =
-      FlowConfiguration::createRootProcessGroup(flowName, uuid);
+      FlowConfiguration::createRootProcessGroup(flowName, std::make_shared<Id>(id));
 
   this->name_ = flowName;
 
@@ -221,7 +218,6 @@ void YamlConfiguration::parseProcessorNodeYaml(
 
 void YamlConfiguration::parseRemoteProcessGroupYaml(
     YAML::Node *rpgNode, core::ProcessGroup * parentGroup) {
-  uuid_t uuid;
   std::string id;
 
   if (!parentGroup) {
@@ -249,8 +245,7 @@ void YamlConfiguration::parseRemoteProcessGroupYaml(
         core::TimeUnit unit;
         int64_t timeoutValue = -1;
         int64_t yieldPeriodValue = -1;
-        uuid_parse(id.c_str(), uuid);
-        group = this->createRemoteProcessGroup(name.c_str(), uuid).release();
+        group = this->createRemoteProcessGroup(name.c_str(), std::make_shared<Id>(id)).release();
         group->setParent(parentGroup);
         parentGroup->addProcessGroup(group);
 
@@ -405,10 +400,7 @@ void YamlConfiguration::parseControllerServices(
           auto id = controllerServiceNode["id"].as<std::string>();
           auto type = controllerServiceNode["class"].as<std::string>();
 
-          uuid_t uuid;
-          uuid_parse(id.c_str(), uuid);
-          auto controller_service_node = createControllerService(type, name,
-                                                                 uuid);
+          auto controller_service_node = createControllerService(type, name, std::make_shared<Id>(id));
           if (nullptr != controller_service_node) {
             logger_->log_debug(
                 "Created Controller Service with UUID %s and name %s", id,
@@ -456,12 +448,10 @@ void YamlConfiguration::parseConnectionYaml(YAML::Node *connectionsNode,
         std::shared_ptr<minifi::Connection> connection = nullptr;
 
         // Configure basic connection
-        uuid_t uuid;
         checkRequiredField(&connectionNode, "name", CONFIG_YAML_CONNECTIONS_KEY);
         std::string name = connectionNode["name"].as<std::string>();
         std::string id = getOrGenerateId(&connectionNode);
-        uuid_parse(id.c_str(), uuid);
-        connection = this->createConnection(name, uuid);
+        connection = this->createConnection(name, std::make_shared<Id>(id));
         logger_->log_debug("Created connection with UUID %s and name %s", id,
                            name);
 

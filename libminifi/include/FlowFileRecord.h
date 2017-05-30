@@ -170,9 +170,6 @@ class FlowFileRecord : public core::FlowFile, public io::Serializable {
   // Full path to the content
   std::string content_full_fath_;
 
-  // Local flow sequence ID
-  static std::atomic<uint64_t> local_flow_seq_number_;
-
   // repository reference.
   std::shared_ptr<core::Repository> flow_repository_;
 
