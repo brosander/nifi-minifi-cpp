@@ -41,6 +41,8 @@ class Connectable : public CoreComponent {
  public:
 
   explicit Connectable(std::string name, uuid_t uuid);
+  
+  explicit Connectable(std::string name, std::shared_ptr<Id> id);
 
   explicit Connectable(const Connectable &&other);
 

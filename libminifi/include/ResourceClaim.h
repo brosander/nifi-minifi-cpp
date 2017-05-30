@@ -75,8 +75,6 @@ class ResourceClaim {
  protected:
   // A global unique identifier
   uuid_t _uuid;
-  // A local unique identifier
-  uint64_t _id;
   // Full path to the content
   std::string _contentFullPath;
 
@@ -90,9 +88,6 @@ class ResourceClaim {
   // Only support pass by reference or pointer
   ResourceClaim(const ResourceClaim &parent);
   ResourceClaim &operator=(const ResourceClaim &parent);
-
-  // Local resource claim number
-  static std::atomic<uint64_t> _localResourceClaimNumber;
 };
 
 } /* namespace minifi */

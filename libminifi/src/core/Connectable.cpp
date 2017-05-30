@@ -31,9 +31,15 @@ namespace minifi {
 namespace core {
 
 Connectable::Connectable(std::string name, uuid_t uuid)
-    : CoreComponent(name, uuid),
+    : CoreComponent(name, std::make_shared<Id>(uuid)),
       max_concurrent_tasks_(1),
       logger_(logging::LoggerFactory<Connectable>::getLogger()) {
+}
+
+Connectable::Connectable(std::string name, std::shared_ptr<Id> id)
+    : CoreComponent(name, id),
+      max_concurrent_tasks_(1) {
+
 }
 
 Connectable::Connectable(const Connectable &&other)

@@ -35,6 +35,7 @@
 #include <algorithm>
 #include <uuid/uuid.h>
 
+#include "core/Id.h"
 #include "core/Property.h"
 #include "properties/Configure.h"
 #include "Site2SitePeer.h"
@@ -300,20 +301,13 @@ class Transaction {
     _dataAvailable = false;
     _transfers = 0;
     _bytes = 0;
-
-    char uuidStr[37];
-
-    // Generate the global UUID for the transaction
-    uuid_generate(_uuid);
-    uuid_unparse_lower(_uuid, uuidStr);
-    _uuidStr = uuidStr;
   }
   // Destructor
   virtual ~Transaction() {
   }
   // getUUIDStr
   std::string getUUIDStr() {
-    return _uuidStr;
+    return id_.getUUIDStr();
   }
   // getState
   TransactionState getState() {
@@ -358,10 +352,7 @@ class Transaction {
   TransferDirection _direction;
   // Whether received data is available
   bool _dataAvailable;
-  // A global unique identifier
-  uuid_t _uuid;
-  // UUID string
-  std::string _uuidStr;
+  core::Id id_;
   // Number of transfer
   int _transfers;
   // Number of content bytes

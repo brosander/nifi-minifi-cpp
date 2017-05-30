@@ -92,8 +92,7 @@ bool Processor::addConnection(std::shared_ptr<Connectable> conn) {
   connection->getDestinationUUID(destUUID);
   char uuid_str[37];
 
-  uuid_unparse_lower(uuid_, uuid_str);
-  std::string my_uuid = uuid_str;
+  std::string my_uuid = id_->getUUIDStr();
   uuid_unparse_lower(destUUID, uuid_str);
   std::string destination_uuid = uuid_str;
   if (my_uuid == destination_uuid) {
@@ -162,7 +161,7 @@ void Processor::removeConnection(std::shared_ptr<Connectable> conn) {
   connection->getSourceUUID(srcUUID);
   connection->getDestinationUUID(destUUID);
 
-  if (uuid_compare(uuid_, destUUID) == 0) {
+  if (uuid_compare(id_->getUUID(), destUUID) == 0) {
     // Connection is destination to the current processor
     if (_incomingConnections.find(connection) != _incomingConnections.end()) {
       _incomingConnections.erase(connection);
@@ -174,7 +173,7 @@ void Processor::removeConnection(std::shared_ptr<Connectable> conn) {
     }
   }
 
-  if (uuid_compare(uuid_, srcUUID) == 0) {
+  if (uuid_compare(id_->getUUID(), srcUUID) == 0) {
     std::string relationship = connection->getRelationship().getName();
     // Connection is source from the current processor
     auto &&it = out_going_connections_.find(relationship);

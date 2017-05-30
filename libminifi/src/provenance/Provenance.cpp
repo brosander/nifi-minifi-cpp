@@ -64,11 +64,11 @@ bool ProvenanceEventRecord::DeSerialize(
   if (ret) {
     logger_->log_debug(
         "NiFi Provenance retrieve event %s size %d eventType %d success",
-        _eventIdStr.c_str(), stream.getSize(), _eventType);
+        _eventId.getUUIDStr(), stream.getSize(), _eventType);
   } else {
     logger_->log_debug(
         "NiFi Provenance retrieve event %s size %d eventType %d fail",
-        _eventIdStr.c_str(), stream.getSize(), _eventType);
+        _eventId.getUUIDStr(), stream.getSize(), _eventType);
   }
 
   return ret;
@@ -81,7 +81,7 @@ bool ProvenanceEventRecord::Serialize(
 
   int ret;
 
-  ret = writeUTF(this->_eventIdStr, &outStream);
+  ret = writeUTF(this->_eventId.getUUIDStr(), &outStream);
   if (ret <= 0) {
     return false;
   }
@@ -213,13 +213,13 @@ bool ProvenanceEventRecord::Serialize(
     }
   }
   // Persistent to the DB
-  if (repo->Put(_eventIdStr, const_cast<uint8_t*>(outStream.getBuffer()),
+  if (repo->Put(_eventId.getUUIDStr(), const_cast<uint8_t*>(outStream.getBuffer()),
                 outStream.getSize())) {
     logger_->log_debug("NiFi Provenance Store event %s size %d success",
-                       _eventIdStr.c_str(), outStream.getSize());
+                       _eventId.getUUIDStr().c_str(), outStream.getSize());
   } else {
     logger_->log_error("NiFi Provenance Store event %s size %d fail",
-                       _eventIdStr.c_str(), outStream.getSize());
+                       _eventId.getUUIDStr().c_str(), outStream.getSize());
   }
   return true;
 }
@@ -230,7 +230,9 @@ bool ProvenanceEventRecord::DeSerialize(const uint8_t *buffer,
 
   org::apache::nifi::minifi::io::DataStream outStream(buffer, bufferSize);
 
-  ret = readUTF(this->_eventIdStr, &outStream);
+  std::string eventIdStr;
+  ret = readUTF(eventIdStr, &outStream);
+  _eventId.setUUID(eventIdStr);
 
   if (ret <= 0) {
     return false;

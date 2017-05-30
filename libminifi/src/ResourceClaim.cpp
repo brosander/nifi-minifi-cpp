@@ -32,21 +32,16 @@ namespace apache {
 namespace nifi {
 namespace minifi {
 
-std::atomic<uint64_t> ResourceClaim::_localResourceClaimNumber(0);
-
 char *ResourceClaim::default_directory_path = const_cast<char*>(DEFAULT_CONTENT_DIRECTORY);
 
 ResourceClaim::ResourceClaim(const std::string contentDirectory)
-    : _id(_localResourceClaimNumber.load()),
-      _flowFileRecordOwnedCount(0),
+    : _flowFileRecordOwnedCount(0),
       logger_(logging::LoggerFactory<ResourceClaim>::getLogger()) {
 
   char uuidStr[37];
 
   // Generate the global UUID for the resource claim
   uuid_generate(_uuid);
-  // Increase the local ID for the resource claim
-  ++_localResourceClaimNumber;
   uuid_unparse_lower(_uuid, uuidStr);
   // Create the full content path for the content
   _contentFullPath = contentDirectory + "/" + uuidStr;

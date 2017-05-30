@@ -30,6 +30,7 @@
 #include <thread>
 #include <vector>
 
+#include "core/Id.h"
 #include "core/Repository.h"
 #include "core/Property.h"
 #include "properties/Configure.h"
@@ -167,11 +168,6 @@ class ProvenanceEventRecord :
     _componentId = componentId;
     _componentType = componentType;
     _eventTime = getTimeMillis();
-    char eventIdStr[37];
-    // Generate the global UUID for th event
-    uuid_generate(_eventId);
-    uuid_unparse_lower(_eventId, eventIdStr);
-    _eventIdStr = eventIdStr;
   }
 
   ProvenanceEventRecord(): logger_(logging::LoggerFactory<ProvenanceEventRecord>::getLogger()) {
@@ -183,7 +179,7 @@ class ProvenanceEventRecord :
   }
   // Get the Event ID
   std::string getEventId() {
-    return _eventIdStr;
+    return _eventId.getUUIDStr();
   }
   // Get Attributes
   std::map<std::string, std::string> getAttributes() {
@@ -398,8 +394,8 @@ class ProvenanceEventRecord :
   std::string _contentFullPath;
   // Attributes key/values pairs for the flow record
   std::map<std::string, std::string> _attributes;
-  // provenance ID
-  uuid_t _eventId;
+  
+  core::Id _eventId;
   // UUID string for all parents
   std::set<std::string> _lineageIdentifiers;
   // transitUri
@@ -414,8 +410,6 @@ class ProvenanceEventRecord :
   std::string _details;
   // sourceQueueIdentifier
   std::string _sourceQueueIdentifier;
-  // event ID Str
-  std::string _eventIdStr;
   // relationship
   std::string _relationship;
   // alternateIdentifierUri;

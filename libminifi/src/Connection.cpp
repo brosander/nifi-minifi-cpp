@@ -97,7 +97,7 @@ void Connection::put(std::shared_ptr<core::FlowFile> flow) {
 
   if (!flow->isStored()) {
     // Save to the flowfile repo
-    FlowFileRecord event(flow_repository_, flow, this->uuidStr_);
+    FlowFileRecord event(flow_repository_, flow, id_->getUUIDStr());
     if (event.Serialize()) {
       flow->setStoredToRepository(true);
     }

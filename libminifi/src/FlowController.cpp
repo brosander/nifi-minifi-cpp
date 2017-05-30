@@ -79,8 +79,6 @@ FlowController::FlowController(
   if (IsNullOrEmpty(configuration_)) {
     throw std::runtime_error("Must supply a configuration.");
   }
-  uuid_generate(uuid_);
-  setUUID(uuid_);
 
   // Setup the default values
   if (flow_configuration_ != nullptr) {

@@ -23,6 +23,7 @@
 #include <string>
 #include <uuid/uuid.h>
 #include <cxxabi.h>
+#include "core/Id.h"
 /**
  * namespace aliasing
  */
@@ -90,31 +91,26 @@ typename std::enable_if<class_operations<T>::value, std::shared_ptr<T>>::type in
 class CoreComponent {
 
  public:
+  /**
+   * Constructor that sets the name and id.
+   */
+  explicit CoreComponent(const std::string name)
+      : logger_(logging::Logger::getLogger()),
+        name_(name), id_(std::make_shared<Id>()) {}
 
   /**
-   * Constructor that sets the name and uuid.
+   * Constructor that sets the name and id.
    */
   explicit CoreComponent(const std::string name, uuid_t uuid = 0)
-      : name_(name) {
-    if (!uuid)
-      // Generate the global UUID for the flow record
-      uuid_generate(uuid_);
-    else
-      uuid_copy(uuid_, uuid);
-
-    char uuidStr[37];
-    uuid_unparse_lower(uuid_, uuidStr);
-    uuidStr_ = uuidStr;
-  }
+      : name_(name), id_(id) {}
 
 
   /**
    * Move Constructor.
    */
   explicit CoreComponent(const CoreComponent &&other)
-      : name_(std::move(other.name_)) {
-    uuid_copy(uuid_, other.uuid_);
-  }
+      : name_(std::move(other.name_)),
+        id_(std::move(other.id_)) {}
 
   // Get component name Name
   std::string getName();
@@ -129,32 +125,36 @@ class CoreComponent {
    * Set UUID in this instance
    * @param uuid uuid to apply to the internal representation.
    */
-  void setUUID(uuid_t uuid);
+  void setUUID(uuid_t uuid) {
+    id_->setUUID(uuid);
+  }
 
   /**
    * Returns the UUID through the provided object.
    * @param uuid uuid struct to which we will copy the memory
    * @return success of request
    */
-  bool getUUID(uuid_t uuid);
+  bool getUUID(uuid_t uuid) {
+    return id_->getUUID(uuid);
+  }
 
-  unsigned const char *getUUID();
+  unsigned const char *getUUID() {
+    return id_->getUUID();
+  }
+
   /**
    * Return the UUID string
    * @param constant reference to the UUID str
    */
   const std::string & getUUIDStr() {
-    return uuidStr_;
+    return id_->getUUIDStr();
   }
 
   void loadComponent() {
   }
 
  protected:
-  // A global unique identifier
-  uuid_t uuid_;
-  // UUID string
-  std::string uuidStr_;
+  std::shared_ptr<Id> id_;
 
   // Connectable's name
   std::string name_;
