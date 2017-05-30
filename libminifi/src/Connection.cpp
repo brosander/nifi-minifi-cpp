@@ -40,39 +40,22 @@ namespace nifi {
 namespace minifi {
 
 Connection::Connection(std::shared_ptr<core::Repository> flow_repository,
-                       std::string name, std::shared_ptr<Id> id = nullptr, std::shared_ptr<Id> sourceId = nullptr, std::shared_ptr<Id> destId = nullptr)
+                       std::string name, std::shared_ptr<core::Id> id, std::shared_ptr<core::Id> sourceId, std::shared_ptr<core::Id> destId)
     : core::Connectable(name, id),
-      flow_repository_(flow_repository) {
-
-  if (sourceId) {
-    uuid_copy(src_uuid_, srcUUID);
-  }
-  if (destUUID)
-    uuid_copy(dest_uuid_, destUUID);
-
-  source_connectable_ = nullptr;
-  dest_connectable_ = nullptr;
-  max_queue_size_ = 0;
-  max_data_queue_size_ = 0;
-  expired_duration_ = 0;
-  queued_data_size_ = 0;
-
-  logger_ = logging::Logger::getLogger();
-
-  logger_->log_info("Connection %s created", name_.c_str());
-}
-
-Connection::Connection(std::shared_ptr<core::Repository> flow_repository,
-                       std::string name, uuid_t uuid, uuid_t srcUUID,
-                       uuid_t destUUID)
-    : core::Connectable(name, uuid),
       flow_repository_(flow_repository),
       logger_(logging::LoggerFactory<Connection>::getLogger()) {
 
-  if (srcUUID)
-    uuid_copy(src_uuid_, srcUUID);
-  if (destUUID)
-    uuid_copy(dest_uuid_, destUUID);
+  if (sourceId) {
+    sourceId_ = sourceId;
+  } else {
+    sourceId_ = std::make_shared<core::Id>();
+  }
+  
+  if (destId) {
+    destId_ = destId;
+  } else {
+    destId_ = std::make_shared<core::Id>();
+  }
 
   source_connectable_ = nullptr;
   dest_connectable_ = nullptr;

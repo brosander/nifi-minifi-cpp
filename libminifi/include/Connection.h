@@ -46,34 +46,26 @@ class Connection : public core::Connectable,
     public std::enable_shared_from_this<Connection> {
  public:
   explicit Connection(std::shared_ptr<core::Repository> flow_repository,
-                      std::string name, std::shared_ptr<Id> id = nullptr, std::shared_ptr<Id> sourceId = nullptr, std::shared_ptr<Id> destId = nullptr);
-  // Constructor
-  /*
-   * Create a new processor
-   */
-  explicit Connection(std::shared_ptr<core::Repository> flow_repository,
-                      std::string name, uuid_t uuid = NULL, uuid_t srcUUID =
-                      NULL,
-                      uuid_t destUUID = NULL);
+                      std::string name, std::shared_ptr<core::Id> id = nullptr, std::shared_ptr<core::Id> sourceId = nullptr, std::shared_ptr<core::Id> destId = nullptr);
   // Destructor
   virtual ~Connection() {
   }
 
   // Set Source Processor UUID
   void setSourceUUID(uuid_t uuid) {
-    uuid_copy(src_uuid_, uuid);
+    sourceId_->setUUID(uuid);
   }
   // Set Destination Processor UUID
   void setDestinationUUID(uuid_t uuid) {
-    uuid_copy(dest_uuid_, uuid);
+    destId_->setUUID(uuid);
   }
   // Get Source Processor UUID
-  void getSourceUUID(uuid_t uuid) {
-    uuid_copy(uuid, src_uuid_);
+  bool getSourceUUID(uuid_t uuid) {
+    return sourceId_->getUUID(uuid);
   }
   // Get Destination Processor UUID
-  void getDestinationUUID(uuid_t uuid) {
-    uuid_copy(uuid, dest_uuid_);
+  bool getDestinationUUID(uuid_t uuid) {
+    return destId_->getUUID(uuid);
   }
 
   // Set Connection Source Processor
@@ -158,10 +150,8 @@ class Connection : public core::Connectable,
   }
 
  protected:
-  // Source Processor UUID
-  uuid_t src_uuid_;
-  // Destination Processor UUID
-  uuid_t dest_uuid_;
+  std::shared_ptr<core::Id> sourceId_;
+  std::shared_ptr<core::Id> destId_;
   // Relationship for this connection
   core::Relationship relationship_;
   // Source Processor (ProcessNode/Port)
