@@ -125,14 +125,6 @@ class CoreComponent {
   void setName(const std::string name);
 
   /**
-   * Set UUID in this instance
-   * @param uuid uuid to apply to the internal representation.
-   */
-  void setUUID(uuid_t uuid) {
-    id_->setUUID(uuid);
-  }
-
-  /**
    * Returns the UUID through the provided object.
    * @param uuid uuid struct to which we will copy the memory
    * @return success of request
@@ -143,6 +135,14 @@ class CoreComponent {
 
   unsigned const char *getUUID() {
     return id_->getUUID();
+  }
+
+  std::shared_ptr<core::Id> getId() {
+    return id_;
+  }
+  
+  void setId(std::shared_ptr<core::Id> id) {
+    id_ = id;
   }
 
   /**

@@ -52,12 +52,12 @@ class Connection : public core::Connectable,
   }
 
   // Set Source Processor UUID
-  void setSourceUUID(uuid_t uuid) {
-    sourceId_->setUUID(uuid);
+  void setSourceId(std::shared_ptr<core::Id> sourceId) {
+    sourceId_ = sourceId;
   }
   // Set Destination Processor UUID
-  void setDestinationUUID(uuid_t uuid) {
-    destId_->setUUID(uuid);
+  void setDestinationId(std::shared_ptr<core::Id> destId) {
+    destId_ = destId;
   }
   // Get Source Processor UUID
   bool getSourceUUID(uuid_t uuid) {

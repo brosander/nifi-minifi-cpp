@@ -80,9 +80,7 @@ std::shared_ptr<core::controller::ControllerServiceNode> FlowConfiguration::crea
   std::shared_ptr<core::controller::ControllerServiceNode> controllerServicesNode =
       service_provider_->createControllerService(class_name, name, true);
   if (nullptr != controllerServicesNode) {
-    uuid_t uuid;
-    id->getUUID(uuid);
-    controllerServicesNode->setUUID(uuid);
+    controllerServicesNode->setId(id);
   }
   return controllerServicesNode;
 }

@@ -25,18 +25,14 @@ namespace core {
 
 ProcessorNode::ProcessorNode(const std::shared_ptr<Connectable> processor)
     : processor_(processor),
-      Connectable(processor->getName(), 0), ConfigurableComponent() {
-  uuid_t copy;
-  processor->getUUID(copy);
-  setUUID(copy);
+      Connectable(processor->getName(), 0) {
+  id_ = processor->getId();
 }
 
 ProcessorNode::ProcessorNode(const ProcessorNode &other)
     : processor_(other.processor_),
       Connectable(other.getName(), 0) {
-  uuid_t copy;
-  processor_->getUUID(copy);
-  setUUID(copy);
+  id_ = other.id_;
 }
 
 ProcessorNode::~ProcessorNode() {

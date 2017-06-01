@@ -69,9 +69,9 @@ TEST_CASE("HTTPTestsPostNoResourceClaim", "[httptest1]") {
 
   connection2->setSource(invokehttp);
 
-  connection2->setSourceUUID(invokehttp_uuid);
-  connection->setSourceUUID(processoruuid);
-  connection->setDestinationUUID(invokehttp_uuid);
+  connection2->setSourceId(invokehttp->getId());
+  connection->setSourceId(processor->getId());
+  connection->setDestinationId(invokehttp->getId());
 
   processor->addConnection(connection);
   invokehttp->addConnection(connection);
@@ -188,9 +188,9 @@ TEST_CASE("HTTPTestsWithNoResourceClaimPOST", "[httptest1]") {
   // link the connections so that we can test results at the end for this
   connection->setSource(listenhttp);
 
-  connection2->setSourceUUID(invokehttp_uuid);
-  connection->setSourceUUID(processoruuid);
-  connection->setDestinationUUID(invokehttp_uuid);
+  connection2->setSourceId(invokehttp->getId());
+  connection->setSourceId(listenhttp->getId());
+  connection->setDestinationId(invokehttp->getId());
 
   listenhttp->addConnection(connection);
   invokehttp->addConnection(connection);
@@ -319,11 +319,10 @@ TEST_CASE("HTTPTestsWithResourceClaimPOST", "[httptest1]") {
   // link the connections so that we can test results at the end for this
   connection->setSource(listenhttp);
 
-  connection->setSourceUUID(invokehttp_uuid);
-  connection->setDestinationUUID(processoruuid);
+  connection->setSourceId(invokehttp->getId());
+  connection->setDestinationId(listenhttp->getId());
 
-  connection2->setSourceUUID(processoruuid);
-  connection2->setSourceUUID(processoruuid);
+  connection2->setSourceId(listenhttp->getId());
 
   listenhttp->addConnection(connection);
   invokehttp->addConnection(connection);

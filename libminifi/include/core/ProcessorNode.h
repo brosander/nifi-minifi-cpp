@@ -145,14 +145,10 @@ class ProcessorNode : public ConfigurableComponent, public Connectable {
     Connectable::setName(name);
     processor_->setName(name);
   }
-
-  /**
-   * Set UUID in this instance
-   * @param uuid uuid to apply to the internal representation.
-   */
-  void setUUID(uuid_t uuid) {
-    Connectable::setUUID(uuid);
-    processor_->setUUID(uuid);
+  
+  void setId(std::shared_ptr<core::Id> id) {
+    Connectable::setId(id);
+    processor_->setId(id);
   }
 
 // Get Processor penalization period in MilliSecond

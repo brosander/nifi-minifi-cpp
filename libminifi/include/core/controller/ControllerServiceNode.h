@@ -45,7 +45,6 @@ class ControllerServiceNode : public CoreComponent, public ConfigurableComponent
   explicit ControllerServiceNode(std::shared_ptr<ControllerService> service,
                         const std::string &id, std::shared_ptr<Configure> configuration)
       : CoreComponent(id),
-        ConfigurableComponent(),
         controller_service_(service),
         configuration_(configuration),
         active(false) {
@@ -71,10 +70,11 @@ class ControllerServiceNode : public CoreComponent, public ConfigurableComponent
     CoreComponent::setName(name);
     controller_service_->setName(name);
   }
-
-  void setUUID(uuid_t uuid) {
-    CoreComponent::setUUID(uuid);
-    controller_service_->setUUID(uuid);
+  
+  
+  void setId(std::shared_ptr<core::Id> id) {
+    Connectable::setId(id);
+    controller_service_->setId(id);
   }
 
   /**

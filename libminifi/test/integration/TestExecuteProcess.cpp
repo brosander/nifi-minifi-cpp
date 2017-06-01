@@ -68,8 +68,8 @@ int main(int argc, char **argv) {
   connection->setSource(processor);
   connection->setDestination(processor);
 
-  connection->setSourceUUID(processoruuid);
-  connection->setDestinationUUID(processoruuid);
+  connection->setSourceId(processor->getId());
+  connection->setDestinationId(processor->getId());
 
   processor->addConnection(connection);
   assert(processor->getName() == "executeProcess");

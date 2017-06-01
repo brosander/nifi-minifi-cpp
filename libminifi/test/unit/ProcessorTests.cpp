@@ -75,8 +75,8 @@ TEST_CASE("Test Find file", "[getfileCreate2]") {
   connection->setSource(processor);
   connection->setDestination(processor);
 
-  connection->setSourceUUID(processoruuid);
-  connection->setDestinationUUID(processoruuid);
+  connection->setSourceId(processor->getId());
+  connection->setDestinationId(processor->getId());
 
   processor->addConnection(connection);
   REQUIRE(dir != NULL);
@@ -207,8 +207,8 @@ TEST_CASE("Test GetFileLikeIt'sThreaded", "[getfileCreate3]") {
   connection->setSource(processor);
   connection->setDestination(processor);
 
-  connection->setSourceUUID(processoruuid);
-  connection->setDestinationUUID(processoruuid);
+  connection->setSourceId(processor->getId());
+  connection->setDestinationId(processor->getId());
 
   processor->addConnection(connection);
   REQUIRE(dir != NULL);
@@ -306,9 +306,9 @@ TEST_CASE("LogAttributeTest", "[getfileCreate3]") {
 
   connection2->setSource(logAttribute);
 
-  connection2->setSourceUUID(logattribute_uuid);
-  connection->setSourceUUID(processoruuid);
-  connection->setDestinationUUID(logattribute_uuid);
+  connection2->setSourceId(logAttribute->getId());
+  connection->setSourceId(processor->getId());
+  connection->setDestinationId(logAttribute->getId());
 
   processor->addConnection(connection);
   logAttribute->addConnection(connection);
