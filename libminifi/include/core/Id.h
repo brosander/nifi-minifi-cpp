@@ -46,18 +46,6 @@ class Id {
   Id(uuid_t uuid);
 
   /**
-   * Set UUID in this instance
-   * @param uuid uuid to apply to the internal representation.
-   */
-  void setUUID(uuid_t uuid);
-
-  /**
-   * Set UUID in this instance
-   * @param uuid uuid to apply to the internal representation.
-   */
-  void setUUID(const std::string uuid_str);
-
-  /**
    * Returns the UUID through the provided object.
    * @param uuid uuid struct to which we will copy the memory
    * @return success of request

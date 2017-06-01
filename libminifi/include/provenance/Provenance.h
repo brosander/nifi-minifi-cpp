@@ -163,14 +163,16 @@ class ProvenanceEventRecord :
    * Create a new provenance event record
    */
   ProvenanceEventRecord(ProvenanceEventType event, std::string componentId,
-                        std::string componentType): logger_(logging::LoggerFactory<ProvenanceEventRecord>::getLogger()) {
+                        std::string componentType): logger_(logging::LoggerFactory<ProvenanceEventRecord>::getLogger()),
+                        _eventId(std::unique_ptr<core::Id>(new core::Id())) {
     _eventType = event;
     _componentId = componentId;
     _componentType = componentType;
     _eventTime = getTimeMillis();
   }
 
-  ProvenanceEventRecord(): logger_(logging::LoggerFactory<ProvenanceEventRecord>::getLogger()) {
+  ProvenanceEventRecord(): logger_(logging::LoggerFactory<ProvenanceEventRecord>::getLogger()),
+                        _eventId(std::unique_ptr<core::Id>(new core::Id())) {
     _eventTime = getTimeMillis();
   }
 
@@ -179,7 +181,7 @@ class ProvenanceEventRecord :
   }
   // Get the Event ID
   std::string getEventId() {
-    return _eventId.getUUIDStr();
+    return _eventId->getUUIDStr();
   }
   // Get Attributes
   std::map<std::string, std::string> getAttributes() {
@@ -395,7 +397,7 @@ class ProvenanceEventRecord :
   // Attributes key/values pairs for the flow record
   std::map<std::string, std::string> _attributes;
   
-  core::Id _eventId;
+  std::unique_ptr<core::Id> _eventId;
   // UUID string for all parents
   std::set<std::string> _lineageIdentifiers;
   // transitUri

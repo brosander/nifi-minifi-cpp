@@ -98,10 +98,6 @@ class ProcessGroup {
   uint64_t getYieldPeriodMsec(void) {
     return (yield_period_msec_);
   }
-  // Set UUID
-  void setUUID(uuid_t uuid) {
-    id_->setUUID(uuid);
-  }
   // Get UUID
   bool getUUID(uuid_t uuid) {
     return id_->getUUID(uuid);

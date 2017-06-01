@@ -54,26 +54,6 @@ void org::apache::nifi::minifi::core::Id::initializeIfNecessary() {
   }
 }
 
-// Set UUID
-void org::apache::nifi::minifi::core::Id::setUUID(uuid_t uuid) {
-  std::lock_guard<std::mutex> lock(mutex_);
-  uuid_copy(uuid_, uuid);
-  char uuidStr[37];
-  uuid_unparse_lower(uuid_, uuidStr);
-  uuidStr_ = uuidStr;
-  initialized_ = true;
-}
-
-void org::apache::nifi::minifi::core::Id::setUUID(const std::string uuid_str) {
-  std::lock_guard<std::mutex> lock(mutex_);
-  uuid_parse(uuid_str.c_str(), uuid_);
-  char uuidStr[37];
-  uuid_unparse_lower(uuid_, uuidStr);
-  uuidStr_ = uuidStr;
-  initialized_ = true;
-}
-
-
 // Get UUID
 bool org::apache::nifi::minifi::core::Id::getUUID(uuid_t uuid) {
   initializeIfNecessary();

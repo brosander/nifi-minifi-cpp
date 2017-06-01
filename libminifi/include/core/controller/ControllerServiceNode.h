@@ -73,7 +73,7 @@ class ControllerServiceNode : public CoreComponent, public ConfigurableComponent
   
   
   void setId(std::shared_ptr<core::Id> id) {
-    Connectable::setId(id);
+    CoreComponent::setId(id);
     controller_service_->setId(id);
   }
 

@@ -295,7 +295,7 @@ bool FlowFileRecord::DeSerialize(const uint8_t *buffer, const int bufferSize) {
   if (ret <= 0) {
     return false;
   } else {
-    id_->setUUID(uuid_str);
+    id_ = std::make_shared<core::Id>(uuid_str);
   }
 
   ret = readUTF(this->uuid_connection_, &outStream);
