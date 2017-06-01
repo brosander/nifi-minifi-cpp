@@ -21,7 +21,6 @@
 #define __RESOURCE_CLAIM_H__
 
 #include <atomic>
-#include <chrono>
 #include <map>
 #include <mutex>
 #include <queue>
@@ -29,6 +28,7 @@
 #include <string>
 #include <uuid/uuid.h>
 #include <vector>
+#include "core/Id.h"
 #include "properties/Configure.h"
 
 namespace org {
@@ -90,8 +90,8 @@ class ResourceClaim {
   // Only support pass by reference or pointer
   ResourceClaim(const ResourceClaim &parent);
   ResourceClaim &operator=(const ResourceClaim &parent);
-  static std::string content_path_prefix_;
-  static std::atomic<uint64_t> content_path_incrementor_;
+
+  static core::NonRepeatingStringGenerator non_repeating_string_generator_;
 };
 
 } /* namespace minifi */

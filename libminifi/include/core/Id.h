@@ -18,6 +18,7 @@
 #ifndef LIBMINIFI_INCLUDE_CORE_ID_H_
 #define LIBMINIFI_INCLUDE_CORE_ID_H_
 
+#include <atomic>
 #include <mutex>
 #include <string>
 #include <uuid/uuid.h>
@@ -27,6 +28,16 @@ namespace apache {
 namespace nifi {
 namespace minifi {
 namespace core {
+
+class NonRepeatingStringGenerator {
+ public:
+  std::string generate() {
+    return prefix_ + std::to_string(incrementor_++);
+  }
+ private:
+  std::atomic<uint64_t> incrementor_;
+  static std::string prefix_;
+};
 
 class Id {
  public:

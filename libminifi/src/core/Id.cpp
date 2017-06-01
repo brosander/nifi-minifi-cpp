@@ -19,6 +19,9 @@
 
 #include "core/Id.h"
 
+std::string org::apache::nifi::minifi::core::NonRepeatingStringGenerator::prefix_ =
+  std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count()) + "-";
+
 org::apache::nifi::minifi::core::Id::Id() : initialized_(false) {}
 
 org::apache::nifi::minifi::core::Id::Id(const std::string& uuid_str) : initialized_(true) {
