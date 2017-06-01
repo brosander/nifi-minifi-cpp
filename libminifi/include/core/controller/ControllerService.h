@@ -72,7 +72,7 @@ class ControllerService : public ConfigurableComponent, public Connectable {
    * Controller Service constructor.
    */
   explicit ControllerService(const std::string &name, const std::string &id)
-      : Connectable(name, std::make_shared<Id>(id))
+      : Connectable(name, std::make_shared<Id>(id)),
         configuration_(std::make_shared<Configure>()) {
     current_state_ = DISABLED;
   }

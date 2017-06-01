@@ -27,7 +27,7 @@ namespace minifi {
 namespace core {
 
 struct ProcessorConfig {
-  std::string id;
+  std::shared_ptr<core::Id> id;
   std::string name;
   std::string javaClass;
   std::string maxConcurrentTasks;

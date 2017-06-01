@@ -95,14 +95,17 @@ class CoreComponent {
    * Constructor that sets the name and id.
    */
   explicit CoreComponent(const std::string name)
-      : logger_(logging::Logger::getLogger()),
-        name_(name), id_(std::make_shared<Id>()) {}
+      : name_(name), id_(std::make_shared<Id>()) {}
 
   /**
    * Constructor that sets the name and id.
    */
-  explicit CoreComponent(const std::string name, uuid_t uuid = 0)
-      : name_(name), id_(id) {}
+  explicit CoreComponent(const std::string name, std::shared_ptr<Id> id)
+      : name_(name), id_(id) {
+	if (!id_) {
+	  id_ = std::make_shared<Id>();
+	}
+}
 
 
   /**

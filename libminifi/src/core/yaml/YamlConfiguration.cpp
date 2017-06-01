@@ -33,12 +33,10 @@ core::ProcessGroup *YamlConfiguration::parseRootProcessGroupYaml(
     YAML::Node rootFlowNode) {
   checkRequiredField(&rootFlowNode, "name", CONFIG_YAML_REMOTE_PROCESS_GROUP_KEY);
   std::string flowName = rootFlowNode["name"].as<std::string>();
-  std::string id = getOrGenerateId(&rootFlowNode);
+  std::shared_ptr<core::Id> id = getOrGenerateId(&rootFlowNode);
 
-  logger_->log_debug("parseRootProcessGroup: id => [%s], name => [%s]", id,
-                     flowName);
-  std::unique_ptr<core::ProcessGroup> group =
-      FlowConfiguration::createRootProcessGroup(flowName, std::make_shared<Id>(id));
+  logger_->log_debug("parseRootProcessGroup: id => [%s], name => [%s]", id->getUUIDStr(), flowName);
+  std::unique_ptr<core::ProcessGroup> group = FlowConfiguration::createRootProcessGroup(flowName, id);
 
   this->name_ = flowName;
 
@@ -70,9 +68,7 @@ void YamlConfiguration::parseProcessorNodeYaml(
         checkRequiredField(&procNode, "name", CONFIG_YAML_PROCESSORS_KEY);
         procCfg.name = procNode["name"].as<std::string>();
         procCfg.id = getOrGenerateId(&procNode);
-        uuid_parse(procCfg.id.c_str(), uuid);
-        logger_->log_debug("parseProcessorNode: name => [%s] id => [%s]",
-                           procCfg.name, procCfg.id);
+        logger_->log_debug("parseProcessorNode: name => [%s] id => [%s]", procCfg.name, procCfg.id->getUUIDStr());
         checkRequiredField(&procNode, "class", CONFIG_YAML_PROCESSORS_KEY);
         procCfg.javaClass = procNode["class"].as<std::string>();
         logger_->log_debug("parseProcessorNode: class => [%s]",
@@ -218,8 +214,6 @@ void YamlConfiguration::parseProcessorNodeYaml(
 
 void YamlConfiguration::parseRemoteProcessGroupYaml(
     YAML::Node *rpgNode, core::ProcessGroup * parentGroup) {
-  std::string id;
-
   if (!parentGroup) {
     logger_->log_error("parseRemoteProcessGroupYaml: no parent group exists");
     return;
@@ -233,9 +227,9 @@ void YamlConfiguration::parseRemoteProcessGroupYaml(
 
         checkRequiredField(&currRpgNode, "name", CONFIG_YAML_REMOTE_PROCESS_GROUP_KEY);
         auto name = currRpgNode["name"].as<std::string>();
-        id = getOrGenerateId(&currRpgNode);
+        std::shared_ptr<core::Id> id = getOrGenerateId(&currRpgNode);
 
-        logger_->log_debug("parseRemoteProcessGroupYaml: name => [%s], id => [%s]", name, id);
+        logger_->log_debug("parseRemoteProcessGroupYaml: name => [%s], id => [%s]", name, id->getUUIDStr());
 
         checkRequiredField(&currRpgNode, "url", CONFIG_YAML_REMOTE_PROCESS_GROUP_KEY);
         std::string url = currRpgNode["url"].as<std::string>();
@@ -245,7 +239,7 @@ void YamlConfiguration::parseRemoteProcessGroupYaml(
         core::TimeUnit unit;
         int64_t timeoutValue = -1;
         int64_t yieldPeriodValue = -1;
-        group = this->createRemoteProcessGroup(name.c_str(), std::make_shared<Id>(id)).release();
+        group = this->createRemoteProcessGroup(name.c_str(), id).release();
         group->setParent(parentGroup);
         parentGroup->addProcessGroup(group);
 
@@ -450,9 +444,9 @@ void YamlConfiguration::parseConnectionYaml(YAML::Node *connectionsNode,
         // Configure basic connection
         checkRequiredField(&connectionNode, "name", CONFIG_YAML_CONNECTIONS_KEY);
         std::string name = connectionNode["name"].as<std::string>();
-        std::string id = getOrGenerateId(&connectionNode);
-        connection = this->createConnection(name, std::make_shared<Id>(id));
-        logger_->log_debug("Created connection with UUID %s and name %s", id,
+        std::shared_ptr<core::Id> id = getOrGenerateId(&connectionNode);
+        connection = this->createConnection(name, id);
+        logger_->log_debug("Created connection with UUID %s and name %s", id->getUUIDStr(),
                            name);
 
         // Configure connection source
@@ -650,28 +644,20 @@ void YamlConfiguration::parsePropertiesNodeYaml(
   }
 }
 
-std::string YamlConfiguration::getOrGenerateId(YAML::Node *yamlNode,
-                                               const std::string &idField) {
+std::shared_ptr<core::Id>  YamlConfiguration::getOrGenerateId(YAML::Node *yamlNode, const std::string &idField) {
   std::string id;
   YAML::Node node = yamlNode->as<YAML::Node>();
 
   if (node[idField]) {
     if (YAML::NodeType::Scalar == node[idField].Type()) {
-      id = node[idField].as<std::string>();
+      return std::make_shared<core::Id>(node[idField].as<std::string>());
     } else {
       throw std::invalid_argument(
           "getOrGenerateId: idField is expected to reference YAML::Node "
           "of YAML::NodeType::Scalar.");
     }
-  } else {
-    uuid_t uuid;
-    uuid_generate(uuid);
-    char uuid_str[37];
-    uuid_unparse(uuid, uuid_str);
-    id = uuid_str;
-    logger_->log_debug("Generating random ID: id => [%s]", id);
   }
-  return id;
+  return std::make_shared<core::Id>();
 }
 
 void YamlConfiguration::checkRequiredField(YAML::Node *yamlNode,

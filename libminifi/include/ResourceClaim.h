@@ -20,13 +20,15 @@
 #ifndef __RESOURCE_CLAIM_H__
 #define __RESOURCE_CLAIM_H__
 
+#include <atomic>
+#include <chrono>
+#include <map>
+#include <mutex>
+#include <queue>
+#include <stdint.h>
 #include <string>
 #include <uuid/uuid.h>
 #include <vector>
-#include <queue>
-#include <map>
-#include <mutex>
-#include <atomic>
 #include "properties/Configure.h"
 
 namespace org {
@@ -88,6 +90,8 @@ class ResourceClaim {
   // Only support pass by reference or pointer
   ResourceClaim(const ResourceClaim &parent);
   ResourceClaim &operator=(const ResourceClaim &parent);
+  static std::string content_path_prefix_;
+  static std::atomic<uint64_t> content_path_incrementor_;
 };
 
 } /* namespace minifi */

@@ -26,6 +26,7 @@ bin
 target
 thirdparty/**/*.o
 thirdparty/**/*.a
+thirdparty/apache-rat
 libminifi/test/**/*.a
 docs/generated
 

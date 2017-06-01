@@ -21,6 +21,7 @@
 
 #include <map>
 #include <queue>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -32,21 +33,16 @@ namespace apache {
 namespace nifi {
 namespace minifi {
 
+std::string ResourceClaim::content_path_prefix_ = std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count()) + "-";
+std::atomic<uint64_t> ResourceClaim::content_path_incrementor_(0);
+
 char *ResourceClaim::default_directory_path = const_cast<char*>(DEFAULT_CONTENT_DIRECTORY);
 
 ResourceClaim::ResourceClaim(const std::string contentDirectory)
     : _flowFileRecordOwnedCount(0),
       logger_(logging::LoggerFactory<ResourceClaim>::getLogger()) {
-
-  char uuidStr[37];
-
-  // Generate the global UUID for the resource claim
-  uuid_generate(_uuid);
-  uuid_unparse_lower(_uuid, uuidStr);
-  // Create the full content path for the content
-  _contentFullPath = contentDirectory + "/" + uuidStr;
-
-  logger_->log_debug("Resource Claim created %s", _contentFullPath.c_str());
+  _contentFullPath = contentDirectory + "/" + content_path_prefix_ + std::to_string(content_path_incrementor_++);
+  logger_->log_debug("Resource Claim created %s", _contentFullPath);
 }
 
 } /* namespace minifi */

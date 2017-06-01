@@ -18,6 +18,7 @@
 #ifndef LIBMINIFI_INCLUDE_CORE_YAMLCONFIGURATION_H_
 #define LIBMINIFI_INCLUDE_CORE_YAMLCONFIGURATION_H_
 
+#include "core/Id.h"
 #include "core/ProcessorConfig.h"
 #include "yaml-cpp/yaml.h"
 #include "processors/LoadProcessors.h"
@@ -250,8 +251,7 @@ class YamlConfiguration : public FlowConfiguration {
    *                   is optional and defaults to 'id'
    * @return         the parsed or generated UUID string
    */
-  std::string getOrGenerateId(YAML::Node *yamlNode, const std::string &idField =
-                                  "id");
+  std::shared_ptr<core::Id> getOrGenerateId(YAML::Node *yamlNode, const std::string &idField = "id");
 
   /**
    * This is a helper function for verifying the existence of a required

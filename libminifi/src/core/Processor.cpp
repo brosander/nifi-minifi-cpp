@@ -45,7 +45,7 @@ namespace minifi {
 namespace core {
 
 Processor::Processor(std::string name, uuid_t uuid)
-    : Connectable(name, uuid), ConfigurableComponent(),
+    : Connectable(name, uuid),
     logger_(logging::LoggerFactory<Processor>::getLogger()) {
   has_work_.store(false);
   // Setup the default values
@@ -62,7 +62,7 @@ Processor::Processor(std::string name, uuid_t uuid)
   yield_expiration_ = 0;
   incoming_connections_Iter = this->_incomingConnections.begin();
   logger_->log_info("Processor %s created UUID %s", name_.c_str(),
-                    uuidStr_.c_str());
+                    id_->getUUIDStr());
 }
 
 bool Processor::isRunning() {
