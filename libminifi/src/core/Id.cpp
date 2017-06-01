@@ -54,17 +54,6 @@ void org::apache::nifi::minifi::core::Id::initializeIfNecessary() {
   }
 }
 
-// Get UUID
-bool org::apache::nifi::minifi::core::Id::getUUID(uuid_t uuid) {
-  initializeIfNecessary();
-  if (uuid) {
-    uuid_copy(uuid, uuid_);
-    return true;
-  } else {
-    return false;
-  }
-}
-
 const std::string& org::apache::nifi::minifi::core::Id::getUUIDStr() {
   initializeIfNecessary();
   return uuidStr_;

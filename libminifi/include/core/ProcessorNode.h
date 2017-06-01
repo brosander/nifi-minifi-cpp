@@ -180,15 +180,6 @@ class ProcessorNode : public ConfigurableComponent, public Connectable {
     return processor_->hasIncomingConnections();
   }
 
-  /**
-   * Returns the UUID through the provided object.
-   * @param uuid uuid struct to which we will copy the memory
-   * @return success of request
-   */
-  bool getUUID(uuid_t uuid) {
-    return processor_->getUUID(uuid);
-  }
-
   unsigned const char *getUUID() {
     return processor_->getUUID();
   }

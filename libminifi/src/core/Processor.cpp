@@ -85,17 +85,8 @@ bool Processor::addConnection(std::shared_ptr<Connectable> conn) {
       conn);
   std::lock_guard<std::mutex> lock(mutex_);
 
-  uuid_t srcUUID;
-  uuid_t destUUID;
-
-  connection->getSourceUUID(srcUUID);
-  connection->getDestinationUUID(destUUID);
-  char uuid_str[37];
-
   std::string my_uuid = id_->getUUIDStr();
-  uuid_unparse_lower(destUUID, uuid_str);
-  std::string destination_uuid = uuid_str;
-  if (my_uuid == destination_uuid) {
+  if (my_uuid == connection->getDestination()->getUUIDStr()) {
     // Connection is destination to the current processor
     if (_incomingConnections.find(connection) == _incomingConnections.end()) {
       _incomingConnections.insert(connection);
@@ -107,9 +98,8 @@ bool Processor::addConnection(std::shared_ptr<Connectable> conn) {
       ret = true;
     }
   }
-  uuid_unparse_lower(srcUUID, uuid_str);
-  std::string source_uuid = uuid_str;
-  if (my_uuid == source_uuid) {
+  
+  if (my_uuid == connection->getSource()->getUUIDStr()) {
     std::string relationship = connection->getRelationship().getName();
     // Connection is source from the current processor
     auto &&it = out_going_connections_.find(relationship);
@@ -152,16 +142,10 @@ void Processor::removeConnection(std::shared_ptr<Connectable> conn) {
 
   std::lock_guard<std::mutex> lock(mutex_);
 
-  uuid_t srcUUID;
-  uuid_t destUUID;
-
   std::shared_ptr<Connection> connection = std::static_pointer_cast<Connection>(
       conn);
 
-  connection->getSourceUUID(srcUUID);
-  connection->getDestinationUUID(destUUID);
-
-  if (uuid_compare(id_->getUUID(), destUUID) == 0) {
+  if (uuid_compare(id_->getUUID(), connection->getDestination()->getUUID()) == 0) {
     // Connection is destination to the current processor
     if (_incomingConnections.find(connection) != _incomingConnections.end()) {
       _incomingConnections.erase(connection);
@@ -173,7 +157,7 @@ void Processor::removeConnection(std::shared_ptr<Connectable> conn) {
     }
   }
 
-  if (uuid_compare(id_->getUUID(), srcUUID) == 0) {
+  if (uuid_compare(id_->getUUID(), connection->getSource()->getUUID()) == 0) {
     std::string relationship = connection->getRelationship().getName();
     // Connection is source from the current processor
     auto &&it = out_going_connections_.find(relationship);

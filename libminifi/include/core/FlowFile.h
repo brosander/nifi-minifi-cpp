@@ -183,10 +183,6 @@ class FlowFile {
   std::string getUUIDStr() {
     return id_->getUUIDStr();
   }
-
-  bool getUUID(uuid_t other) {
-    return id_->getUUID(other);
-  }
   
   std::shared_ptr<Id> getId() {
     return id_;

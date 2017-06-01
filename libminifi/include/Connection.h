@@ -59,14 +59,6 @@ class Connection : public core::Connectable,
   void setDestinationId(std::shared_ptr<core::Id> destId) {
     destId_ = destId;
   }
-  // Get Source Processor UUID
-  bool getSourceUUID(uuid_t uuid) {
-    return sourceId_->getUUID(uuid);
-  }
-  // Get Destination Processor UUID
-  bool getDestinationUUID(uuid_t uuid) {
-    return destId_->getUUID(uuid);
-  }
 
   // Set Connection Source Processor
   void setSource(std::shared_ptr<core::Connectable> source) {

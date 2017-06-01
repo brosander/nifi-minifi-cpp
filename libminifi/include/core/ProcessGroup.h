@@ -98,10 +98,6 @@ class ProcessGroup {
   uint64_t getYieldPeriodMsec(void) {
     return (yield_period_msec_);
   }
-  // Get UUID
-  bool getUUID(uuid_t uuid) {
-    return id_->getUUID(uuid);
-  }
   // Start Processing
   void startProcessing(TimerDrivenSchedulingAgent *timeScheduler,
                        EventDrivenSchedulingAgent *eventScheduler);
@@ -131,7 +127,7 @@ class ProcessGroup {
   // ! Add connections
   void addConnection(std::shared_ptr<Connection> connection);
   // findProcessor based on UUID
-  std::shared_ptr<Processor> findProcessor(uuid_t uuid);
+  std::shared_ptr<Processor> findProcessor(const std::shared_ptr<core::Id> &id);
   // findProcessor based on name
   std::shared_ptr<Processor> findProcessor(const std::string &processorName);
   /**

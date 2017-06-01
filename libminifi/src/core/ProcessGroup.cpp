@@ -176,11 +176,11 @@ void ProcessGroup::stopProcessing(TimerDrivenSchedulingAgent *timeScheduler,
   }
 }
 
-std::shared_ptr<Processor> ProcessGroup::findProcessor(uuid_t uuid) {
+std::shared_ptr<Processor> ProcessGroup::findProcessor(const std::shared_ptr<core::Id> &id) {
   std::lock_guard<std::recursive_mutex> lock(mutex_);
   std::shared_ptr<Processor> ret = NULL;
   for (auto processor : processors_) {
-    logger_->log_info("find processor %s", processor->getName().c_str());
+    logger_->log_info("find processor %s", processor->getName());
     uuid_t processorUUID;
 
     if (processor->getUUID(processorUUID)) {
@@ -195,8 +195,7 @@ std::shared_ptr<Processor> ProcessGroup::findProcessor(uuid_t uuid) {
     }
   }
   for (auto processGroup : child_process_groups_) {
-    logger_->log_info("find processor child %s",
-                      processGroup->getName().c_str());
+    logger_->log_info("find processor child %s", processGroup->getName());
     std::shared_ptr<Processor> processor = processGroup->findProcessor(uuid);
     if (processor)
       return processor;
