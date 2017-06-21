@@ -30,6 +30,7 @@
 #include "properties/Configure.h"
 #include "properties/Properties.h"
 #include "core/logging/LoggerConfiguration.h"
+#include "utils/Id.h"
 #include "spdlog/sinks/ostream_sink.h"
 #include "spdlog/sinks/dist_sink.h"
 
@@ -144,6 +145,7 @@ class TestController {
       : log(LogTestController::getInstance()) {
     minifi::ResourceClaim::default_directory_path = const_cast<char*>("./");
     log.reset();
+    utils::IdGenerator::getIdGenerator()->initialize(std::make_shared<minifi::Properties>());
   }
 
   ~TestController() {

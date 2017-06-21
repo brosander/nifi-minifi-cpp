@@ -52,7 +52,7 @@ uint64_t IdGenerator::getDeviceSegmentFromString(const std::string& str, int num
     }
     deviceSegment = deviceSegment << 4;
   }
-  deviceSegment <<= 64 - (4 * str.length());
+  deviceSegment <<= 64 - (4 * (str.length() + 1));
   deviceSegment >>= 64 - numBits;
   logger_->log_debug("Using user defined device segment: %" PRIx64, deviceSegment);
   deviceSegment <<= 64 - numBits;
@@ -103,6 +103,7 @@ void IdGenerator::initialize(const std::shared_ptr<Properties> & properties) {
       unsigned char prefix_element = (prefix >> ((7 - i) * 8)) & char_mask;
       deterministic_prefix_[i] = prefix_element;
     }
+    incrementor_ = 0;
   } else {
     logger_->log_debug("Using uuid-based uid implementation");
   }
