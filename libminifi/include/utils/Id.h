@@ -25,6 +25,12 @@
 #include "core/logging/Logger.h"
 #include "core/Property.h"
 
+#define UNSIGNED_CHAR_MAX 255
+#define UUID_TIME_IMPL 0
+#define UUID_RANDOM_IMPL 1
+#define UUID_DEFAULT_IMPL 2
+#define MINIFI_UID_IMPL 3
+
 namespace org {
 namespace apache {
 namespace nifi {
@@ -46,10 +52,9 @@ class IdGenerator {
   uint64_t getRandomDeviceSegment(int numBits);
  private:
   std::shared_ptr<logging::Logger> logger_;
-  bool deterministic_;
+  int implementation_;
   unsigned char deterministic_prefix_[8];
   std::atomic<uint64_t> incrementor_;
-  static uint64_t char_mask;
 };
 
 class NonRepeatingStringGenerator {

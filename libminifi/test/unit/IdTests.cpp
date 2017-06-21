@@ -23,12 +23,80 @@
 #include "../TestBase.h"
 #include "utils/Id.h"
 
+TEST_CASE("Test default is time", "[id]") {
+  TestController test_controller;
+  
+  LogTestController::getInstance().setDebug<utils::IdGenerator>();
+  std::shared_ptr<utils::IdGenerator> generator = utils::IdGenerator::getIdGenerator();
+  generator->initialize(std::make_shared<minifi::Properties>());
+  
+  REQUIRE(true == LogTestController::getInstance().contains("Using uuid_generate_time implementation for uids."));
+  LogTestController::getInstance().reset();
+}
+
+TEST_CASE("Test time", "[id]") {
+  TestController test_controller;
+  
+  LogTestController::getInstance().setDebug<utils::IdGenerator>();
+  std::shared_ptr<minifi::Properties> id_props = std::make_shared<minifi::Properties>();
+  id_props->set("uid.implementation", "TiMe");
+  
+  std::shared_ptr<utils::IdGenerator> generator = utils::IdGenerator::getIdGenerator();
+  generator->initialize(id_props);
+  
+  REQUIRE(true == LogTestController::getInstance().contains("Using uuid_generate_time implementation for uids."));
+  LogTestController::getInstance().reset();
+}
+
+TEST_CASE("Test random", "[id]") {
+  TestController test_controller;
+  
+  LogTestController::getInstance().setDebug<utils::IdGenerator>();
+  std::shared_ptr<minifi::Properties> id_props = std::make_shared<minifi::Properties>();
+  id_props->set("uid.implementation", "RaNDoM");
+  
+  std::shared_ptr<utils::IdGenerator> generator = utils::IdGenerator::getIdGenerator();
+  generator->initialize(id_props);
+  
+  REQUIRE(true == LogTestController::getInstance().contains("Using uuid_generate_random for uids."));
+  LogTestController::getInstance().reset();
+}
+
+TEST_CASE("Test uuid_default", "[id]") {
+  TestController test_controller;
+  
+  LogTestController::getInstance().setDebug<utils::IdGenerator>();
+  std::shared_ptr<minifi::Properties> id_props = std::make_shared<minifi::Properties>();
+  id_props->set("uid.implementation", "UUID_default");
+  
+  std::shared_ptr<utils::IdGenerator> generator = utils::IdGenerator::getIdGenerator();
+  generator->initialize(id_props);
+  
+  REQUIRE(true == LogTestController::getInstance().contains("Using uuid_generate for uids."));
+  LogTestController::getInstance().reset();
+}
+
+TEST_CASE("Test invalid", "[id]") {
+  TestController test_controller;
+  
+  LogTestController::getInstance().setDebug<utils::IdGenerator>();
+  std::shared_ptr<minifi::Properties> id_props = std::make_shared<minifi::Properties>();
+  id_props->set("uid.implementation", "InVaLiD");
+  
+  std::shared_ptr<utils::IdGenerator> generator = utils::IdGenerator::getIdGenerator();
+  generator->initialize(id_props);
+  
+  REQUIRE(true == LogTestController::getInstance().contains("Invalid value for uid.implementation (invalid). Using uuid_generate_time implementation for uids."));
+  LogTestController::getInstance().reset();
+}
+
 TEST_CASE("Test Hex Device Segment 16 bits correct digits", "[id]") {
   TestController test_controller;
   
   LogTestController::getInstance().setDebug<utils::IdGenerator>();
   std::shared_ptr<minifi::Properties> id_props = std::make_shared<minifi::Properties>();
-  id_props->set("uid.deterministic.device.segment", "09aF");
+  id_props->set("uid.implementation", "minifi_uid");
+  id_props->set("uid.minifi.device.segment", "09aF");
   
   std::shared_ptr<utils::IdGenerator> generator = utils::IdGenerator::getIdGenerator();
   generator->initialize(id_props);
@@ -53,7 +121,8 @@ TEST_CASE("Test Hex Device Segment 16 bits too many digits", "[id]") {
   
   LogTestController::getInstance().setDebug<utils::IdGenerator>();
   std::shared_ptr<minifi::Properties> id_props = std::make_shared<minifi::Properties>();
-  id_props->set("uid.deterministic.device.segment", "09aFee");
+  id_props->set("uid.implementation", "minifi_uid");
+  id_props->set("uid.minifi.device.segment", "09aFee");
   
   std::shared_ptr<utils::IdGenerator> generator = utils::IdGenerator::getIdGenerator();
   generator->initialize(id_props);
@@ -80,8 +149,9 @@ TEST_CASE("Test Hex Device Segment 18 bits", "[id]") {
   
   LogTestController::getInstance().setDebug<utils::IdGenerator>();
   std::shared_ptr<minifi::Properties> id_props = std::make_shared<minifi::Properties>();
-  id_props->set("uid.deterministic.device.segment.bits", "18");
-  id_props->set("uid.deterministic.device.segment", "09aF8");
+  id_props->set("uid.implementation", "minifi_uid");
+  id_props->set("uid.minifi.device.segment.bits", "18");
+  id_props->set("uid.minifi.device.segment", "09aF8");
   
   std::shared_ptr<utils::IdGenerator> generator = utils::IdGenerator::getIdGenerator();
   generator->initialize(id_props);
@@ -99,6 +169,6 @@ TEST_CASE("Test Hex Device Segment 18 bits", "[id]") {
   REQUIRE(128 == (uid[2] & 192));
   REQUIRE(1 == uid[15]);
   
-  REQUIRE(true == LogTestController::getInstance().contains("Using deterministic prefix:  9afbb238"));
+  REQUIRE(true == LogTestController::getInstance().contains("Using minifi uid prefix:  9af8"));
   LogTestController::getInstance().reset();
 }

@@ -85,7 +85,7 @@ class LogTestController {
 
   bool contains(const std::ostringstream &stream, const std::string &ending) {
     std::string str = stream.str();
-    logger_->log_info("Looking for %s in %s.", ending, str);
+    logger_->log_info("Looking for %s in log output.", ending);
     return (ending.length() > 0 && str.find(ending) != std::string::npos);
   }
 
