@@ -36,6 +36,8 @@ namespace apache {
 namespace nifi {
 namespace minifi {
 
+std::shared_ptr<utils::IdGenerator> Transaction::id_generator_ = utils::IdGenerator::getIdGenerator();
+
 bool Site2SiteClientProtocol::establish() {
   if (_peerState != IDLE) {
     logger_->log_error("Site2Site peer state is not idle while try to establish");
